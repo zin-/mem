@@ -71,31 +71,112 @@ class ActStatusLabels extends StatelessWidget {
   final Act? _act;
   final Target? _target;
   final DayActAmount? _amount;
+  final Widget? _leading;
+  final Widget? _time;
+  final bool _centerTime;
 
-  const ActStatusLabels(this._act, this._target, this._amount, {super.key});
-
-  static bool shows(Act? act, Target? target, DayActAmount? amount) =>
-      StateElapsedTime.shows(act) ||
-      (DayTargetLabel.shows(target) && amount != null);
+  const ActStatusLabels(
+    this._act,
+    this._target,
+    this._amount, {
+    Widget? leading,
+    Widget? time,
+    bool centerTime = true,
+    super.key,
+  })  : _leading = leading,
+        _time = time,
+        _centerTime = centerTime;
 
   @override
   Widget build(BuildContext context) => v(
-        () => Wrap(
-          spacing: defaultComponentPadding,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            // 状態時間は LiveElapsedTimeText があった右端に残す
-            if (DayTargetLabel.shows(_target) && _amount != null)
-              DayTargetLabel(_target!, _amount, _act),
-            if (StateElapsedTime.shows(_act)) StateElapsedTime(_act),
-          ],
-        ),
+        () {
+          final time = _timeLabel();
+          final count = _countLabel();
+          final leading = _leading;
+          if (time == null && count == null) {
+            return leading ?? const SizedBox.shrink();
+          }
+          // 件数目標は右端。Mem 一覧の時間は中央、Act 一覧の時間は左
+          if (time == null) {
+            return Row(
+              children: [
+                Expanded(child: leading ?? const SizedBox.shrink()),
+                count!,
+              ],
+            );
+          }
+          if (!_centerTime) {
+            return Row(
+              children: [
+                if (leading != null) leading,
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: time,
+                  ),
+                ),
+                if (count != null) count,
+              ],
+            );
+          }
+          return Row(
+            children: [
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: leading ?? const SizedBox.shrink(),
+                ),
+              ),
+              time,
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: count ?? const SizedBox.shrink(),
+                ),
+              ),
+            ],
+          );
+        },
         {
           '_act': _act,
           '_target': _target,
           '_amount': _amount,
         },
       );
+
+  Widget? _timeLabel() {
+    final target = _target;
+    final amount = _amount;
+    final children = <Widget>[
+      if (_time != null) _time,
+      if (target != null &&
+          amount != null &&
+          DayTargetLabel.shows(target) &&
+          target.targetUnit == TargetUnit.time)
+        DayTargetLabel(target, amount, _act),
+      if (StateElapsedTime.shows(_act)) StateElapsedTime(_act),
+    ];
+    if (children.isEmpty) {
+      return null;
+    }
+    return Wrap(
+      spacing: defaultComponentPadding,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: children,
+    );
+  }
+
+  Widget? _countLabel() {
+    final target = _target;
+    final amount = _amount;
+    if (target == null ||
+        amount == null ||
+        !DayTargetLabel.shows(target) ||
+        target.targetUnit != TargetUnit.count) {
+      return null;
+    }
+    return DayTargetLabel(target, amount, _act);
+  }
 }
 
 class _TimeTargetLabel extends StatefulWidget {

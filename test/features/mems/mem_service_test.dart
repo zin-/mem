@@ -25,6 +25,7 @@ void main() {
   late MemService memService;
 
   setUp(() {
+    MemService.resetSingleton();
     mockMemRepository = MockMemRepository();
     mockTargetRepository = MockTargetRepository();
 
@@ -109,6 +110,66 @@ void main() {
         expect(saved.target?.value, 10);
         expect(saved.target?.targetUnit, TargetUnit.count);
         expect(saved.target?.period, Period.aDay);
+      });
+
+      test('receive keeps secondsAfterLastAct', () async {
+        const testMemId = 1;
+        const seconds = 7200;
+        final savedMemEntity = savedMem(
+          id: testMemId,
+          name: 'Test Mem',
+          createdAt: DateTime.now(),
+        );
+        when(mockMemRepository.receive(
+          any,
+          items: anyNamed('items'),
+        )).thenAnswer((_) async => savedMemEntity);
+        when(mockMemRepository.wasteRepeatedNotifications(
+          memId: anyNamed('memId'),
+          type: anyNamed('type'),
+        )).thenAnswer((_) async => []);
+        when(mockMemRepository.wasteRelations(
+          sourceMemId: anyNamed('sourceMemId'),
+        )).thenAnswer((_) async => []);
+        when(mockTargetRepository.waste(memId: anyNamed('memId')))
+            .thenAnswer((_) async => []);
+        when(mockTargetRepository.receive(any)).thenAnswer(
+          (_) async => TargetEntity(
+            testMemId,
+            TargetType.equalTo,
+            TargetUnit.count,
+            2,
+            Period.aDay,
+            1,
+            DateTime.now(),
+            null,
+            null,
+            secondsAfterLastAct: seconds,
+          ),
+        );
+
+        await memService.save((
+          MemViewData.newMem(),
+          <MemItemEntityV1>[],
+          <MemNotificationEntityV1>[],
+          TargetEntityV1(
+            Target(
+              memId: null,
+              targetType: TargetType.equalTo,
+              targetUnit: TargetUnit.count,
+              value: 2,
+              period: Period.aDay,
+              secondsAfterLastAct: seconds,
+            ),
+          ),
+          <MemRelationEntityV1>[],
+        ));
+
+        final received = verify(mockTargetRepository.receive(captureAny))
+            .captured
+            .single as Target;
+        expect(received.memId, testMemId);
+        expect(received.secondsAfterLastAct, seconds);
       });
 
       test('should not call _targetRepository.receive when target is null',

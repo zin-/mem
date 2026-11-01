@@ -27,17 +27,29 @@ class TargetState extends _$TargetState {
     TargetUnit? Function()? targetUnit,
     int? Function()? value,
     Period? Function()? period,
+    int? Function()? secondsAfterLastAct,
   }) {
     state = AsyncData(
-      state.requireValue.updatedWith(
-        (v) => Target(
+      state.requireValue.updatedWith((v) {
+        final next = Target(
           memId: v.memId,
           targetType: targetType?.call() ?? v.targetType,
           targetUnit: targetUnit?.call() ?? v.targetUnit,
           value: value?.call() ?? v.value,
           period: period?.call() ?? v.period,
-        ),
-      ),
+          secondsAfterLastAct: secondsAfterLastAct != null
+              ? secondsAfterLastAct()
+              : v.secondsAfterLastAct,
+        );
+        if (next.acceptsSecondsAfterLastAct) return next;
+        return Target(
+          memId: next.memId,
+          targetType: next.targetType,
+          targetUnit: next.targetUnit,
+          value: next.value,
+          period: next.period,
+        );
+      }),
     );
   }
 

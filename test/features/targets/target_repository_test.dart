@@ -35,12 +35,18 @@ void main() {
     return row.id;
   }
 
-  Target buildTarget(int? memId, {TargetType type = TargetType.equalTo}) => Target(
+  Target buildTarget(
+    int? memId, {
+    TargetType type = TargetType.equalTo,
+    int? secondsAfterLastAct,
+  }) =>
+      Target(
         memId: memId,
         targetType: type,
         targetUnit: TargetUnit.count,
         value: 10,
         period: Period.aDay,
+        secondsAfterLastAct: secondsAfterLastAct,
       );
 
   test('receive and ship by memId/memIds', () async {
@@ -85,6 +91,7 @@ void main() {
     expect(replaced.targetType, TargetType.lessThan);
     expect(replaced.targetUnit, TargetUnit.time);
     expect(replaced.period, Period.aWeek);
+    expect(replaced.secondsAfterLastAct, isNull);
 
     final deletedByMem = await repository.waste(memId: memId);
     expect(deletedByMem, hasLength(1));
@@ -92,5 +99,33 @@ void main() {
     await repository.receive(buildTarget(memId));
     final deletedAll = await repository.waste();
     expect(deletedAll, hasLength(1));
+  });
+
+  test('receive and ship keep secondsAfterLastAct', () async {
+    final memId = await createMem('m');
+    final created = await repository.receive(
+      buildTarget(memId, secondsAfterLastAct: 3 * 60 * 60),
+    );
+
+    expect(created.secondsAfterLastAct, 3 * 60 * 60);
+    expect((await repository.shipByMemId(memId)).single.secondsAfterLastAct,
+        3 * 60 * 60);
+
+    final cleared = await repository.replace(
+      TargetEntity(
+        created.memId,
+        created.targetType,
+        created.targetUnit,
+        created.value,
+        created.period,
+        created.id,
+        created.createdAt,
+        created.updatedAt,
+        created.archivedAt,
+      ),
+    );
+    expect(cleared.secondsAfterLastAct, isNull);
+    expect((await repository.shipByMemId(memId)).single.secondsAfterLastAct,
+        isNull);
   });
 }

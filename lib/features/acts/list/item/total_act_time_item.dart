@@ -4,7 +4,6 @@ import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period_view.dart';
 import 'package:mem/features/acts/act.dart';
-import 'package:mem/features/acts/act_count_label.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_status_labels.dart';
 import 'package:mem/features/acts/day_act_amount.dart';
@@ -18,7 +17,6 @@ import 'package:mem/features/mems/transitions.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:mem/features/targets/target.dart';
-import 'package:mem/values/dimens.dart';
 
 class TotalActTimeListItem extends ConsumerWidget {
   final List<SavedActEntityV1> _actList;
@@ -99,35 +97,19 @@ class TotalActTimeListItem extends ConsumerWidget {
       (sum, act) => sum + (act.value.period?.duration ?? Duration.zero),
     );
     final target = _target;
+    final progress = _progress(amount, recorded, target);
     final range = _actListRange(_actList.map((act) => act.value));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                if (_isDateView &&
-                    ActStatusLabels.shows(statusAct, target, amount))
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      right: defaultComponentPadding,
-                    ),
-                    child: ActStatusLabels(statusAct, target, amount),
-                  ),
-                Text(recorded.formatHHmm()),
-                if (!_isDateView) ..._timeTargetSuffix(),
-              ],
-            ),
-            ActCountLabel(
-              _actList.length,
-              _isDateView ? null : _targetAmount(TargetUnit.count),
-            ),
-          ],
+        ActStatusLabels(
+          statusAct,
+          target,
+          progress,
+          time: _groupDuration(recorded, progress, target),
+          centerTime: false,
         ),
         if (range != null)
           DateAndTimePeriodTexts(
@@ -138,23 +120,34 @@ class TotalActTimeListItem extends ConsumerWidget {
     );
   }
 
-  int? _targetAmount(TargetUnit unit) {
-    final target = _target;
-    if (target == null || target.targetUnit != unit) {
+  // 日表示の進捗は Mem 一覧と同じ今日の集計。月表示だけ、その月の Act から作る
+  DayActAmount? _progress(
+    DayActAmount? dayAmount,
+    Duration recorded,
+    Target? target,
+  ) {
+    if (_isDateView) {
+      return dayAmount;
+    }
+    if (!DayTargetLabel.shows(target)) {
       return null;
     }
-    return target.value;
+    return DayActAmount(_actList.length, recorded);
   }
 
-  List<Widget> _timeTargetSuffix() {
-    final amount = _targetAmount(TargetUnit.time);
-    if (amount == null) {
-      return const [];
+  // 時間目標が同じ合計を出す月表示では、合計時間を重ねて出さない
+  Widget? _groupDuration(
+    Duration recorded,
+    DayActAmount? progress,
+    Target? target,
+  ) {
+    if (!_isDateView &&
+        progress != null &&
+        target != null &&
+        target.targetUnit == TargetUnit.time) {
+      return null;
     }
-    return [
-      const Text(" / "),
-      Text(Duration(seconds: amount).formatHHmm()),
-    ];
+    return Text(recorded.formatHHmm());
   }
 
   ({Widget? leading, Widget? trailing}) _actions(

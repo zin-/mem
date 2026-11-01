@@ -1,0 +1,31 @@
+---
+description: タスク開始時に main を pull してから切るローカルブランチの命名と手順
+alwaysApply: true
+---
+
+# タスク開始時のブランチ
+
+Issue に着手するときは、実装の前に最新の `main` からローカルブランチを切る。`main` 上では実装しない。
+
+## 前提
+
+- 作業ツリーはクリーン。未コミットの変更があるときはブランチを切らず、状態を報告する
+- `main` に切り替えて `git pull` し、`origin/main` の最新にしてから切る。fast-forward でないときは切らず、状態を報告する
+- 作成はローカルのみ。`git push` はしない
+
+## 名前
+
+`{種別}/{issue番号}-{内容}`
+
+- 種別は変更の性質: `feat` / `fix` / `refactor` / `ci`
+- 内容は短い kebab-case
+
+```bash
+git checkout main
+git pull
+git checkout -b feat/683-hours-after-last-act
+```
+
+## Relations(関連)
+
+- `safety-guardrails`（push などの外部書き込みはしない）

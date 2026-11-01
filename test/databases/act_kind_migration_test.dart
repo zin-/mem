@@ -41,7 +41,7 @@ void main() {
       await db.close();
     });
 
-    test('onUpgrade from 1 to 2 adds act_kind and backfills', () async {
+    test('onUpgrade from 1 adds act_kind and backfills', () async {
       final db = AppDatabase.memory();
       await Migrator(db).createAll();
       final now = DateTime(2024, 6, 2, 12);
@@ -59,7 +59,10 @@ void main() {
           );
 
       await db.customStatement('ALTER TABLE acts DROP COLUMN act_kind');
-      await db.migration.onUpgrade(Migrator(db), 1, 2);
+      await db.customStatement(
+        'ALTER TABLE targets DROP COLUMN seconds_after_last_act',
+      );
+      await db.migration.onUpgrade(Migrator(db), 1, 3);
 
       final row = await db.select(db.acts).getSingle();
       expect(row.actKind, ActKind.finished.name);

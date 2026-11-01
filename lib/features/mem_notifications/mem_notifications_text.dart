@@ -127,17 +127,24 @@ Widget renderRepeatMemNotification(
   DateTime startOfToday,
 ) =>
     v(
-      () => Text(
-        repeat.timeOfDay!.format(context),
-        style: TextStyle(
-          color: DateTime.now().isAfter(startOfToday) ? warningColor : null,
-        ),
-      ),
+      () => renderClockTime(context, repeat.timeOfDay!, startOfToday),
       {
         'context': context,
         'repeatMemNotification': repeat,
         'startOfToday': startOfToday,
       },
+    );
+
+Widget renderClockTime(
+  BuildContext context,
+  TimeOfDay time,
+  DateTime at,
+) =>
+    Text(
+      time.format(context),
+      style: TextStyle(
+        color: DateTime.now().isAfter(at) ? warningColor : null,
+      ),
     );
 
 Widget renderRepeatByNDayMemNotification(

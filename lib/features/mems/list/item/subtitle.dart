@@ -7,6 +7,7 @@ import 'package:mem/features/mem_notifications/mem_notifications_text.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
+import 'package:mem/features/targets/next_at_after_last_act.dart';
 
 class MemListItemSubtitle extends ConsumerWidget {
   final int _memId;
@@ -15,15 +16,26 @@ class MemListItemSubtitle extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () => _MemListItemSubtitle(
-          _memId,
-          ref.watch(memByMemIdProvider(_memId))?.period,
-          ref.watch(
-            memNotificationsByMemIdProvider(_memId).select(
-              (v) => v.whereType<SavedMemNotificationEntityV1>(),
+        () {
+          final mem = ref.watch(memByMemIdProvider(_memId));
+          final target = mem?.target;
+          return _MemListItemSubtitle(
+            _memId,
+            mem?.period,
+            ref.watch(
+              memNotificationsByMemIdProvider(_memId).select(
+                (v) => v.whereType<SavedMemNotificationEntityV1>(),
+              ),
             ),
-          ),
-        ),
+            target == null
+                ? null
+                : NextAtAfterLastAct.of(
+                    target: target,
+                    latestAct: mem?.latestAct,
+                    scheduleAnchorAct: mem?.scheduleAnchorAct,
+                  )?.at,
+          );
+        },
         {
           '_memId': _memId,
         },
@@ -34,28 +46,40 @@ class _MemListItemSubtitle extends StatelessWidget {
   final int _memId;
   final DateAndTimePeriod? _memPeriod;
   final Iterable<SavedMemNotificationEntityV1> _savedMemNotificationEntities;
+  final DateTime? _nextAt;
 
   const _MemListItemSubtitle(
     this._memId,
     this._memPeriod,
     this._savedMemNotificationEntities,
+    this._nextAt,
   );
 
   @override
   Widget build(BuildContext context) => v(
-        () => Wrap(
-          children: [
-            if (_memPeriod != null) MemPeriodTexts(_memId),
-            if (_savedMemNotificationEntities
-                .where((e) => e.value.isEnabled())
-                .isNotEmpty)
-              MemNotificationText(_memId),
-          ],
-        ),
+        () {
+          final nextAt = _nextAt;
+          return Wrap(
+            children: [
+              if (_memPeriod != null) MemPeriodTexts(_memId),
+              if (_savedMemNotificationEntities
+                  .where((e) => e.value.isEnabled())
+                  .isNotEmpty)
+                MemNotificationText(_memId),
+              if (nextAt != null)
+                renderClockTime(
+                  context,
+                  TimeOfDay.fromDateTime(nextAt),
+                  nextAt,
+                ),
+            ],
+          );
+        },
         {
           '_memId': _memId,
           '_memPeriod': _memPeriod,
           '_savedMemNotificationEntities': _savedMemNotificationEntities,
+          '_nextAt': _nextAt,
         },
       );
 }
