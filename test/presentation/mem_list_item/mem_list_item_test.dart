@@ -1206,9 +1206,25 @@ void main() {
         expect(find.byType(LiveElapsedTimeText), findsOneWidget);
         expect(find.text('2'), findsOneWidget);
         expect(find.text('3'), findsOneWidget);
+        final row = tester.getRect(
+          find
+              .ancestor(
+                of: find.byType(LiveElapsedTimeText),
+                matching: find.byType(Row),
+              )
+              .first,
+        );
         expect(
-          tester.getTopLeft(find.text('2')).dx,
-          lessThan(tester.getTopLeft(find.byType(LiveElapsedTimeText)).dx),
+          tester.getCenter(find.byType(LiveElapsedTimeText)).dx,
+          closeTo(row.center.dx, 1),
+        );
+        expect(
+          tester.getTopRight(find.text('3')).dx,
+          closeTo(row.right, 1),
+        );
+        expect(
+          tester.getTopLeft(find.byType(LiveElapsedTimeText)).dx,
+          lessThan(tester.getTopLeft(find.text('2')).dx),
         );
       });
     });
