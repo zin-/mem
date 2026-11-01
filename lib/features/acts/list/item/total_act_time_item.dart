@@ -109,6 +109,7 @@ class TotalActTimeListItem extends ConsumerWidget {
           target,
           progress,
           time: _groupDuration(recorded, progress, target),
+          centerTime: false,
         ),
         if (range != null)
           DateAndTimePeriodTexts(
@@ -134,7 +135,7 @@ class TotalActTimeListItem extends ConsumerWidget {
     return DayActAmount(_actList.length, recorded);
   }
 
-  // 時間目標が同じ合計を中央に出す月表示では、合計時間を重ねて出さない
+  // 時間目標が同じ合計を出す月表示では、合計時間を重ねて出さない
   Widget? _groupDuration(
     Duration recorded,
     DayActAmount? progress,

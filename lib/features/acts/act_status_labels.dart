@@ -73,6 +73,7 @@ class ActStatusLabels extends StatelessWidget {
   final DayActAmount? _amount;
   final Widget? _leading;
   final Widget? _time;
+  final bool _centerTime;
 
   const ActStatusLabels(
     this._act,
@@ -80,25 +81,41 @@ class ActStatusLabels extends StatelessWidget {
     this._amount, {
     Widget? leading,
     Widget? time,
+    bool centerTime = true,
     super.key,
   })  : _leading = leading,
-        _time = time;
+        _time = time,
+        _centerTime = centerTime;
 
   @override
   Widget build(BuildContext context) => v(
         () {
-          final time = _centerTime();
+          final time = _timeLabel();
           final count = _countLabel();
           final leading = _leading;
           if (time == null && count == null) {
             return leading ?? const SizedBox.shrink();
           }
-          // 時間は行の中央、件数目標は右端。Mem 一覧と Act 一覧で同じ並びにするため
+          // 件数目標は右端。Mem 一覧の時間は中央、Act 一覧の時間は左
           if (time == null) {
             return Row(
               children: [
                 Expanded(child: leading ?? const SizedBox.shrink()),
                 count!,
+              ],
+            );
+          }
+          if (!_centerTime) {
+            return Row(
+              children: [
+                if (leading != null) leading,
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: time,
+                  ),
+                ),
+                if (count != null) count,
               ],
             );
           }
@@ -127,11 +144,11 @@ class ActStatusLabels extends StatelessWidget {
         },
       );
 
-  Widget? _centerTime() {
+  Widget? _timeLabel() {
     final target = _target;
     final amount = _amount;
     final children = <Widget>[
-      if (_time != null) _time!,
+      if (_time != null) _time,
       if (target != null &&
           amount != null &&
           DayTargetLabel.shows(target) &&

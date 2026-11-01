@@ -609,9 +609,18 @@ void main() {
       expect(find.text('1'), findsNothing);
       expect(find.text('1:00'), findsOneWidget);
       expect(find.byType(LiveElapsedTimeText), findsNothing);
+      final row = tester.getRect(
+        find
+            .ancestor(
+              of: find.text('1:00'),
+              matching: find.byType(Row),
+            )
+            .first,
+      );
+      expect(tester.getTopLeft(find.text('1:00')).dx, closeTo(row.left, 1));
       expect(
-        tester.getTopLeft(find.text('1:00')).dx,
-        lessThan(tester.getTopLeft(find.text('2')).dx),
+        tester.getTopRight(find.text('5')).dx,
+        closeTo(row.right, 1),
       );
     });
 
