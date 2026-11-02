@@ -4,7 +4,6 @@ import 'package:mem/features/mems/mem_client.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mems/mem_service.dart';
-import 'package:mem/features/mems/mem_store.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/shared/entities_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -25,7 +24,9 @@ class MemEntities extends _$MemEntities
 
   Future<void> loadMemList() => v(
         () async {
-          final mems = await MemStore().serve();
+          final mems = await MemRepository().ship(
+            loadLatestAct: true,
+          );
 
           upsert(mems);
 

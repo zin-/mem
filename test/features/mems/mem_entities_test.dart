@@ -10,7 +10,6 @@ import 'package:mem/features/mems/mem_client.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mems/mem_service.dart';
-import 'package:mem/features/mems/mem_store.dart';
 import 'package:mem/features/mems/mem_view_data.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/mems/states.dart';
@@ -31,7 +30,6 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     MemClient.resetSingleton();
     MemService.resetSingleton();
-    MemStore.resetSingleton();
     Singleton.reset<MemRepository>();
     Singleton.reset<MemNotificationRepository>();
     Singleton.reset<MemRelationRepository>();
@@ -46,7 +44,6 @@ void main() {
     container.dispose();
     MemClient.resetSingleton();
     MemService.resetSingleton();
-    MemStore.resetSingleton();
     await DriftRepository.close();
     Singleton.reset<MemRepository>();
     Singleton.reset<MemNotificationRepository>();

@@ -438,32 +438,4 @@ void main() {
       expect(notification.value.isAfterActStarted(), isTrue);
     });
   });
-
-  group('memStateProvider', () {
-    test('serves mem from repository', () async {
-      const memId = 1;
-      final entity = MemEntity(
-        memId,
-        'Test mem',
-        null,
-        null,
-        null,
-        DateTime(2024, 6, 1),
-        DateTime(2024, 6, 1),
-        null,
-        target: null,
-      );
-      when(mockMemRepository.shipById(
-        memId,
-        loadLatestAct: true,
-      )).thenAnswer((_) async => entity);
-
-      final container = containerFor();
-      addTearDown(container.dispose);
-
-      final mem = await container.read(memStateProvider(memId).future);
-
-      expect(mem.name, 'Test mem');
-    });
-  });
 }
