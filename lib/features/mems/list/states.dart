@@ -14,24 +14,25 @@ import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
 
 final showNotArchivedProvider =
-    StateNotifierProvider<ValueStateNotifier<bool>, bool>(
+    StateNotifierProvider.autoDispose<ValueStateNotifier<bool>, bool>(
   (ref) => v(
     () => ValueStateNotifier(true),
   ),
 );
 final showArchivedProvider =
-    StateNotifierProvider<ValueStateNotifier<bool>, bool>(
+    StateNotifierProvider.autoDispose<ValueStateNotifier<bool>, bool>(
   (ref) => v(
     () => ValueStateNotifier(false),
   ),
 );
 final showNotDoneProvider =
-    StateNotifierProvider<ValueStateNotifier<bool>, bool>(
+    StateNotifierProvider.autoDispose<ValueStateNotifier<bool>, bool>(
   (ref) => v(
     () => ValueStateNotifier(true),
   ),
 );
-final showDoneProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
+final showDoneProvider =
+    StateNotifierProvider.autoDispose<ValueStateNotifier<bool>, bool>(
   (ref) => v(
     () => ValueStateNotifier(false),
   ),

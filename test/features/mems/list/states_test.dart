@@ -175,6 +175,55 @@ void main() {
     });
   });
 
+  group('archive and done filters', () {
+    test('return to defaults when the list is left', () async {
+      final active = savedMem(
+        id: 1,
+        name: 'active',
+        createdAt: DateTime(2024, 6, 1),
+        updatedAt: DateTime(2024, 6, 1),
+      );
+      final archived = savedMem(
+        id: 2,
+        name: 'archived',
+        createdAt: DateTime(2024, 6, 1),
+        updatedAt: DateTime(2024, 6, 1),
+        archivedAt: DateTime(2024, 6, 2),
+      );
+      final done = savedMem(
+        id: 3,
+        name: 'done',
+        createdAt: DateTime(2024, 6, 1),
+        updatedAt: DateTime(2024, 6, 1),
+        doneAt: DateTime(2024, 6, 3),
+      );
+      final container = memListTestContainer([active, archived, done]);
+      addTearDown(container.dispose);
+
+      final subscription = container.listen(memListProvider, (_, __) {});
+      container.read(showArchivedProvider.notifier).updatedBy(true);
+      container.read(showNotArchivedProvider.notifier).updatedBy(false);
+
+      expect(sortedMemIds(container), [archived.id]);
+
+      container.read(showNotArchivedProvider.notifier).updatedBy(true);
+      container.read(showArchivedProvider.notifier).updatedBy(false);
+      container.read(showNotDoneProvider.notifier).updatedBy(false);
+      container.read(showDoneProvider.notifier).updatedBy(true);
+
+      expect(sortedMemIds(container), [done.id]);
+
+      subscription.close();
+      await container.pump();
+
+      expect(container.read(showNotArchivedProvider), isTrue);
+      expect(container.read(showArchivedProvider), isFalse);
+      expect(container.read(showNotDoneProvider), isTrue);
+      expect(container.read(showDoneProvider), isFalse);
+      expect(sortedMemIds(container), [active.id]);
+    });
+  });
+
   group('memListProvider', () {
     test('sorts PausedAct mems by pausedAt descending', () {
       final olderPaused = savedMem(
