@@ -5,6 +5,7 @@ import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/mem.dart';
+import 'package:mem/features/mems/states.dart';
 
 Key keyMemName = const Key("mem-name");
 
@@ -78,11 +79,15 @@ class MemNameText extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () => _MemNameText(
-          ref.watch(memStateProvider(_memId)).value?.name ?? '',
-          _memNameTag(_memId),
-          ref.watch(memStateProvider(_memId)).value?.isDone ?? false,
-        ),
+        () {
+          final mem = ref.watch(memByMemIdProvider(_memId))?.toDomain();
+
+          return _MemNameText(
+            mem?.name ?? '',
+            _memNameTag(_memId),
+            mem?.isDone ?? false,
+          );
+        },
         {
           '_memId': _memId,
         },

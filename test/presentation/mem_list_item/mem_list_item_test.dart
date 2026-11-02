@@ -29,17 +29,6 @@ import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/values/colors.dart';
 
-class _FakeMemState extends MemState {
-  final Mem _mem;
-
-  _FakeMemState(this._mem);
-
-  @override
-  Future<Mem> build(int? memId) async {
-    return _mem;
-  }
-}
-
 class _FakeMemEntities extends MemEntities {
   final Iterable<MemEntity> _state;
   int doneMemCallCount = 0;
@@ -146,7 +135,6 @@ void main() {
           overrides: [
             memNotificationsByMemIdProvider(memId).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
-            memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(
                 () => _FakeMemEntities([savedMemFromDomain(baseMem)])),
@@ -186,7 +174,6 @@ void main() {
           overrides: [
             memNotificationsByMemIdProvider(memId).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
-            memStateProvider(memId).overrideWith(() => _FakeMemState(mem)),
             memEntitiesProvider.overrideWith(
                 () => _FakeMemEntities([savedMemFromDomain(mem)])),
           ],
@@ -217,7 +204,6 @@ void main() {
           overrides: [
             memNotificationsByMemIdProvider(memId).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
-            memStateProvider(memId).overrideWith(() => _FakeMemState(mem)),
             memEntitiesProvider.overrideWith(
                 () => _FakeMemEntities([savedMemFromDomain(mem)])),
           ],
@@ -261,8 +247,6 @@ void main() {
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                 ListValueStateNotifier<MemNotificationEntityV1>(
                     [notification])),
-            memStateProvider(memId)
-                .overrideWith(() => _FakeMemState(pausedMem)),
             memEntitiesProvider.overrideWith(
                 () => _FakeMemEntities([savedMemFromDomain(pausedMem)])),
             actEntitiesProvider.overrideWith(() => _FakeActEntities()),
@@ -299,7 +283,6 @@ void main() {
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                 ListValueStateNotifier<MemNotificationEntityV1>(
                     [notification])),
-            memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(
                 () => _FakeMemEntities([savedMemFromDomain(baseMem)])),
@@ -325,7 +308,6 @@ void main() {
           overrides: [
             memNotificationsByMemIdProvider(memId).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
-            memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(
                 () => _FakeMemEntities([savedMemFromDomain(baseMem)])),
@@ -351,7 +333,6 @@ void main() {
           overrides: [
             memNotificationsByMemIdProvider(memId).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
-            memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(
                 () => _FakeMemEntities([savedMemFromDomain(baseMem)])),
@@ -378,7 +359,6 @@ void main() {
           overrides: [
             memNotificationsByMemIdProvider(memId).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
-            memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(
                 () => _FakeMemEntities([savedMemFromDomain(baseMem)])),
@@ -416,7 +396,6 @@ void main() {
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                 ListValueStateNotifier<MemNotificationEntityV1>(
                     [notification])),
-            memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(
                 () => _FakeMemEntities([savedMemFromDomain(baseMem)])),
@@ -453,7 +432,6 @@ void main() {
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                 ListValueStateNotifier<MemNotificationEntityV1>(
                     [notification])),
-            memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(
                 () => _FakeMemEntities([savedMemFromDomain(baseMem)])),
@@ -489,7 +467,6 @@ void main() {
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                 ListValueStateNotifier<MemNotificationEntityV1>(
                     [notification])),
-            memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(
                 () => _FakeMemEntities([savedMemFromDomain(baseMem)])),
@@ -514,7 +491,6 @@ void main() {
           overrides: [
             memNotificationsByMemIdProvider(memId).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
-            memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(
                 () => _FakeMemEntities([savedMemFromDomain(baseMem)])),
@@ -557,7 +533,6 @@ void main() {
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                 ListValueStateNotifier<MemNotificationEntityV1>(
                     [notification])),
-            memStateProvider(memId).overrideWith(() => _FakeMemState(mem)),
             memEntitiesProvider.overrideWith(
                 () => _FakeMemEntities([savedMemFromDomain(mem)])),
           ],
@@ -604,7 +579,6 @@ void main() {
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                 ListValueStateNotifier<MemNotificationEntityV1>(
                     [notification])),
-            memStateProvider(memId).overrideWith(() => _FakeMemState(mem)),
             memEntitiesProvider.overrideWith(
                 () => _FakeMemEntities([savedMemFromDomain(mem)])),
           ],
@@ -653,8 +627,6 @@ void main() {
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                 ListValueStateNotifier<MemNotificationEntityV1>(
                     [notification])),
-            memStateProvider(memId)
-                .overrideWith(() => _FakeMemState(memWithPeriod)),
             memEntitiesProvider.overrideWith(
                 () => _FakeMemEntities([savedMemFromDomain(memWithPeriod)])),
           ],
@@ -703,8 +675,6 @@ void main() {
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                 ListValueStateNotifier<MemNotificationEntityV1>(
                     [notification])),
-            memStateProvider(memId)
-                .overrideWith(() => _FakeMemState(memWithPeriod)),
             memEntitiesProvider.overrideWith(
                 () => _FakeMemEntities([savedMemFromDomain(memWithPeriod)])),
           ],
@@ -736,8 +706,6 @@ void main() {
             overrides: [
               memNotificationsByMemIdProvider(memId).overrideWith(
                   (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
-              memStateProvider(memId)
-                  .overrideWith(() => _FakeMemState(baseMem)),
               memEntitiesProvider.overrideWith(() => fakeMemEntities),
             ],
             child: MaterialApp(
@@ -766,8 +734,6 @@ void main() {
             overrides: [
               memNotificationsByMemIdProvider(memId).overrideWith(
                   (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
-              memStateProvider(memId)
-                  .overrideWith(() => _FakeMemState(doneMem)),
               memEntitiesProvider.overrideWith(() => fakeMemEntities),
             ],
             child: MaterialApp(
@@ -806,8 +772,6 @@ void main() {
               memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                   ListValueStateNotifier<MemNotificationEntityV1>(
                       [notification])),
-              memStateProvider(memId)
-                  .overrideWith(() => _FakeMemState(baseMem)),
               memEntitiesProvider.overrideWith(
                   () => _FakeMemEntities([savedMemFromDomain(baseMem)])),
               actEntitiesProvider.overrideWith(() => fakeActEntities),
@@ -850,7 +814,6 @@ void main() {
               memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                   ListValueStateNotifier<MemNotificationEntityV1>(
                       [notification])),
-              memStateProvider(memId).overrideWith(() => _FakeMemState(mem)),
               memEntitiesProvider.overrideWith(
                   () => _FakeMemEntities([savedMemFromDomain(mem)])),
               actEntitiesProvider.overrideWith(() => fakeActEntities),
@@ -896,7 +859,6 @@ void main() {
               memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                   ListValueStateNotifier<MemNotificationEntityV1>(
                       [notification])),
-              memStateProvider(memId).overrideWith(() => _FakeMemState(mem)),
               memEntitiesProvider.overrideWith(
                   () => _FakeMemEntities([savedMemFromDomain(mem)])),
               actEntitiesProvider.overrideWith(() => fakeActEntities),
@@ -937,8 +899,6 @@ void main() {
               memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                   ListValueStateNotifier<MemNotificationEntityV1>(
                       [notification])),
-              memStateProvider(memId)
-                  .overrideWith(() => _FakeMemState(baseMem)),
               memEntitiesProvider.overrideWith(
                   () => _FakeMemEntities([savedMemFromDomain(baseMem)])),
               actEntitiesProvider.overrideWith(() => fakeActEntities),
@@ -988,7 +948,6 @@ void main() {
               memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                   ListValueStateNotifier<MemNotificationEntityV1>(
                       [notification])),
-              memStateProvider(memId).overrideWith(() => _FakeMemState(mem)),
               memEntitiesProvider.overrideWith(
                   () => _FakeMemEntities([savedMemFromDomain(mem)])),
               actEntitiesProvider.overrideWith(() => fakeActEntities),
@@ -1034,7 +993,6 @@ void main() {
               memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                   ListValueStateNotifier<MemNotificationEntityV1>(
                       [notification])),
-              memStateProvider(memId).overrideWith(() => _FakeMemState(mem)),
               memEntitiesProvider.overrideWith(
                   () => _FakeMemEntities([savedMemFromDomain(mem)])),
               actEntitiesProvider.overrideWith(() => fakeActEntities),
@@ -1077,7 +1035,6 @@ void main() {
               memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                   ListValueStateNotifier<MemNotificationEntityV1>(
                       [notification])),
-              memStateProvider(memId).overrideWith(() => _FakeMemState(mem)),
               memEntitiesProvider.overrideWith(
                   () => _FakeMemEntities([savedMemFromDomain(mem)])),
               actEntitiesProvider.overrideWith(() => fakeActEntities),
@@ -1104,8 +1061,6 @@ void main() {
             overrides: [
               memNotificationsByMemIdProvider(memId).overrideWith(
                   (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
-              memStateProvider(memId)
-                  .overrideWith(() => _FakeMemState(baseMem)),
               memEntitiesProvider.overrideWith(
                   () => _FakeMemEntities([savedMemFromDomain(baseMem)])),
             ],
@@ -1130,8 +1085,6 @@ void main() {
             overrides: [
               memNotificationsByMemIdProvider(memId).overrideWith(
                   (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
-              memStateProvider(memId)
-                  .overrideWith(() => _FakeMemState(baseMem)),
               memEntitiesProvider.overrideWith(
                 () => _FakeMemEntities([
                   savedMemFromDomain(baseMem).updatedWith(
@@ -1180,7 +1133,6 @@ void main() {
             overrides: [
               memNotificationsByMemIdProvider(memId).overrideWith(
                   (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
-              memStateProvider(memId).overrideWith(() => _FakeMemState(mem)),
               memEntitiesProvider.overrideWith(
                 () => _FakeMemEntities([
                   savedMemFromDomain(mem).updatedWith(
@@ -1262,7 +1214,6 @@ void main() {
             overrides: [
               memNotificationsByMemIdProvider(memId).overrideWith(
                   (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
-              memStateProvider(memId).overrideWith(() => _FakeMemState(mem)),
               memEntitiesProvider.overrideWith(
                 () => _FakeMemEntities([
                   savedMemFromDomain(mem).updatedWith(
