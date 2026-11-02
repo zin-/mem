@@ -1,11 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:mem/features/mems/mem_store.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_view_data.dart';
 import 'package:mem/features/mem_items/mem_item.dart';
@@ -14,8 +11,6 @@ import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/features/mems/states.dart';
-
-part 'states.g.dart';
 
 void listenMemInitialLoad(
   Ref ref,
@@ -211,14 +206,3 @@ final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
     {"memId": memId},
   ),
 );
-
-@riverpod
-class MemState extends _$MemState {
-  // TODO Mem自体がMemNotificaitonなどを持つようになったら
-  // そこへのアクセスを持って取得しに行くようにする
-  @override
-  Future<Mem> build(int? memId) async => v(
-        () async => await MemStore().serveOneBy(memId),
-        {'memId': memId},
-      );
-}

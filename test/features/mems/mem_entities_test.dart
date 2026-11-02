@@ -10,10 +10,11 @@ import 'package:mem/features/mems/mem_client.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mems/mem_service.dart';
-import 'package:mem/features/mems/mem_store.dart';
 import 'package:mem/features/mems/mem_view_data.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/mems/states.dart';
+import 'package:mem/features/settings/preference/keys.dart';
+import 'package:mem/features/settings/states.dart';
 import 'package:mem/features/targets/target_repository.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/repository/drift_repository.dart';
@@ -29,7 +30,6 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     MemClient.resetSingleton();
     MemService.resetSingleton();
-    MemStore.resetSingleton();
     Singleton.reset<MemRepository>();
     Singleton.reset<MemNotificationRepository>();
     Singleton.reset<MemRelationRepository>();
@@ -44,7 +44,6 @@ void main() {
     container.dispose();
     MemClient.resetSingleton();
     MemService.resetSingleton();
-    MemStore.resetSingleton();
     await DriftRepository.close();
     Singleton.reset<MemRepository>();
     Singleton.reset<MemNotificationRepository>();
@@ -57,44 +56,59 @@ void main() {
   Future<MemEntity> insertMem(String name) =>
       MemRepository().receive(Mem(null, name, null, null));
 
-  test('build reloads when archive and done filters change', () async {
-    await insertMem('active');
-    container.read(memEntitiesProvider);
+  test(
+      'default reload keeps active mems, later reloads grow the cache, and the list follows the filter',
+      () async {
+    final active = await insertMem('active');
+    final archived = await insertMem('archived');
+    final done = await insertMem('done');
+    await MemRepository().replace(
+      archived.updatedWith(archivedAt: () => DateTime(2024, 1, 2)),
+    );
+    await MemRepository().replace(
+      done.updatedWith(update: (mem) => mem.done(DateTime(2024, 1, 3))),
+    );
 
-    container.read(showNotArchivedProvider.notifier).updatedBy(false);
-    container.read(showArchivedProvider.notifier).updatedBy(true);
-    container.read(showNotDoneProvider.notifier).updatedBy(false);
-    container.read(showDoneProvider.notifier).updatedBy(true);
-    await notifier().loadMemList();
-  });
-
-  test('loadMemList follows archive and done filters', () async {
-    await insertMem('active');
     container.dispose();
     container = ProviderContainer(
       overrides: [
         memEntitiesProvider.overrideWith(() => FakeMemEntities()),
+        preferenceProvider(startOfDayKey)
+            .overrideWith(() => FakeStartOfDayPreference()),
       ],
     );
 
-    await notifier().loadMemList();
-    expect(container.read(memEntitiesProvider), hasLength(1));
+    final subscription = container.listen(memListProvider, (_, __) {});
+    addTearDown(subscription.close);
+    await container.read(loadMemListProvider.future);
+
+    expect(
+      container.read(memEntitiesProvider).map((mem) => mem.id).toSet(),
+      {active.id},
+    );
+    expect(sortedMemIds(container), [active.id]);
 
     container.read(showArchivedProvider.notifier).updatedBy(true);
     container.read(showNotArchivedProvider.notifier).updatedBy(false);
-    await notifier().loadMemList();
+    await container.read(loadMemListProvider.future);
+
+    expect(
+      container.read(memEntitiesProvider).map((mem) => mem.id).toSet(),
+      {active.id, archived.id},
+    );
+    expect(sortedMemIds(container), [archived.id]);
 
     container.read(showNotArchivedProvider.notifier).updatedBy(true);
-    await notifier().loadMemList();
-    expect(container.read(memEntitiesProvider), hasLength(1));
-
+    container.read(showArchivedProvider.notifier).updatedBy(false);
     container.read(showNotDoneProvider.notifier).updatedBy(false);
     container.read(showDoneProvider.notifier).updatedBy(true);
-    await notifier().loadMemList();
+    await container.read(loadMemListProvider.future);
 
-    container.read(showNotDoneProvider.notifier).updatedBy(true);
-    await notifier().loadMemList();
-    expect(container.read(memEntitiesProvider), hasLength(1));
+    expect(
+      container.read(memEntitiesProvider).map((mem) => mem.id).toSet(),
+      {active.id, archived.id, done.id},
+    );
+    expect(sortedMemIds(container), [done.id]);
   });
 
   test('refreshLatestActForMem ignores a missing id and reloads a saved mem',

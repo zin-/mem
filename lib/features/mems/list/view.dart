@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/mems/mem.dart';
-import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/logger/log_service.dart';
 
 class MemListView extends ConsumerWidget {
@@ -19,7 +19,7 @@ class MemListView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemListViewComponent(
-          ref.watch(memEntitiesProvider).map((e) => e.toDomain()).toList(),
+          ref.watch(memListProvider).map((e) => e.toDomain()).toList(),
           _appBar,
           _itemBuilder,
           _scrollController,

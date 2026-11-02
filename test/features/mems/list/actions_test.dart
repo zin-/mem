@@ -10,7 +10,6 @@ import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/mems/list/widget.dart';
-import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/mems/states.dart';
@@ -19,17 +18,6 @@ import 'package:mem/features/settings/preference/preference_key.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
-
-class _FakeMemState extends MemState {
-  final Mem _mem;
-
-  _FakeMemState(this._mem);
-
-  @override
-  Future<Mem> build(int? memId) async {
-    return _mem;
-  }
-}
 
 class _FakeMemEntities extends MemEntities {
   final Iterable<MemEntity> _state;
@@ -138,10 +126,6 @@ void main() {
                   [notification2],
                 ),
               ),
-              memStateProvider(1)
-                  .overrideWith(() => _FakeMemState(saved1.toDomain())),
-              memStateProvider(2)
-                  .overrideWith(() => _FakeMemState(saved2.toDomain())),
               actEntitiesProvider.overrideWith(() => fakeAct),
             ],
             child: MaterialApp(
@@ -214,10 +198,6 @@ void main() {
                   [notification2],
                 ),
               ),
-              memStateProvider(1)
-                  .overrideWith(() => _FakeMemState(saved1.toDomain())),
-              memStateProvider(2)
-                  .overrideWith(() => _FakeMemState(saved2.toDomain())),
               actEntitiesProvider.overrideWith(() => fakeAct),
             ],
             child: MaterialApp(

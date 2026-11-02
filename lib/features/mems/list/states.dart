@@ -13,25 +13,27 @@ import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
 
+// FIXME: [一覧のアーカイブと完了フィルターを一つの値にする](https://github.com/zin-/mem/issues/692)
 final showNotArchivedProvider =
-    StateNotifierProvider<ValueStateNotifier<bool>, bool>(
+    StateNotifierProvider.autoDispose<ValueStateNotifier<bool>, bool>(
   (ref) => v(
     () => ValueStateNotifier(true),
   ),
 );
 final showArchivedProvider =
-    StateNotifierProvider<ValueStateNotifier<bool>, bool>(
+    StateNotifierProvider.autoDispose<ValueStateNotifier<bool>, bool>(
   (ref) => v(
     () => ValueStateNotifier(false),
   ),
 );
 final showNotDoneProvider =
-    StateNotifierProvider<ValueStateNotifier<bool>, bool>(
+    StateNotifierProvider.autoDispose<ValueStateNotifier<bool>, bool>(
   (ref) => v(
     () => ValueStateNotifier(true),
   ),
 );
-final showDoneProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
+final showDoneProvider =
+    StateNotifierProvider.autoDispose<ValueStateNotifier<bool>, bool>(
   (ref) => v(
     () => ValueStateNotifier(false),
   ),
@@ -85,6 +87,26 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
     );
   },
 );
+
+final loadMemListProvider = FutureProvider.autoDispose<void>((ref) {
+  final showNotArchived = ref.watch(showNotArchivedProvider);
+  final showArchived = ref.watch(showArchivedProvider);
+  final showNotDone = ref.watch(showNotDoneProvider);
+  final showDone = ref.watch(showDoneProvider);
+
+  return v(
+    () => ref.read(memEntitiesProvider.notifier).loadMemList(
+          archived: showNotArchived == showArchived ? null : showArchived,
+          done: showNotDone == showDone ? null : showDone,
+        ),
+    {
+      'showNotArchived': showNotArchived,
+      'showArchived': showArchived,
+      'showNotDone': showNotDone,
+      'showDone': showDone,
+    },
+  );
+});
 
 int compareMemListEntries(
   MemEntity a,
@@ -156,6 +178,8 @@ int compareMemListEntries(
 
 final memListProvider = StateNotifierProvider.autoDispose<
     ValueStateNotifier<List<MemEntity>>, List<MemEntity>>((ref) {
+  ref.listen(loadMemListProvider, (_, __) {});
+
   final filtered = ref.watch(_filteredMemsProvider);
   final savedMemNotifications = ref.watch(savedMemNotificationsProvider);
 

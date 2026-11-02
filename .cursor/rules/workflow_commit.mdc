@@ -1,0 +1,44 @@
+---
+description: 1コミットは1つの理由で説明できる変更にする
+alwaysApply: true
+---
+
+# コミットの単位
+
+1コミットは、1つの理由で説明できる変更にする。メッセージはその理由だけを書く。
+
+ユーザーがコミットを求めていないときは作らない。
+
+## 同じコミットに含める
+
+- その振る舞いを表すテスト
+- その変更が要求する生成コード（`*.g.dart`）と lock ファイル
+- 同じ振る舞いの Red → Green → Refactor。失敗するテストだけではコミットしない
+
+## 別コミットに分ける
+
+- 別の振る舞い
+- 振る舞いを変えないリファクタ
+- ルール、ドキュメント、開発用設定だけ
+- ついでに直した無関係な修正
+
+各コミットは、それ単体でテストが通る状態にする。
+
+## Example(具体例)
+
+**❌ 1コミットに混ぜる:**
+
+一覧への回数表示、無関係なレイアウト修正、`entity.mdc` の追加
+
+**✅ 分ける:**
+
+1. `Show how many times a count-target mem was done on the mem list.`（実装とテスト）
+2. `Refactor TotalActTimeListItem layout for improved readability.`
+3. `Add entity.mdc file to define entity rules and characteristics.`
+
+## Relations(関連)
+
+- KISS
+- `workflow_red_green`
+- `documents/dependencies.md`（依存を変えたら lock ファイルも同じコミット）
+- `safety-guardrails`（push はしない）

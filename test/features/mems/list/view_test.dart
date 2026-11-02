@@ -11,7 +11,6 @@ import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/list/item/view.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/mems/list/widget.dart';
-import 'package:mem/features/mems/mem.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mems_state.dart';
@@ -23,17 +22,6 @@ import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_view.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
-
-class _FakeMemState extends MemState {
-  final Mem _mem;
-
-  _FakeMemState(this._mem);
-
-  @override
-  Future<Mem> build(int? memId) async {
-    return _mem;
-  }
-}
 
 class _FakeMemEntities extends MemEntities {
   final Iterable<MemEntity> _state;
@@ -128,8 +116,6 @@ void main() {
               memNotificationsByMemIdProvider(1).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
               ),
-              memStateProvider(1)
-                  .overrideWith(() => _FakeMemState(saved.toDomain())),
               actEntitiesProvider.overrideWith(() => _FakeActEntities()),
             ],
             child: MaterialApp(
@@ -176,8 +162,6 @@ void main() {
                   notification,
                 ]),
               ),
-              memStateProvider(1)
-                  .overrideWith(() => _FakeMemState(saved.toDomain())),
               actEntitiesProvider.overrideWith(() => _FakeActEntities()),
             ],
             child: MaterialApp(
@@ -228,8 +212,6 @@ void main() {
                   unsavedNotification,
                 ]),
               ),
-              memStateProvider(1)
-                  .overrideWith(() => _FakeMemState(saved.toDomain())),
               actEntitiesProvider.overrideWith(() => _FakeActEntities()),
             ],
             child: MaterialApp(
@@ -275,8 +257,6 @@ void main() {
               memNotificationsByMemIdProvider(1).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
               ),
-              memStateProvider(1)
-                  .overrideWith(() => _FakeMemState(saved.toDomain())),
               actEntitiesProvider.overrideWith(() => _FakeActEntities()),
             ],
             child: MaterialApp(

@@ -5,7 +5,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/database.dart' hide Act;
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/mems/list/period_act_count.dart';
-import 'package:mem/features/mems/mem_store.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/preference/preference_key.dart';
@@ -34,7 +33,6 @@ void main() {
     });
 
     tearDown(() async {
-      MemStore.resetSingleton();
       await db.close();
       DriftDatabaseAccessor.reset();
     });
