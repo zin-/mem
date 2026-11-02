@@ -80,12 +80,12 @@ class MemNameText extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
-          final mem = ref.watch(memByMemIdProvider(_memId))?.toDomain();
+          final mem = ref.watch(memByMemIdProvider(_memId));
 
           return _MemNameText(
             mem?.name ?? '',
             _memNameTag(_memId),
-            mem?.isDone ?? false,
+            mem?.doneAt != null,
           );
         },
         {
