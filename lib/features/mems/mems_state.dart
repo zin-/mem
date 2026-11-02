@@ -14,17 +14,13 @@ part 'mems_state.g.dart';
 class MemEntities extends _$MemEntities
     with EntitiesStateMixinV1<MemEntity, int> {
   @override
-  Iterable<MemEntity> build() => v(
-        () {
-          loadMemList();
+  Iterable<MemEntity> build() => v(() => []);
 
-          return [];
-        },
-      );
-
-  Future<void> loadMemList() => v(
+  Future<void> loadMemList({bool? archived, bool? done}) => v(
         () async {
           final mems = await MemRepository().ship(
+            archived: archived,
+            done: done,
             loadLatestAct: true,
           );
 
@@ -34,6 +30,10 @@ class MemEntities extends _$MemEntities
             ref,
             memIdsIn: mems.map((e) => e.id),
           );
+        },
+        {
+          'archived': archived,
+          'done': done,
         },
       );
 
