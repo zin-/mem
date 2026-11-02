@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/mems/mem_client.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
@@ -18,11 +17,6 @@ class MemEntities extends _$MemEntities
   @override
   Iterable<MemEntity> build() => v(
         () {
-          ref.listen<bool>(showNotArchivedProvider, (_, __) => loadMemList());
-          ref.listen<bool>(showArchivedProvider, (_, __) => loadMemList());
-          ref.listen<bool>(showNotDoneProvider, (_, __) => loadMemList());
-          ref.listen<bool>(showDoneProvider, (_, __) => loadMemList());
-
           loadMemList();
 
           return [];
@@ -31,15 +25,7 @@ class MemEntities extends _$MemEntities
 
   Future<void> loadMemList() => v(
         () async {
-          final showNotArchived = ref.read(showNotArchivedProvider);
-          final showArchived = ref.read(showArchivedProvider);
-          final showNotDone = ref.read(showNotDoneProvider);
-          final showDone = ref.read(showDoneProvider);
-
-          final mems = await MemStore().serve(
-            archived: showNotArchived == showArchived ? null : showArchived,
-            done: showNotDone == showDone ? null : showDone,
-          );
+          final mems = await MemStore().serve();
 
           upsert(mems);
 
