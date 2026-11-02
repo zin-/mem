@@ -56,7 +56,9 @@ void main() {
   Future<MemEntity> insertMem(String name) =>
       MemRepository().receive(Mem(null, name, null, null));
 
-  test('loadMemList caches every mem and memListProvider filters', () async {
+  test(
+      'default reload keeps active mems, later reloads grow the cache, and the list follows the filter',
+      () async {
     final active = await insertMem('active');
     final archived = await insertMem('archived');
     final done = await insertMem('done');
@@ -76,19 +78,23 @@ void main() {
       ],
     );
 
-    await notifier().loadMemList();
+    final subscription = container.listen(memListProvider, (_, __) {});
+    addTearDown(subscription.close);
+    await container.read(loadMemListProvider.future);
 
     expect(
       container.read(memEntitiesProvider).map((mem) => mem.id).toSet(),
-      {active.id, archived.id, done.id},
+      {active.id},
     );
     expect(sortedMemIds(container), [active.id]);
 
     container.read(showArchivedProvider.notifier).updatedBy(true);
     container.read(showNotArchivedProvider.notifier).updatedBy(false);
+    await container.read(loadMemListProvider.future);
+
     expect(
       container.read(memEntitiesProvider).map((mem) => mem.id).toSet(),
-      {active.id, archived.id, done.id},
+      {active.id, archived.id},
     );
     expect(sortedMemIds(container), [archived.id]);
 
@@ -96,6 +102,8 @@ void main() {
     container.read(showArchivedProvider.notifier).updatedBy(false);
     container.read(showNotDoneProvider.notifier).updatedBy(false);
     container.read(showDoneProvider.notifier).updatedBy(true);
+    await container.read(loadMemListProvider.future);
+
     expect(
       container.read(memEntitiesProvider).map((mem) => mem.id).toSet(),
       {active.id, archived.id, done.id},

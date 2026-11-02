@@ -88,6 +88,26 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
   },
 );
 
+final loadMemListProvider = FutureProvider.autoDispose<void>((ref) {
+  final showNotArchived = ref.watch(showNotArchivedProvider);
+  final showArchived = ref.watch(showArchivedProvider);
+  final showNotDone = ref.watch(showNotDoneProvider);
+  final showDone = ref.watch(showDoneProvider);
+
+  return v(
+    () => ref.read(memEntitiesProvider.notifier).loadMemList(
+          archived: showNotArchived == showArchived ? null : showArchived,
+          done: showNotDone == showDone ? null : showDone,
+        ),
+    {
+      'showNotArchived': showNotArchived,
+      'showArchived': showArchived,
+      'showNotDone': showNotDone,
+      'showDone': showDone,
+    },
+  );
+});
+
 int compareMemListEntries(
   MemEntity a,
   MemEntity b, {
@@ -158,6 +178,8 @@ int compareMemListEntries(
 
 final memListProvider = StateNotifierProvider.autoDispose<
     ValueStateNotifier<List<MemEntity>>, List<MemEntity>>((ref) {
+  ref.listen(loadMemListProvider, (_, __) {});
+
   final filtered = ref.watch(_filteredMemsProvider);
   final savedMemNotifications = ref.watch(savedMemNotificationsProvider);
 

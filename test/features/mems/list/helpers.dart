@@ -95,6 +95,7 @@ ProviderContainer loadMemListTestContainer({
       memEntitiesProvider.overrideWith(() => FakeMemEntities()),
       preferenceProvider(startOfDayKey)
           .overrideWith(() => FakeStartOfDayPreference(startOfDay)),
+      loadMemListProvider.overrideWith((ref) => Future<void>.value()),
     ],
   );
 }
@@ -109,6 +110,7 @@ ProviderContainer memListTestContainer(
       preferenceProvider(startOfDayKey)
           .overrideWith(() => FakeStartOfDayPreference(startOfDay)),
       memEntitiesProvider.overrideWith(() => FakeMemEntities(mems)),
+      loadMemListProvider.overrideWith((ref) => Future<void>.value()),
       memNotificationsProvider.overrideWith(
         (ref) => ListValueStateNotifier<MemNotificationEntityV1>(
           notifications.toList(),
