@@ -13,6 +13,7 @@ import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
 
+// FIXME: [一覧のアーカイブと完了フィルターを一つの値にする](https://github.com/zin-/mem/issues/692)
 final showNotArchivedProvider =
     StateNotifierProvider.autoDispose<ValueStateNotifier<bool>, bool>(
   (ref) => v(
