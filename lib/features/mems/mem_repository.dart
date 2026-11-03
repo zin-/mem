@@ -389,6 +389,15 @@ class MemRepository extends DriftRepository {
         {'memId': memId},
       );
 
+  Future<MemParentEntity> replaceParent(MemParent domain) => v(
+        () async {
+          await _rejectParentCycle(domain.memId, domain.parentMemId);
+          await wasteParents(memId: domain.memId);
+          return receiveParent(domain);
+        },
+        {'domain': domain},
+      );
+
   Future<void> _rejectParentCycle(int memId, int parentMemId) async {
     if (memId == parentMemId) {
       throw ArgumentError('mem cannot be its own parent');

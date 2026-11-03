@@ -82,6 +82,60 @@ void main() {
     );
   });
 
+  test('replaceParent writes another parent and drops the old row', () async {
+    final child = await repository.receive(Mem(null, 'child', null, null));
+    final parent = await repository.receive(Mem(null, 'parent', null, null));
+    final other = await repository.receive(Mem(null, 'other', null, null));
+    await repository.receiveParent(
+      MemParent(memId: child.id, parentMemId: parent.id),
+    );
+
+    final replaced = await repository.replaceParent(
+      MemParent(memId: child.id, parentMemId: other.id),
+    );
+
+    expect(replaced.memId, child.id);
+    expect(replaced.parentMemId, other.id);
+    expect(
+      (await repository.shipParentByMemId(child.id))?.parentMemId,
+      other.id,
+    );
+    expect(await repository.shipChildrenByParentMemId(parent.id), isEmpty);
+    expect(
+      (await repository.shipChildrenByParentMemId(other.id))
+          .map((e) => e.memId),
+      [child.id],
+    );
+    expect(await db.select(db.memParents).get(), hasLength(1));
+  });
+
+  test('replaceParent rejects a cycle and keeps the old parent', () async {
+    final child = await repository.receive(Mem(null, 'child', null, null));
+    final mid = await repository.receive(Mem(null, 'mid', null, null));
+    final top = await repository.receive(Mem(null, 'top', null, null));
+    await repository.receiveParent(
+      MemParent(memId: child.id, parentMemId: mid.id),
+    );
+    await repository.receiveParent(
+      MemParent(memId: mid.id, parentMemId: top.id),
+    );
+
+    await expectLater(
+      repository.replaceParent(
+        MemParent(memId: mid.id, parentMemId: child.id),
+      ),
+      throwsA(isA<ArgumentError>()),
+    );
+    expect(
+      (await repository.shipParentByMemId(mid.id))?.parentMemId,
+      top.id,
+    );
+    expect(
+      (await repository.shipParentByMemId(child.id))?.parentMemId,
+      mid.id,
+    );
+  });
+
   test('removing a mem removes parent rows that point at it', () async {
     final child = await repository.receive(Mem(null, 'child', null, null));
     final parent = await repository.receive(Mem(null, 'parent', null, null));
