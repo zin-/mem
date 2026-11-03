@@ -14,6 +14,7 @@ import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_state.dart';
+import 'package:mem/features/mem_parents/mem_parent_view.dart';
 import 'package:mem/features/mems/detail/page.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/mem.dart';
@@ -146,6 +147,7 @@ void main() {
         memRelationEntitiesByMemIdProvider(_memId).overrideWith(
           () => _FakeMemRelationEntitiesByMemId(),
         ),
+        parentNameByMemIdProvider(_memId).overrideWith((ref) async => null),
         preferenceProvider(startOfDayKey).overrideWith(() => _FakePreference()),
         if (actEntities != null)
           actEntitiesProvider.overrideWith(() => actEntities),

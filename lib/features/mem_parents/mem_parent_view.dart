@@ -6,7 +6,7 @@ import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/l10n/l10n.dart';
 
-final _parentNameByMemIdProvider =
+final parentNameByMemIdProvider =
     FutureProvider.autoDispose.family<String?, int>((ref, memId) {
   return v(
     () async {
@@ -27,7 +27,7 @@ class MemParentView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
-          final parentName = ref.watch(_parentNameByMemIdProvider(_memId));
+          final parentName = ref.watch(parentNameByMemIdProvider(_memId));
 
           return parentName.when(
             data: (name) => _MemParentSection(
@@ -114,7 +114,7 @@ Future<void> _setParent(BuildContext context, WidgetRef ref, int memId) => v(
           return;
         }
         if (!context.mounted) return;
-        ref.invalidate(_parentNameByMemIdProvider(memId));
+        ref.invalidate(parentNameByMemIdProvider(memId));
       },
       memId,
     );
@@ -128,7 +128,7 @@ Future<void> _disconnectParent(
       () async {
         await MemRepository().wasteParents(memId: memId);
         if (!context.mounted) return;
-        ref.invalidate(_parentNameByMemIdProvider(memId));
+        ref.invalidate(parentNameByMemIdProvider(memId));
       },
       memId,
     );
