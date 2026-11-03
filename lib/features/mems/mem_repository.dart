@@ -10,6 +10,8 @@ import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
+import 'package:mem/features/mem_parents/mem_parent.dart';
+import 'package:mem/features/mem_parents/mem_parent_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/features/mems/mem.dart';
@@ -342,6 +344,66 @@ class MemRepository extends DriftRepository {
           'relatedMemId': relatedMemId,
         },
       );
+
+  Future<MemParentEntity> receiveParent(MemParent domain) => v(
+        () async {
+          await _rejectParentCycle(domain.memId, domain.parentMemId);
+          final inserted =
+              await driftDb.into(driftDb.memParents).insertReturning(
+                    convertIntoMemParentsInsertable(domain),
+                  );
+          return MemParentEntity.fromTuple(inserted);
+        },
+        {'domain': domain},
+      );
+
+  Future<MemParentEntity?> shipParentByMemId(int memId) => v(
+        () async {
+          final row = await (driftDb.select(driftDb.memParents)
+                ..where((t) => t.memId.equals(memId)))
+              .getSingleOrNull();
+          return row == null ? null : MemParentEntity.fromTuple(row);
+        },
+        {'memId': memId},
+      );
+
+  Future<List<MemParentEntity>> shipChildrenByParentMemId(int parentMemId) => v(
+        () async {
+          final rows = await (driftDb.select(driftDb.memParents)
+                ..where((t) => t.parentMemId.equals(parentMemId)))
+              .get();
+          return rows.map(MemParentEntity.fromTuple).toList();
+        },
+        {'parentMemId': parentMemId},
+      );
+
+  Future<List<MemParentEntity>> wasteParents({int? memId}) => v(
+        () async {
+          var query = driftDb.delete(driftDb.memParents);
+          if (memId != null) {
+            query = query..where((t) => t.memId.equals(memId));
+          }
+          final deleted = await query.goAndReturn();
+          return deleted.map(MemParentEntity.fromTuple).toList();
+        },
+        {'memId': memId},
+      );
+
+  Future<void> _rejectParentCycle(int memId, int parentMemId) async {
+    if (memId == parentMemId) {
+      throw ArgumentError('mem cannot be its own parent');
+    }
+    var cursor = parentMemId;
+    final seen = <int>{memId, parentMemId};
+    while (true) {
+      final parent = await shipParentByMemId(cursor);
+      if (parent == null) return;
+      cursor = parent.parentMemId;
+      if (!seen.add(cursor)) {
+        throw ArgumentError('parent cycle');
+      }
+    }
+  }
 
   Future<List<MemEntity>> waste({int? id}) => v(
         () async {
