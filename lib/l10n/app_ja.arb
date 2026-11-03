@@ -149,5 +149,11 @@
         "type": "int"
       }
     }
-  }
+  },
+
+  "parentLabel": "親",
+  "parentNone": "なし",
+  "setParentAction": "設定",
+  "disconnectParentAction": "切断",
+  "selectParentTitle": "親を選ぶ"
 }

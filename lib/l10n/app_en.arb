@@ -149,5 +149,11 @@
         "type": "int"
       }
     }
-  }
+  },
+
+  "parentLabel": "Parent",
+  "parentNone": "None",
+  "setParentAction": "Set",
+  "disconnectParentAction": "Disconnect",
+  "selectParentTitle": "Select parent"
 }
