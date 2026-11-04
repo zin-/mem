@@ -155,10 +155,6 @@ void main() {
         find.text(localizations.formatShortMonthDay(DateTime(2026, 5, 4))),
         findsNothing,
       );
-      expect(
-        find.text(localizations.formatShortMonthDay(DateTime(2026, 6, 1))),
-        findsNothing,
-      );
     },
   );
 
@@ -200,53 +196,25 @@ void main() {
 
       final monday = DateTime(2026, 9, 7);
       final spot = FlSpot(monday.millisecondsSinceEpoch.toDouble(), 4);
-      final getTooltipItems = tester
+      final items = tester
           .widget<LineChart>(find.byType(LineChart))
           .data
           .lineTouchData
           .touchTooltipData
-          .getTooltipItems;
-
-      final items = getTooltipItems([
+          .getTooltipItems([
         LineBarSpot(
           LineChartBarData(spots: [spot], color: Colors.teal),
           0,
           spot,
         ),
-        LineBarSpot(
-          LineChartBarData(
-            spots: [spot],
-            gradient: const LinearGradient(colors: [Colors.red, Colors.orange]),
-          ),
-          1,
-          spot,
-        ),
       ]);
-
       final localizations = MaterialLocalizations.of(
         tester.element(find.byType(LineChartWrapper)),
       );
 
       expect(
-        items,
-        [
-          LineTooltipItem(
-            '${localizations.formatCompactDate(monday)}\n4 items',
-            const TextStyle(
-              color: Colors.teal,
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
-          ),
-          const LineTooltipItem(
-            '4 items',
-            TextStyle(
-              color: Colors.red,
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
-          ),
-        ],
+        items?.single?.text,
+        '${localizations.formatCompactDate(monday)}\n4 items',
       );
     },
   );

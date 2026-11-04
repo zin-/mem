@@ -49,6 +49,9 @@ class LineChartWrapper extends StatelessWidget {
 
     final interval = Duration(days: dayStep).inMilliseconds.toDouble();
     final weekly = dayStep >= DateTime.daysPerWeek;
+    // 約4ヶ月を超えると各月の先頭週が重なるので、1・4・7・10月だけ残す
+    final quarterly = points.length > 1 &&
+        points.first.key.calendarDaysUntil(points.last.key) > 31 * 4;
 
     final titlesData = FlTitlesData(
       topTitles: const AxisTitles(),
@@ -71,7 +74,8 @@ class LineChartWrapper extends StatelessWidget {
                 meta.parentAxisSize * 0.9 < meta.axisPosition) {
               text = "";
             } else if (weekly) {
-              text = dateTime.day <= DateTime.daysPerWeek
+              text = dateTime.day <= DateTime.daysPerWeek &&
+                      (!quarterly || dateTime.month % 3 == 1)
                   ? localizations.formatShortMonthDay(dateTime)
                   : "";
             } else if (dateTime.day == 1) {
@@ -136,7 +140,8 @@ class LineChartWrapper extends StatelessWidget {
           // enabled: true,
           touchTooltipData: LineTouchTooltipData(
             getTooltipItems: (touchedSpots) {
-              return touchedSpots.map((spot) {
+              final localizations = MaterialLocalizations.of(context);
+              return touchedSpots.mapIndexed((index, spot) {
                 final textStyle = TextStyle(
                   color: spot.bar.gradient?.colors.first ??
                       spot.bar.color ??
@@ -144,8 +149,11 @@ class LineChartWrapper extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
                 );
+                final value = _valueFormatter(spot.y);
                 return LineTooltipItem(
-                  _valueFormatter(spot.y),
+                  weekly && index == 0
+                      ? "${localizations.formatCompactDate(DateTime.fromMillisecondsSinceEpoch(spot.x.toInt()))}\n$value"
+                      : value,
                   textStyle,
                 );
               }).toList();
