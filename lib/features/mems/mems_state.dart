@@ -13,8 +13,15 @@ part 'mems_state.g.dart';
 @Riverpod(keepAlive: true)
 class MemEntities extends _$MemEntities
     with EntitiesStateMixinV1<MemEntity, int> {
+  final _detailLoads = <int, Future<void>>{};
+
   @override
   Iterable<MemEntity> build() => v(() => []);
+
+  @override
+  Iterable<MemEntity> upsert(Iterable<MemEntity> entities) => super.upsert([
+        for (final entity in entities) _keepingLoadedParents(entity),
+      ]);
 
   Future<void> loadMemList({bool? archived, bool? done}) => v(
         () async {
@@ -46,7 +53,24 @@ class MemEntities extends _$MemEntities
 
           upsert([mem]);
 
-          return mem;
+          return _entity(mem.id) ?? mem;
+        },
+        {'memId': memId},
+      );
+
+  Future<void> loadDetail(int memId) => v(
+        () {
+          final inFlight = _detailLoads[memId];
+          if (inFlight != null) return inFlight;
+
+          late final Future<void> future;
+          future = _fetchDetail(memId).whenComplete(() {
+            if (identical(_detailLoads[memId], future)) {
+              _detailLoads.remove(memId);
+            }
+          });
+          _detailLoads[memId] = future;
+          return future;
         },
         {'memId': memId},
       );
@@ -148,4 +172,57 @@ class MemEntities extends _$MemEntities
           upsert([unarchived]);
         },
       );
+
+  Future<void> _fetchDetail(int memId) async {
+    final repository = MemRepository();
+    final mem = await repository.shipById(memId, loadLatestAct: true);
+    final parent = await repository.shipParentByMemId(memId);
+    final children = await repository.shipChildrenByParentMemId(memId);
+
+    final relatedIds = <int>{
+      if (parent != null) parent.parentMemId,
+      for (final child in children) child.memId,
+    };
+    final missing = <MemEntity>[];
+    for (final id in relatedIds) {
+      if (id == memId || _entity(id) != null) continue;
+      missing.add(await repository.shipById(id));
+    }
+    final toInsert = [
+      for (final entity in missing)
+        if (_entity(entity.id) == null) entity,
+    ];
+    if (toInsert.isNotEmpty) {
+      upsert(toInsert);
+    }
+
+    upsert([
+      mem.updatedWith(
+        parentsLoaded: () => true,
+        parentMemId: () => parent?.parentMemId,
+        childMemIds: () => [
+          for (final child in children) child.memId,
+        ],
+      ),
+    ]);
+  }
+
+  MemEntity? _entity(int id) {
+    for (final entity in state) {
+      if (entity.id == id) return entity;
+    }
+    return null;
+  }
+
+  // ship は親リンクを含まない。取得済みのリンクを後から来た ship で消さない
+  MemEntity _keepingLoadedParents(MemEntity shipped) {
+    if (shipped.parentsLoaded) return shipped;
+    final existing = _entity(shipped.id);
+    if (existing == null || !existing.parentsLoaded) return shipped;
+    return shipped.updatedWith(
+      parentsLoaded: () => true,
+      parentMemId: () => existing.parentMemId,
+      childMemIds: () => existing.childMemIds,
+    );
+  }
 }

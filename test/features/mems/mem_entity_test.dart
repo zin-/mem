@@ -100,6 +100,46 @@ void main() {
       expect(domain.scheduleAnchorAct, isNull);
     });
 
+    test('parent links default to unloaded and updatedWith keeps them', () {
+      final unloaded = MemEntity(
+        10,
+        'before',
+        null,
+        null,
+        null,
+        DateTime(2024, 2, 1),
+        DateTime(2024, 2, 2),
+        null,
+        target: null,
+      );
+      expect(unloaded.parentsLoaded, isFalse);
+      expect(unloaded.parentMemId, isNull);
+      expect(unloaded.childMemIds, isEmpty);
+
+      final entity = MemEntity(
+        10,
+        'before',
+        null,
+        null,
+        null,
+        DateTime(2024, 2, 1),
+        DateTime(2024, 2, 2),
+        null,
+        target: null,
+        parentsLoaded: true,
+        parentMemId: 3,
+        childMemIds: const [4, 5],
+      );
+      final updated = entity.updatedWith(
+        update: (mem) => Mem(mem.id, 'after', mem.doneAt, mem.period),
+      );
+
+      expect(updated.name, 'after');
+      expect(updated.parentsLoaded, isTrue);
+      expect(updated.parentMemId, 3);
+      expect(updated.childMemIds, [4, 5]);
+    });
+
     test('MemViewData updatedWith updates period', () {
       final viewData = MemViewData.fromEntityV2(
         savedMem(

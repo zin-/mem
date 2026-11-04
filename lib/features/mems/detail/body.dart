@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/mem_items/mem_items_view.dart';
 import 'package:mem/features/mem_notifications/mem_notifications_view.dart';
+import 'package:mem/features/mem_parents/mem_parent_view.dart';
 import 'package:mem/features/mem_relations/mem_relation_widget.dart';
 import 'package:mem/framework/date_and_time/created_and_updated_at_texts.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -11,6 +12,7 @@ import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mems/mem_period.dart';
 import 'package:mem/features/mems/mem_view_data.dart';
+import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/values/dimens.dart';
 
@@ -26,6 +28,13 @@ class MemDetailBody extends ConsumerWidget {
         () {
           final editingMem = ref.watch(editingMemByMemIdProvider(_memId));
           final savedMem = ref.watch(memByMemIdProvider(_memId));
+          final memId = _memId;
+          if (memId != null && savedMem?.parentsLoaded != true) {
+            Future<void>(() {
+              if (!context.mounted) return;
+              ref.read(memEntitiesProvider.notifier).loadDetail(memId);
+            });
+          }
 
           return _MemDetailBodyComponent(
             _memId,
@@ -77,6 +86,7 @@ class _MemDetailBodyComponent extends StatelessWidget {
                       MemNotificationsView(_memId),
                       TargetText(_memId),
                       MemItemsFormFields(_memId),
+                      if (_memId != null) MemParentView(_memId),
                       MemRelationList(sourceMemId: _memId),
                     ],
                   ),

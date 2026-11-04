@@ -42,6 +42,22 @@ class _FakeMemEntities extends MemEntities {
 
   @override
   Iterable<MemEntity> build() => _initial;
+
+  @override
+  Future<void> loadDetail(int memId) async {
+    MemEntity? current;
+    for (final entity in state) {
+      if (entity.id == memId) {
+        current = entity;
+        break;
+      }
+    }
+    if (current == null || current.parentsLoaded) return;
+    await Future<void>.value();
+    upsert([
+      current.updatedWith(parentsLoaded: () => true),
+    ]);
+  }
 }
 
 class _FakeTargetState extends TargetState {

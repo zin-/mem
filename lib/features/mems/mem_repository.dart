@@ -10,6 +10,7 @@ import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
+import 'package:mem/features/mem_parents/mem_parent.dart';
 import 'package:mem/features/mem_relations/mem_relation.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/features/mems/mem.dart';
@@ -342,6 +343,87 @@ class MemRepository extends DriftRepository {
           'relatedMemId': relatedMemId,
         },
       );
+
+  Future<MemParent> receiveParent(MemParent domain) => v(
+        () async {
+          await _rejectParentCycle(domain.memId, domain.parentMemId);
+          return _insertParent(domain);
+        },
+        {'domain': domain},
+      );
+
+  Future<MemParent?> shipParentByMemId(int memId) => v(
+        () async {
+          final row = await (driftDb.select(driftDb.memParents)
+                ..where((t) => t.memId.equals(memId)))
+              .getSingleOrNull();
+          return row == null ? null : _memParentFrom(row);
+        },
+        {'memId': memId},
+      );
+
+  Future<List<MemParent>> shipChildrenByParentMemId(int parentMemId) => v(
+        () async {
+          final rows = await (driftDb.select(driftDb.memParents)
+                ..where((t) => t.parentMemId.equals(parentMemId)))
+              .get();
+          return rows.map(_memParentFrom).toList();
+        },
+        {'parentMemId': parentMemId},
+      );
+
+  Future<List<MemParent>> wasteParents({int? memId}) => v(
+        () async {
+          var query = driftDb.delete(driftDb.memParents);
+          if (memId != null) {
+            query = query..where((t) => t.memId.equals(memId));
+          }
+          final deleted = await query.goAndReturn();
+          return deleted.map(_memParentFrom).toList();
+        },
+        {'memId': memId},
+      );
+
+  Future<MemParent> replaceParent(MemParent domain) => v(
+        () async {
+          await _rejectParentCycle(domain.memId, domain.parentMemId);
+          await wasteParents(memId: domain.memId);
+          return _insertParent(domain);
+        },
+        {'domain': domain},
+      );
+
+  Future<MemParent> _insertParent(MemParent parent) async {
+    final inserted = await driftDb.into(driftDb.memParents).insertReturning(
+          drift_schema.MemParentsCompanion(
+            memId: drift.Value(parent.memId),
+            parentMemId: drift.Value(parent.parentMemId),
+            createdAt: drift.Value(DateTime.now()),
+          ),
+        );
+    return _memParentFrom(inserted);
+  }
+
+  MemParent _memParentFrom(drift_schema.MemParent row) => MemParent(
+        memId: row.memId,
+        parentMemId: row.parentMemId,
+      );
+
+  Future<void> _rejectParentCycle(int memId, int parentMemId) async {
+    if (memId == parentMemId) {
+      throw ArgumentError('mem cannot be its own parent');
+    }
+    var cursor = parentMemId;
+    final seen = <int>{memId, parentMemId};
+    while (true) {
+      final parent = await shipParentByMemId(cursor);
+      if (parent == null) return;
+      cursor = parent.parentMemId;
+      if (!seen.add(cursor)) {
+        throw ArgumentError('parent cycle');
+      }
+    }
+  }
 
   Future<List<MemEntity>> waste({int? id}) => v(
         () async {

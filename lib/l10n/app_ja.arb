@@ -149,5 +149,9 @@
         "type": "int"
       }
     }
-  }
+  },
+
+  "parentNone": "なし",
+  "disconnectParentAction": "切断",
+  "selectParentTitle": "親を選ぶ"
 }

@@ -21,6 +21,11 @@ class MemEntity implements Entity<int>, Identifiable<int> {
   final Act? latestAct;
   final Act? scheduleAnchorAct;
 
+  // parentMemId が null でも、未取得と「親なし」を区別する
+  final bool parentsLoaded;
+  final int? parentMemId;
+  final List<int> childMemIds;
+
   @override
   final int id;
   @override
@@ -46,6 +51,9 @@ class MemEntity implements Entity<int>, Identifiable<int> {
     this.memRelations,
     this.latestAct,
     this.scheduleAnchorAct,
+    this.parentsLoaded = false,
+    this.parentMemId,
+    this.childMemIds = const [],
   });
 
   Mem toDomain() => Mem(
@@ -72,6 +80,9 @@ class MemEntity implements Entity<int>, Identifiable<int> {
     Act? Function()? scheduleAnchorAct,
     DateTime? Function()? updatedAt,
     DateTime? Function()? archivedAt,
+    bool Function()? parentsLoaded,
+    int? Function()? parentMemId,
+    List<int> Function()? childMemIds,
   }) {
     final updated = update == null ? toDomain() : update(toDomain());
     return MemEntity(
@@ -92,6 +103,10 @@ class MemEntity implements Entity<int>, Identifiable<int> {
       scheduleAnchorAct: scheduleAnchorAct == null
           ? this.scheduleAnchorAct
           : scheduleAnchorAct(),
+      parentsLoaded:
+          parentsLoaded == null ? this.parentsLoaded : parentsLoaded(),
+      parentMemId: parentMemId == null ? this.parentMemId : parentMemId(),
+      childMemIds: childMemIds == null ? this.childMemIds : childMemIds(),
     );
   }
 

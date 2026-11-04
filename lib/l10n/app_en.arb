@@ -149,5 +149,9 @@
         "type": "int"
       }
     }
-  }
+  },
+
+  "parentNone": "None",
+  "disconnectParentAction": "Disconnect",
+  "selectParentTitle": "Select parent"
 }

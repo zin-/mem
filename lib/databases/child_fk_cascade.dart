@@ -27,5 +27,10 @@ Future<void> wasteChildRowsReferencingMemIds(
             (t) => t.sourceMemId.isIn(chunk) | t.targetMemId.isIn(chunk),
           ))
         .go();
+    await (db.delete(db.memParents)
+          ..where(
+            (t) => t.memId.isIn(chunk) | t.parentMemId.isIn(chunk),
+          ))
+        .go();
   }
 }

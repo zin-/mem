@@ -5,6 +5,7 @@ import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
+import 'package:mem/databases/table_definitions/mem_parents.dart';
 import 'package:mem/databases/table_definitions/mem_relations.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/features/targets/target_table.dart';
@@ -21,6 +22,7 @@ part 'database.g.dart';
   MemRepeatedNotifications,
   Targets,
   MemRelations,
+  MemParents,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -29,7 +31,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.memory() : super(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration {
@@ -45,16 +47,19 @@ class AppDatabase extends _$AppDatabase {
         if (from < 3) {
           await m.addColumn(targets, targets.secondsAfterLastAct);
         }
+        if (from < 4) {
+          await m.createTable(memParents);
+        }
       },
     );
   }
 }
 
 Future<void> backfillFinishedActKind(AppDatabase db) => (db.update(db.acts)
-      ..where(
-        (row) => row.start.isNotNull() & row.end.isNotNull(),
-      ))
-    .write(
+          ..where(
+            (row) => row.start.isNotNull() & row.end.isNotNull(),
+          ))
+        .write(
       ActsCompanion(actKind: Value(ActKind.finished.name)),
     );
 
