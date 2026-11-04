@@ -124,6 +124,7 @@ Future<void> _setParent(BuildContext context, WidgetRef ref, int memId) => v(
       () async {
         final mems = await MemRepository().ship();
         final excludedIds = await _excludedParentCandidateIds(memId);
+        final currentParent = await MemRepository().shipParentByMemId(memId);
         if (!context.mounted) return;
 
         final candidates = mems
@@ -132,7 +133,10 @@ Future<void> _setParent(BuildContext context, WidgetRef ref, int memId) => v(
           ..sort((a, b) => a.name.compareTo(b.name));
         final selectedId = await showDialog<int>(
           context: context,
-          builder: (context) => _SelectParentDialog(candidates: candidates),
+          builder: (context) => _SelectParentDialog(
+            candidates: candidates,
+            currentParentMemId: currentParent?.parentMemId,
+          ),
         );
         if (selectedId == null || !context.mounted) return;
 
@@ -185,9 +189,13 @@ Future<void> _disconnectParent(
 
 class _SelectParentDialog extends StatelessWidget {
   final List<MemEntity> _candidates;
+  final int? _currentParentMemId;
 
-  const _SelectParentDialog({required List<MemEntity> candidates})
-      : _candidates = candidates;
+  const _SelectParentDialog({
+    required List<MemEntity> candidates,
+    required int? currentParentMemId,
+  })  : _candidates = candidates,
+        _currentParentMemId = currentParentMemId;
 
   @override
   Widget build(BuildContext context) => v(
@@ -203,9 +211,13 @@ class _SelectParentDialog extends StatelessWidget {
                 itemCount: _candidates.length,
                 itemBuilder: (context, index) {
                   final mem = _candidates[index];
+                  final isCurrentParent = mem.id == _currentParentMemId;
                   return ListTile(
                     title: Text(mem.name),
-                    onTap: () => Navigator.of(context).pop(mem.id),
+                    enabled: !isCurrentParent,
+                    onTap: isCurrentParent
+                        ? null
+                        : () => Navigator.of(context).pop(mem.id),
                   );
                 },
               ),
@@ -218,6 +230,9 @@ class _SelectParentDialog extends StatelessWidget {
             ],
           );
         },
-        _candidates,
+        {
+          'candidates': _candidates,
+          'currentParentMemId': _currentParentMemId,
+        },
       );
 }

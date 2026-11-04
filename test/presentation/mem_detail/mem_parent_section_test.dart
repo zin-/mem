@@ -317,4 +317,63 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('disables the current parent in the picker', (tester) async {
+    final child = await insertMem('Child');
+    final parent = await insertMem('Parent');
+    final other = await insertMem('Other');
+    await MemRepository().receiveParent(
+      MemParent(memId: child.id, parentMemId: parent.id),
+    );
+
+    await pumpDetail(tester, child.id);
+
+    await tester.tap(find.text('Parent'));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 50),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
+
+    final dialog = find.byType(AlertDialog);
+    final currentParentTile = find.descendant(
+      of: dialog,
+      matching: find.widgetWithText(ListTile, 'Parent'),
+    );
+    final otherTile = find.descendant(
+      of: dialog,
+      matching: find.widgetWithText(ListTile, 'Other'),
+    );
+    expect(currentParentTile, findsOneWidget);
+    expect(tester.widget<ListTile>(currentParentTile).enabled, isFalse);
+    expect(tester.widget<ListTile>(otherTile).enabled, isTrue);
+
+    await tester.tap(currentParentTile);
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 50),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
+
+    expect(find.byType(AlertDialog), findsOneWidget);
+    expect(
+      (await MemRepository().shipParentByMemId(child.id))?.parentMemId,
+      parent.id,
+    );
+
+    await tester.tap(otherTile);
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 50),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
+
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.text('Other'), findsOneWidget);
+    expect(find.text('Parent'), findsNothing);
+    expect(
+      (await MemRepository().shipParentByMemId(child.id))?.parentMemId,
+      other.id,
+    );
+  });
 }
