@@ -86,6 +86,7 @@ void main() {
     await pumpDetail(tester, null);
 
     expect(find.text(_l10n.parentLabel), findsNothing);
+    expect(find.text(_l10n.childrenLabel), findsNothing);
     expect(find.byIcon(Icons.close), findsNothing);
   });
 
@@ -190,5 +191,50 @@ void main() {
     expect(find.text(_l10n.parentNone), findsOneWidget);
     expect(find.byIcon(Icons.close), findsNothing);
     expect(await MemRepository().shipParentByMemId(child.id), isNull);
+  });
+
+  testWidgets('shows direct child names in name order', (tester) async {
+    final parent = await insertMem('Parent');
+    final childB = await insertMem('Child B');
+    final childA = await insertMem('Child A');
+    final grandchild = await insertMem('Grandchild');
+    await MemRepository().receiveParent(
+      MemParent(memId: childB.id, parentMemId: parent.id),
+    );
+    await MemRepository().receiveParent(
+      MemParent(memId: childA.id, parentMemId: parent.id),
+    );
+    await MemRepository().receiveParent(
+      MemParent(memId: grandchild.id, parentMemId: childA.id),
+    );
+
+    await pumpDetail(tester, parent.id);
+
+    expect(find.text(_l10n.childrenLabel), findsOneWidget);
+    expect(find.text('Child A'), findsOneWidget);
+    expect(find.text('Child B'), findsOneWidget);
+    expect(find.text('Grandchild'), findsNothing);
+    expect(
+      tester.getTopLeft(find.text(_l10n.parentLabel)).dy,
+      lessThan(tester.getTopLeft(find.text(_l10n.childrenLabel)).dy),
+    );
+    expect(
+      tester.getTopLeft(find.text('Child A')).dy,
+      lessThan(tester.getTopLeft(find.text('Child B')).dy),
+    );
+    expect(
+      tester.getTopLeft(find.text(_l10n.childrenLabel)).dy,
+      lessThan(tester.getTopLeft(find.text('Relations')).dy),
+    );
+  });
+
+  testWidgets('hides the children field when a mem has no children',
+      (tester) async {
+    final mem = await insertMem('Alone');
+
+    await pumpDetail(tester, mem.id);
+
+    expect(find.text(_l10n.parentLabel), findsOneWidget);
+    expect(find.text(_l10n.childrenLabel), findsNothing);
   });
 }

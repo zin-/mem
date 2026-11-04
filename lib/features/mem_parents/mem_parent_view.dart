@@ -19,6 +19,23 @@ final parentNameByMemIdProvider =
   );
 });
 
+final childrenNamesByMemIdProvider =
+    FutureProvider.autoDispose.family<List<String>, int>((ref, memId) {
+  return v(
+    () async {
+      final children = await MemRepository().shipChildrenByParentMemId(memId);
+      final names = <String>[];
+      for (final child in children) {
+        final mem = await MemRepository().shipById(child.memId);
+        names.add(mem.name);
+      }
+      names.sort();
+      return names;
+    },
+    memId,
+  );
+});
+
 class MemParentView extends ConsumerWidget {
   final int _memId;
 
@@ -28,14 +45,20 @@ class MemParentView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
           final parentName = ref.watch(parentNameByMemIdProvider(_memId));
+          final childrenNames = ref.watch(childrenNamesByMemIdProvider(_memId));
 
           return parentName.when(
-            data: (name) => _MemParentSection(
-              parentName: name,
-              onSet: () => _setParent(context, ref, _memId),
-              onDisconnect: name == null
-                  ? null
-                  : () => _disconnectParent(context, ref, _memId),
+            data: (name) => childrenNames.when(
+              data: (names) => _MemParentSection(
+                parentName: name,
+                childrenNames: names,
+                onSet: () => _setParent(context, ref, _memId),
+                onDisconnect: name == null
+                    ? null
+                    : () => _disconnectParent(context, ref, _memId),
+              ),
+              loading: () => const CircularProgressIndicator(),
+              error: (error, stackTrace) => const Text('Error'),
             ),
             loading: () => const CircularProgressIndicator(),
             error: (error, stackTrace) => const Text('Error'),
@@ -47,14 +70,17 @@ class MemParentView extends ConsumerWidget {
 
 class _MemParentSection extends StatelessWidget {
   final String? _parentName;
+  final List<String> _childrenNames;
   final VoidCallback _onSet;
   final VoidCallback? _onDisconnect;
 
   const _MemParentSection({
     required String? parentName,
+    required List<String> childrenNames,
     required VoidCallback onSet,
     required VoidCallback? onDisconnect,
   })  : _parentName = parentName,
+        _childrenNames = childrenNames,
         _onSet = onSet,
         _onDisconnect = onDisconnect;
 
@@ -63,22 +89,40 @@ class _MemParentSection extends StatelessWidget {
         () {
           final l10n = buildL10n(context);
 
-          return ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.account_tree),
-            title: Text(l10n.parentLabel),
-            subtitle: Text(_parentName ?? l10n.parentNone),
-            onTap: _onSet,
-            trailing: _onDisconnect == null
-                ? null
-                : IconButton(
-                    onPressed: _onDisconnect,
-                    tooltip: l10n.disconnectParentAction,
-                    icon: const Icon(Icons.close),
+          return Column(
+            children: [
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.account_tree),
+                title: Text(l10n.parentLabel),
+                subtitle: Text(_parentName ?? l10n.parentNone),
+                onTap: _onSet,
+                trailing: _onDisconnect == null
+                    ? null
+                    : IconButton(
+                        onPressed: _onDisconnect,
+                        tooltip: l10n.disconnectParentAction,
+                        icon: const Icon(Icons.close),
+                      ),
+              ),
+              if (_childrenNames.isNotEmpty)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(l10n.childrenLabel),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (final name in _childrenNames) Text(name),
+                    ],
                   ),
+                ),
+            ],
           );
         },
-        _parentName,
+        {
+          'parentName': _parentName,
+          'childrenNames': _childrenNames,
+        },
       );
 }
 

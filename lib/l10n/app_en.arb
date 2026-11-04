@@ -152,6 +152,7 @@
   },
 
   "parentLabel": "Parent",
+  "childrenLabel": "Children",
   "parentNone": "None",
   "disconnectParentAction": "Disconnect",
   "selectParentTitle": "Select parent"

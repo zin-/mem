@@ -152,6 +152,7 @@
   },
 
   "parentLabel": "親",
+  "childrenLabel": "子",
   "parentNone": "なし",
   "disconnectParentAction": "切断",
   "selectParentTitle": "親を選ぶ"
