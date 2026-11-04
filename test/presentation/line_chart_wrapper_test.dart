@@ -104,6 +104,154 @@ void main() {
   );
 
   testWidgets(
+    'year axis labels the first week of each quarter',
+    (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          onGenerateTitle: (context) => buildL10n(context).test,
+          home: Scaffold(
+            body: SizedBox(
+              width: 800,
+              height: 400,
+              child: LineChartWrapper(
+                ActsSummary(
+                  [
+                    FinishedAct(
+                      1,
+                      DateAndTime(2026, 4, 6, 10),
+                      DateAndTime(2026, 4, 6, 11),
+                    ),
+                  ],
+                  AggregationType.count,
+                  period: DateAndTimePeriod(
+                    start: DateAndTime(2025, 10, 14, 5),
+                    end: DateAndTime(2026, 10, 14, 5),
+                  ),
+                ),
+                (value) => value.toInt().toString(),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final localizations = MaterialLocalizations.of(
+        tester.element(find.byType(LineChartWrapper)),
+      );
+
+      expect(
+        find.text(localizations.formatShortMonthDay(DateTime(2026, 4, 6))),
+        findsOneWidget,
+      );
+      expect(
+        find.text(localizations.formatShortMonthDay(DateTime(2026, 7, 6))),
+        findsOneWidget,
+      );
+      expect(
+        find.text(localizations.formatShortMonthDay(DateTime(2026, 5, 4))),
+        findsNothing,
+      );
+      expect(
+        find.text(localizations.formatShortMonthDay(DateTime(2026, 6, 1))),
+        findsNothing,
+      );
+    },
+  );
+
+  testWidgets(
+    'weekly tooltip text is the monday date and the formatted spot y',
+    (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          onGenerateTitle: (context) => buildL10n(context).test,
+          home: Scaffold(
+            body: SizedBox(
+              width: 800,
+              height: 400,
+              child: LineChartWrapper(
+                ActsSummary(
+                  [
+                    FinishedAct(
+                      1,
+                      DateAndTime(2026, 7, 14, 10),
+                      DateAndTime(2026, 7, 14, 11),
+                    ),
+                  ],
+                  AggregationType.count,
+                  period: DateAndTimePeriod(
+                    start: DateAndTime(2026, 7, 14, 5),
+                    end: DateAndTime(2026, 10, 14, 5),
+                  ),
+                ),
+                (value) => '${value.toInt()} items',
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final monday = DateTime(2026, 9, 7);
+      final spot = FlSpot(monday.millisecondsSinceEpoch.toDouble(), 4);
+      final getTooltipItems = tester
+          .widget<LineChart>(find.byType(LineChart))
+          .data
+          .lineTouchData
+          .touchTooltipData
+          .getTooltipItems;
+
+      final items = getTooltipItems([
+        LineBarSpot(
+          LineChartBarData(spots: [spot], color: Colors.teal),
+          0,
+          spot,
+        ),
+        LineBarSpot(
+          LineChartBarData(
+            spots: [spot],
+            gradient: const LinearGradient(colors: [Colors.red, Colors.orange]),
+          ),
+          1,
+          spot,
+        ),
+      ]);
+
+      final localizations = MaterialLocalizations.of(
+        tester.element(find.byType(LineChartWrapper)),
+      );
+
+      expect(
+        items,
+        [
+          LineTooltipItem(
+            '${localizations.formatCompactDate(monday)}\n4 items',
+            const TextStyle(
+              color: Colors.teal,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+          const LineTooltipItem(
+            '4 items',
+            TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      );
+    },
+  );
+
+  testWidgets(
     'tooltip text is the formatted spot y',
     (tester) async {
       await tester.pumpWidget(
