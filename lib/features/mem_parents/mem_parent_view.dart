@@ -129,9 +129,12 @@ class _MemParentSection extends StatelessWidget {
 Future<void> _setParent(BuildContext context, WidgetRef ref, int memId) => v(
       () async {
         final mems = await MemRepository().ship();
+        final excludedIds = await _excludedParentCandidateIds(memId);
         if (!context.mounted) return;
 
-        final candidates = mems.where((mem) => mem.id != memId).toList()
+        final candidates = mems
+            .where((mem) => !excludedIds.contains(mem.id))
+            .toList()
           ..sort((a, b) => a.name.compareTo(b.name));
         final selectedId = await showDialog<int>(
           context: context,
@@ -149,6 +152,25 @@ Future<void> _setParent(BuildContext context, WidgetRef ref, int memId) => v(
         }
         if (!context.mounted) return;
         ref.invalidate(parentNameByMemIdProvider(memId));
+      },
+      memId,
+    );
+
+Future<Set<int>> _excludedParentCandidateIds(int memId) => v(
+      () async {
+        final excluded = <int>{memId};
+        final pending = <int>[memId];
+        while (pending.isNotEmpty) {
+          final current = pending.removeLast();
+          final children =
+              await MemRepository().shipChildrenByParentMemId(current);
+          for (final child in children) {
+            if (excluded.add(child.memId)) {
+              pending.add(child.memId);
+            }
+          }
+        }
+        return excluded;
       },
       memId,
     );

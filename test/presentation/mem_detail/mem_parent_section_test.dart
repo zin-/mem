@@ -237,4 +237,54 @@ void main() {
     expect(find.text(_l10n.parentLabel), findsOneWidget);
     expect(find.text(_l10n.childrenLabel), findsNothing);
   });
+
+  testWidgets('hides self and descendants from the parent picker',
+      (tester) async {
+    final ancestor = await insertMem('Ancestor');
+    final editing = await insertMem('Editing');
+    final child = await insertMem('Child');
+    final grandchild = await insertMem('Grandchild');
+    await insertMem('Unrelated');
+    await MemRepository().receiveParent(
+      MemParent(memId: editing.id, parentMemId: ancestor.id),
+    );
+    await MemRepository().receiveParent(
+      MemParent(memId: child.id, parentMemId: editing.id),
+    );
+    await MemRepository().receiveParent(
+      MemParent(memId: grandchild.id, parentMemId: child.id),
+    );
+
+    await pumpDetail(tester, editing.id);
+
+    await tester.tap(find.text(_l10n.parentLabel));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 50),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
+
+    final dialog = find.byType(AlertDialog);
+    expect(find.text(_l10n.selectParentTitle), findsOneWidget);
+    expect(
+      find.descendant(of: dialog, matching: find.text('Editing')),
+      findsNothing,
+    );
+    expect(
+      find.descendant(of: dialog, matching: find.text('Child')),
+      findsNothing,
+    );
+    expect(
+      find.descendant(of: dialog, matching: find.text('Grandchild')),
+      findsNothing,
+    );
+    expect(
+      find.descendant(of: dialog, matching: find.text('Ancestor')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: dialog, matching: find.text('Unrelated')),
+      findsOneWidget,
+    );
+  });
 }
