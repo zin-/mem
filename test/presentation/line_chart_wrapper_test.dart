@@ -155,66 +155,9 @@ void main() {
         find.text(localizations.formatShortMonthDay(DateTime(2026, 5, 4))),
         findsNothing,
       );
-    },
-  );
-
-  testWidgets(
-    'weekly tooltip text is the monday date and the formatted spot y',
-    (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('en'),
-          onGenerateTitle: (context) => buildL10n(context).test,
-          home: Scaffold(
-            body: SizedBox(
-              width: 800,
-              height: 400,
-              child: LineChartWrapper(
-                ActsSummary(
-                  [
-                    FinishedAct(
-                      1,
-                      DateAndTime(2026, 7, 14, 10),
-                      DateAndTime(2026, 7, 14, 11),
-                    ),
-                  ],
-                  AggregationType.count,
-                  period: DateAndTimePeriod(
-                    start: DateAndTime(2026, 7, 14, 5),
-                    end: DateAndTime(2026, 10, 14, 5),
-                  ),
-                ),
-                (value) => '${value.toInt()} items',
-              ),
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      final monday = DateTime(2026, 9, 7);
-      final spot = FlSpot(monday.millisecondsSinceEpoch.toDouble(), 4);
-      final items = tester
-          .widget<LineChart>(find.byType(LineChart))
-          .data
-          .lineTouchData
-          .touchTooltipData
-          .getTooltipItems([
-        LineBarSpot(
-          LineChartBarData(spots: [spot], color: Colors.teal),
-          0,
-          spot,
-        ),
-      ]);
-      final localizations = MaterialLocalizations.of(
-        tester.element(find.byType(LineChartWrapper)),
-      );
-
       expect(
-        items?.single?.text,
-        '${localizations.formatCompactDate(monday)}\n4 items',
+        find.text(localizations.formatShortMonthDay(DateTime(2026, 6, 1))),
+        findsNothing,
       );
     },
   );

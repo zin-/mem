@@ -140,8 +140,7 @@ class LineChartWrapper extends StatelessWidget {
           // enabled: true,
           touchTooltipData: LineTouchTooltipData(
             getTooltipItems: (touchedSpots) {
-              final localizations = MaterialLocalizations.of(context);
-              return touchedSpots.mapIndexed((index, spot) {
+              return touchedSpots.map((spot) {
                 final textStyle = TextStyle(
                   color: spot.bar.gradient?.colors.first ??
                       spot.bar.color ??
@@ -149,11 +148,8 @@ class LineChartWrapper extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
                 );
-                final value = _valueFormatter(spot.y);
                 return LineTooltipItem(
-                  weekly && index == 0
-                      ? "${localizations.formatCompactDate(DateTime.fromMillisecondsSinceEpoch(spot.x.toInt()))}\n$value"
-                      : value,
+                  _valueFormatter(spot.y),
                   textStyle,
                 );
               }).toList();
