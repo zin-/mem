@@ -12,6 +12,7 @@ import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mems/mem_period.dart';
 import 'package:mem/features/mems/mem_view_data.dart';
+import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/values/dimens.dart';
 
@@ -27,6 +28,13 @@ class MemDetailBody extends ConsumerWidget {
         () {
           final editingMem = ref.watch(editingMemByMemIdProvider(_memId));
           final savedMem = ref.watch(memByMemIdProvider(_memId));
+          final memId = _memId;
+          if (memId != null && savedMem?.parentsLoaded != true) {
+            Future<void>(() {
+              if (!context.mounted) return;
+              ref.read(memEntitiesProvider.notifier).loadDetail(memId);
+            });
+          }
 
           return _MemDetailBodyComponent(
             _memId,

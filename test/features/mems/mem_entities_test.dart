@@ -1,7 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/databases/database.dart' hide Mem;
+import 'package:mem/databases/database.dart' hide Mem, MemParent;
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
+import 'package:mem/features/mem_parents/mem_parent.dart';
 import 'package:mem/features/mem_relations/mem_relation_repository.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'list/helpers.dart';
@@ -52,6 +53,10 @@ void main() {
   });
 
   MemEntities notifier() => container.read(memEntitiesProvider.notifier);
+
+  MemEntity cachedMem(int id) => container
+      .read(memEntitiesProvider)
+      .singleWhere((entity) => entity.id == id);
 
   Future<MemEntity> insertMem(String name) =>
       MemRepository().receive(Mem(null, name, null, null));
@@ -153,6 +158,52 @@ void main() {
 
     await notifier().unarchive(saved.id);
     expect(container.read(memEntitiesProvider).single.archivedAt, isNull);
+  });
+
+  test('loadDetail caches parent links and does not replace a cached mem',
+      () async {
+    final parent = await insertMem('Parent');
+    final child = await insertMem('Child');
+    final other = await insertMem('Other');
+    await MemRepository().receiveParent(
+      MemParent(memId: child.id, parentMemId: parent.id),
+    );
+    await MemRepository().receiveParent(
+      MemParent(memId: other.id, parentMemId: child.id),
+    );
+    notifier().upsert([
+      parent.updatedWith(
+        update: (mem) => Mem(mem.id, 'kept', mem.doneAt, mem.period),
+      ),
+    ]);
+
+    final first = notifier().loadDetail(child.id);
+    final second = notifier().loadDetail(child.id);
+    expect(second, same(first));
+    await first;
+
+    final loadedChild = cachedMem(child.id);
+    expect(loadedChild.parentsLoaded, isTrue);
+    expect(loadedChild.parentMemId, parent.id);
+    expect(loadedChild.childMemIds, [other.id]);
+    expect(cachedMem(parent.id).name, 'kept');
+    expect(cachedMem(parent.id).parentsLoaded, isFalse);
+    expect(cachedMem(other.id).name, 'Other');
+    expect(cachedMem(other.id).parentsLoaded, isFalse);
+
+    await MemRepository().wasteParents(memId: child.id);
+    await notifier().loadDetail(child.id);
+
+    expect(cachedMem(child.id).parentsLoaded, isTrue);
+    expect(cachedMem(child.id).parentMemId, isNull);
+    expect(cachedMem(child.id).childMemIds, [other.id]);
+    expect(cachedMem(parent.id).name, 'kept');
+
+    await notifier().loadByMemId(child.id);
+
+    expect(cachedMem(child.id).parentsLoaded, isTrue);
+    expect(cachedMem(child.id).parentMemId, isNull);
+    expect(cachedMem(child.id).childMemIds, [other.id]);
   });
 
   test('doneMem and undoneMem update state', () async {

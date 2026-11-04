@@ -4,37 +4,9 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_parents/mem_parent.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
+import 'package:mem/features/mems/mems_state.dart';
+import 'package:mem/features/mems/states.dart';
 import 'package:mem/l10n/l10n.dart';
-
-final parentNameByMemIdProvider =
-    FutureProvider.autoDispose.family<String?, int>((ref, memId) {
-  return v(
-    () async {
-      final parent = await MemRepository().shipParentByMemId(memId);
-      if (parent == null) return null;
-      final mem = await MemRepository().shipById(parent.parentMemId);
-      return mem.name;
-    },
-    memId,
-  );
-});
-
-final childrenNamesByMemIdProvider =
-    FutureProvider.autoDispose.family<List<String>, int>((ref, memId) {
-  return v(
-    () async {
-      final children = await MemRepository().shipChildrenByParentMemId(memId);
-      final names = <String>[];
-      for (final child in children) {
-        final mem = await MemRepository().shipById(child.memId);
-        names.add(mem.name);
-      }
-      names.sort();
-      return names;
-    },
-    memId,
-  );
-});
 
 class MemParentView extends ConsumerWidget {
   final int _memId;
@@ -44,24 +16,30 @@ class MemParentView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
-          final parentName = ref.watch(parentNameByMemIdProvider(_memId));
-          final childrenNames = ref.watch(childrenNamesByMemIdProvider(_memId));
+          final mem = ref.watch(memByMemIdProvider(_memId));
+          if (mem == null || !mem.parentsLoaded) {
+            return const CircularProgressIndicator();
+          }
 
-          return parentName.when(
-            data: (name) => childrenNames.when(
-              data: (names) => _MemParentSection(
-                parentName: name,
-                childrenNames: names,
-                onSet: () => _setParent(context, ref, _memId),
-                onDisconnect: name == null
-                    ? null
-                    : () => _disconnectParent(context, ref, _memId),
-              ),
-              loading: () => const CircularProgressIndicator(),
-              error: (error, stackTrace) => const Text('Error'),
-            ),
-            loading: () => const CircularProgressIndicator(),
-            error: (error, stackTrace) => const Text('Error'),
+          final entities = ref.watch(memEntitiesProvider);
+          final parentMemId = mem.parentMemId;
+          final parentName = parentMemId == null
+              ? null
+              : _entityById(entities, parentMemId)?.name;
+          final childrenNames = <String>[];
+          for (final childId in mem.childMemIds) {
+            final name = _entityById(entities, childId)?.name;
+            if (name != null) childrenNames.add(name);
+          }
+          childrenNames.sort();
+
+          return _MemParentSection(
+            parentName: parentName,
+            childrenNames: childrenNames,
+            onSet: () => _setParent(context, ref, _memId),
+            onDisconnect: parentMemId == null
+                ? null
+                : () => _disconnectParent(context, ref, _memId),
           );
         },
         _memId,
@@ -149,7 +127,12 @@ Future<void> _setParent(BuildContext context, WidgetRef ref, int memId) => v(
           return;
         }
         if (!context.mounted) return;
-        ref.invalidate(parentNameByMemIdProvider(memId));
+        await _reloadParentDetails(
+          ref,
+          memId: memId,
+          previousParentMemId: currentParent?.parentMemId,
+          nextParentMemId: selectedId,
+        );
       },
       memId,
     );
@@ -180,12 +163,46 @@ Future<void> _disconnectParent(
 ) =>
     v(
       () async {
+        final previousParentMemId =
+            ref.read(memByMemIdProvider(memId))?.parentMemId;
         await MemRepository().wasteParents(memId: memId);
         if (!context.mounted) return;
-        ref.invalidate(parentNameByMemIdProvider(memId));
+        await _reloadParentDetails(
+          ref,
+          memId: memId,
+          previousParentMemId: previousParentMemId,
+        );
       },
       memId,
     );
+
+Future<void> _reloadParentDetails(
+  WidgetRef ref, {
+  required int memId,
+  int? previousParentMemId,
+  int? nextParentMemId,
+}) async {
+  final entities = ref.read(memEntitiesProvider);
+  final ids = <int>[memId];
+  for (final parentId in [previousParentMemId, nextParentMemId]) {
+    if (parentId == null || ids.contains(parentId)) continue;
+    final cached = _entityById(entities, parentId);
+    if (cached != null && cached.parentsLoaded) {
+      ids.add(parentId);
+    }
+  }
+  final notifier = ref.read(memEntitiesProvider.notifier);
+  await Future.wait([
+    for (final id in ids) notifier.loadDetail(id),
+  ]);
+}
+
+MemEntity? _entityById(Iterable<MemEntity> entities, int id) {
+  for (final entity in entities) {
+    if (entity.id == id) return entity;
+  }
+  return null;
+}
 
 class _SelectParentDialog extends StatelessWidget {
   final List<MemEntity> _candidates;

@@ -99,6 +99,23 @@ void main() {
         .thenAnswer((_) async => null);
     when(mockMemRepository.shipChildrenByParentMemId(any))
         .thenAnswer((_) async => []);
+    when(mockMemRepository.shipById(
+      any,
+      loadLatestAct: anyNamed('loadLatestAct'),
+    )).thenAnswer((invocation) async {
+      final id = invocation.positionalArguments.single as int;
+      return MemEntity(
+        id,
+        '',
+        null,
+        null,
+        null,
+        DateTime.now(),
+        null,
+        null,
+        target: null,
+      );
+    });
   });
 
   tearDown(() {

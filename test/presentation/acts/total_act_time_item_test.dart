@@ -14,7 +14,6 @@ import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_state.dart';
-import 'package:mem/features/mem_parents/mem_parent_view.dart';
 import 'package:mem/features/mems/detail/page.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/mem.dart';
@@ -43,6 +42,22 @@ class _FakeMemEntities extends MemEntities {
 
   @override
   Iterable<MemEntity> build() => _initial;
+
+  @override
+  Future<void> loadDetail(int memId) async {
+    MemEntity? current;
+    for (final entity in state) {
+      if (entity.id == memId) {
+        current = entity;
+        break;
+      }
+    }
+    if (current == null || current.parentsLoaded) return;
+    await Future<void>.value();
+    upsert([
+      current.updatedWith(parentsLoaded: () => true),
+    ]);
+  }
 }
 
 class _FakeTargetState extends TargetState {
@@ -147,8 +162,6 @@ void main() {
         memRelationEntitiesByMemIdProvider(_memId).overrideWith(
           () => _FakeMemRelationEntitiesByMemId(),
         ),
-        parentNameByMemIdProvider(_memId).overrideWith((ref) async => null),
-        childrenNamesByMemIdProvider(_memId).overrideWith((ref) async => []),
         preferenceProvider(startOfDayKey).overrideWith(() => _FakePreference()),
         if (actEntities != null)
           actEntitiesProvider.overrideWith(() => actEntities),
