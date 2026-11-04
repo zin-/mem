@@ -97,6 +97,8 @@ void main() {
         .thenAnswer((_) async => []);
     when(mockMemRepository.shipParentByMemId(any))
         .thenAnswer((_) async => null);
+    when(mockMemRepository.shipChildrenByParentMemId(any))
+        .thenAnswer((_) async => []);
   });
 
   tearDown(() {

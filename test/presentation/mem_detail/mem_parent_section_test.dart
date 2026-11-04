@@ -85,9 +85,12 @@ void main() {
   testWidgets('hides the parent field on an unsaved mem', (tester) async {
     await pumpDetail(tester, null);
 
-    expect(find.text(_l10n.parentLabel), findsNothing);
-    expect(find.text(_l10n.childrenLabel), findsNothing);
+    expect(find.text(_l10n.parentNone), findsNothing);
+    expect(find.byIcon(Icons.account_tree), findsNothing);
+    expect(find.byIcon(Icons.subdirectory_arrow_right), findsNothing);
     expect(find.byIcon(Icons.close), findsNothing);
+    expect(find.text('親'), findsNothing);
+    expect(find.text('子'), findsNothing);
   });
 
   testWidgets('shows the saved parent name above relations', (tester) async {
@@ -99,12 +102,20 @@ void main() {
 
     await pumpDetail(tester, child.id);
 
-    expect(find.text(_l10n.parentLabel), findsOneWidget);
+    expect(find.byIcon(Icons.account_tree), findsOneWidget);
     expect(find.text('Parent'), findsOneWidget);
     expect(find.text(_l10n.parentNone), findsNothing);
+    expect(find.text('親'), findsNothing);
     expect(find.byIcon(Icons.close), findsOneWidget);
     expect(
-      tester.getTopLeft(find.text(_l10n.parentLabel)).dy,
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'Parent'),
+        matching: find.byIcon(Icons.account_tree),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      tester.getTopLeft(find.text('Parent')).dy,
       lessThan(tester.getTopLeft(find.text('Relations')).dy),
     );
   });
@@ -116,11 +127,11 @@ void main() {
 
     await pumpDetail(tester, child.id);
 
-    expect(find.text(_l10n.parentLabel), findsOneWidget);
+    expect(find.byIcon(Icons.account_tree), findsOneWidget);
     expect(find.text(_l10n.parentNone), findsOneWidget);
     expect(find.byIcon(Icons.close), findsNothing);
 
-    await tester.tap(find.text(_l10n.parentLabel));
+    await tester.tap(find.text(_l10n.parentNone));
     await tester.pumpAndSettle(
       const Duration(milliseconds: 50),
       EnginePhase.sendSemanticsUpdate,
@@ -159,7 +170,7 @@ void main() {
       parentA.id,
     );
 
-    await tester.tap(find.text(_l10n.parentLabel));
+    await tester.tap(find.text('Parent A'));
     await tester.pumpAndSettle(
       const Duration(milliseconds: 50),
       EnginePhase.sendSemanticsUpdate,
@@ -210,20 +221,36 @@ void main() {
 
     await pumpDetail(tester, parent.id);
 
-    expect(find.text(_l10n.childrenLabel), findsOneWidget);
+    expect(find.text('親'), findsNothing);
+    expect(find.text('子'), findsNothing);
+    expect(find.byIcon(Icons.subdirectory_arrow_right), findsNWidgets(2));
     expect(find.text('Child A'), findsOneWidget);
     expect(find.text('Child B'), findsOneWidget);
     expect(find.text('Grandchild'), findsNothing);
     expect(
-      tester.getTopLeft(find.text(_l10n.parentLabel)).dy,
-      lessThan(tester.getTopLeft(find.text(_l10n.childrenLabel)).dy),
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'Child A'),
+        matching: find.byIcon(Icons.subdirectory_arrow_right),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'Child B'),
+        matching: find.byIcon(Icons.subdirectory_arrow_right),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      tester.getTopLeft(find.byIcon(Icons.account_tree)).dy,
+      lessThan(tester.getTopLeft(find.text('Child A')).dy),
     );
     expect(
       tester.getTopLeft(find.text('Child A')).dy,
       lessThan(tester.getTopLeft(find.text('Child B')).dy),
     );
     expect(
-      tester.getTopLeft(find.text(_l10n.childrenLabel)).dy,
+      tester.getTopLeft(find.text('Child B')).dy,
       lessThan(tester.getTopLeft(find.text('Relations')).dy),
     );
   });
@@ -234,8 +261,11 @@ void main() {
 
     await pumpDetail(tester, mem.id);
 
-    expect(find.text(_l10n.parentLabel), findsOneWidget);
-    expect(find.text(_l10n.childrenLabel), findsNothing);
+    expect(find.byIcon(Icons.account_tree), findsOneWidget);
+    expect(find.text(_l10n.parentNone), findsOneWidget);
+    expect(find.byIcon(Icons.subdirectory_arrow_right), findsNothing);
+    expect(find.text('親'), findsNothing);
+    expect(find.text('子'), findsNothing);
   });
 
   testWidgets('hides self and descendants from the parent picker',
@@ -257,7 +287,7 @@ void main() {
 
     await pumpDetail(tester, editing.id);
 
-    await tester.tap(find.text(_l10n.parentLabel));
+    await tester.tap(find.text('Ancestor'));
     await tester.pumpAndSettle(
       const Duration(milliseconds: 50),
       EnginePhase.sendSemanticsUpdate,

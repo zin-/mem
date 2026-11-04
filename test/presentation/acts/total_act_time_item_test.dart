@@ -148,6 +148,7 @@ void main() {
           () => _FakeMemRelationEntitiesByMemId(),
         ),
         parentNameByMemIdProvider(_memId).overrideWith((ref) async => null),
+        childrenNamesByMemIdProvider(_memId).overrideWith((ref) async => []),
         preferenceProvider(startOfDayKey).overrideWith(() => _FakePreference()),
         if (actEntities != null)
           actEntitiesProvider.overrideWith(() => actEntities),

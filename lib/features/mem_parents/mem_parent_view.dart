@@ -94,8 +94,7 @@ class _MemParentSection extends StatelessWidget {
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.account_tree),
-                title: Text(l10n.parentLabel),
-                subtitle: Text(_parentName ?? l10n.parentNone),
+                title: Text(_parentName ?? l10n.parentNone),
                 onTap: _onSet,
                 trailing: _onDisconnect == null
                     ? null
@@ -105,16 +104,11 @@ class _MemParentSection extends StatelessWidget {
                         icon: const Icon(Icons.close),
                       ),
               ),
-              if (_childrenNames.isNotEmpty)
+              for (final name in _childrenNames)
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: Text(l10n.childrenLabel),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      for (final name in _childrenNames) Text(name),
-                    ],
-                  ),
+                  leading: const Icon(Icons.subdirectory_arrow_right),
+                  title: Text(name),
                 ),
             ],
           );
