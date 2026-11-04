@@ -86,7 +86,7 @@ void main() {
     await pumpDetail(tester, null);
 
     expect(find.text(_l10n.parentLabel), findsNothing);
-    expect(find.text(_l10n.disconnectParentAction), findsNothing);
+    expect(find.byIcon(Icons.close), findsNothing);
   });
 
   testWidgets('shows the saved parent name above relations', (tester) async {
@@ -101,7 +101,7 @@ void main() {
     expect(find.text(_l10n.parentLabel), findsOneWidget);
     expect(find.text('Parent'), findsOneWidget);
     expect(find.text(_l10n.parentNone), findsNothing);
-    expect(find.text(_l10n.disconnectParentAction), findsOneWidget);
+    expect(find.byIcon(Icons.close), findsOneWidget);
     expect(
       tester.getTopLeft(find.text(_l10n.parentLabel)).dy,
       lessThan(tester.getTopLeft(find.text('Relations')).dy),
@@ -117,7 +117,7 @@ void main() {
 
     expect(find.text(_l10n.parentLabel), findsOneWidget);
     expect(find.text(_l10n.parentNone), findsOneWidget);
-    expect(find.text(_l10n.disconnectParentAction), findsNothing);
+    expect(find.byIcon(Icons.close), findsNothing);
 
     await tester.tap(find.text(_l10n.parentLabel));
     await tester.pumpAndSettle(
@@ -152,7 +152,7 @@ void main() {
 
     expect(find.text('Parent A'), findsOneWidget);
     expect(find.text(_l10n.parentNone), findsNothing);
-    expect(find.text(_l10n.disconnectParentAction), findsOneWidget);
+    expect(find.byIcon(Icons.close), findsOneWidget);
     expect(
       (await MemRepository().shipParentByMemId(child.id))?.parentMemId,
       parentA.id,
@@ -179,7 +179,7 @@ void main() {
       parentB.id,
     );
 
-    await tester.tap(find.text(_l10n.disconnectParentAction));
+    await tester.tap(find.byIcon(Icons.close));
     await tester.pumpAndSettle(
       const Duration(milliseconds: 50),
       EnginePhase.sendSemanticsUpdate,
@@ -188,7 +188,7 @@ void main() {
 
     expect(find.text('Parent B'), findsNothing);
     expect(find.text(_l10n.parentNone), findsOneWidget);
-    expect(find.text(_l10n.disconnectParentAction), findsNothing);
+    expect(find.byIcon(Icons.close), findsNothing);
     expect(await MemRepository().shipParentByMemId(child.id), isNull);
   });
 }

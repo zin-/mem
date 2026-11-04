@@ -63,22 +63,19 @@ class _MemParentSection extends StatelessWidget {
         () {
           final l10n = buildL10n(context);
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.account_tree),
-                title: Text(l10n.parentLabel),
-                subtitle: Text(_parentName ?? l10n.parentNone),
-                onTap: _onSet,
-              ),
-              if (_onDisconnect != null)
-                TextButton(
-                  onPressed: _onDisconnect,
-                  child: Text(l10n.disconnectParentAction),
-                ),
-            ],
+          return ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.account_tree),
+            title: Text(l10n.parentLabel),
+            subtitle: Text(_parentName ?? l10n.parentNone),
+            onTap: _onSet,
+            trailing: _onDisconnect == null
+                ? null
+                : IconButton(
+                    onPressed: _onDisconnect,
+                    tooltip: l10n.disconnectParentAction,
+                    icon: const Icon(Icons.close),
+                  ),
           );
         },
         _parentName,
