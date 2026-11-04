@@ -49,6 +49,9 @@ class LineChartWrapper extends StatelessWidget {
 
     final interval = Duration(days: dayStep).inMilliseconds.toDouble();
     final weekly = dayStep >= DateTime.daysPerWeek;
+    // 約4ヶ月を超えると各月の先頭週が重なるので、1・4・7・10月だけ残す
+    final quarterly = points.length > 1 &&
+        points.first.key.calendarDaysUntil(points.last.key) > 31 * 4;
 
     final titlesData = FlTitlesData(
       topTitles: const AxisTitles(),
@@ -66,12 +69,13 @@ class LineChartWrapper extends StatelessWidget {
 
             final String text;
             if (value == meta.min || value == meta.max) {
-              text = localizations.formatCompactDate(dateTime);
+              text = localizations.formatShortMonthDay(dateTime);
             } else if (meta.axisPosition < meta.parentAxisSize * 0.1 ||
                 meta.parentAxisSize * 0.9 < meta.axisPosition) {
               text = "";
             } else if (weekly) {
-              text = dateTime.day <= DateTime.daysPerWeek
+              text = dateTime.day <= DateTime.daysPerWeek &&
+                      (!quarterly || dateTime.month % 3 == 1)
                   ? localizations.formatShortMonthDay(dateTime)
                   : "";
             } else if (dateTime.day == 1) {

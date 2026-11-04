@@ -104,6 +104,81 @@ void main() {
   );
 
   testWidgets(
+    'year axis labels the first week of each quarter',
+    (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          onGenerateTitle: (context) => buildL10n(context).test,
+          home: Scaffold(
+            body: SizedBox(
+              width: 800,
+              height: 400,
+              child: LineChartWrapper(
+                ActsSummary(
+                  [
+                    FinishedAct(
+                      1,
+                      DateAndTime(2026, 4, 6, 10),
+                      DateAndTime(2026, 4, 6, 11),
+                    ),
+                  ],
+                  AggregationType.count,
+                  period: DateAndTimePeriod(
+                    start: DateAndTime(2025, 10, 14, 5),
+                    end: DateAndTime(2026, 10, 14, 5),
+                  ),
+                ),
+                (value) => value.toInt().toString(),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final localizations = MaterialLocalizations.of(
+        tester.element(find.byType(LineChartWrapper)),
+      );
+
+      expect(
+        find.text(localizations.formatShortMonthDay(DateTime(2026, 4, 6))),
+        findsOneWidget,
+      );
+      expect(
+        find.text(localizations.formatShortMonthDay(DateTime(2026, 7, 6))),
+        findsOneWidget,
+      );
+      expect(
+        find.text(localizations.formatShortMonthDay(DateTime(2026, 5, 4))),
+        findsNothing,
+      );
+      expect(
+        find.text(localizations.formatShortMonthDay(DateTime(2026, 6, 1))),
+        findsNothing,
+      );
+      expect(
+        find.text(localizations.formatShortMonthDay(DateTime(2025, 10, 13))),
+        findsOneWidget,
+      );
+      expect(
+        find.text(localizations.formatShortMonthDay(DateTime(2026, 10, 12))),
+        findsOneWidget,
+      );
+      expect(
+        find.text(localizations.formatCompactDate(DateTime(2025, 10, 13))),
+        findsNothing,
+      );
+      expect(
+        find.text(localizations.formatCompactDate(DateTime(2026, 10, 12))),
+        findsNothing,
+      );
+    },
+  );
+
+  testWidgets(
     'tooltip text is the formatted spot y',
     (tester) async {
       await tester.pumpWidget(
