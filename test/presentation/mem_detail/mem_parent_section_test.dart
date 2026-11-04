@@ -86,7 +86,6 @@ void main() {
     await pumpDetail(tester, null);
 
     expect(find.text(_l10n.parentLabel), findsNothing);
-    expect(find.text(_l10n.setParentAction), findsNothing);
     expect(find.text(_l10n.disconnectParentAction), findsNothing);
   });
 
@@ -120,7 +119,7 @@ void main() {
     expect(find.text(_l10n.parentNone), findsOneWidget);
     expect(find.text(_l10n.disconnectParentAction), findsNothing);
 
-    await tester.tap(find.text(_l10n.setParentAction));
+    await tester.tap(find.text(_l10n.parentLabel));
     await tester.pumpAndSettle(
       const Duration(milliseconds: 50),
       EnginePhase.sendSemanticsUpdate,
@@ -159,7 +158,7 @@ void main() {
       parentA.id,
     );
 
-    await tester.tap(find.text(_l10n.setParentAction));
+    await tester.tap(find.text(_l10n.parentLabel));
     await tester.pumpAndSettle(
       const Duration(milliseconds: 50),
       EnginePhase.sendSemanticsUpdate,

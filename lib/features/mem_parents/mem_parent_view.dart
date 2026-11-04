@@ -71,20 +71,13 @@ class _MemParentSection extends StatelessWidget {
                 leading: const Icon(Icons.account_tree),
                 title: Text(l10n.parentLabel),
                 subtitle: Text(_parentName ?? l10n.parentNone),
+                onTap: _onSet,
               ),
-              Wrap(
-                children: [
-                  TextButton(
-                    onPressed: _onSet,
-                    child: Text(l10n.setParentAction),
-                  ),
-                  if (_onDisconnect != null)
-                    TextButton(
-                      onPressed: _onDisconnect,
-                      child: Text(l10n.disconnectParentAction),
-                    ),
-                ],
-              ),
+              if (_onDisconnect != null)
+                TextButton(
+                  onPressed: _onDisconnect,
+                  child: Text(l10n.disconnectParentAction),
+                ),
             ],
           );
         },
