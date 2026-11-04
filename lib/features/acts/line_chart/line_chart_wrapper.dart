@@ -69,7 +69,7 @@ class LineChartWrapper extends StatelessWidget {
 
             final String text;
             if (value == meta.min || value == meta.max) {
-              text = localizations.formatCompactDate(dateTime);
+              text = localizations.formatShortMonthDay(dateTime);
             } else if (meta.axisPosition < meta.parentAxisSize * 0.1 ||
                 meta.parentAxisSize * 0.9 < meta.axisPosition) {
               text = "";

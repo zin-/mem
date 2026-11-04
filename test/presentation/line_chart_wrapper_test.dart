@@ -159,6 +159,22 @@ void main() {
         find.text(localizations.formatShortMonthDay(DateTime(2026, 6, 1))),
         findsNothing,
       );
+      expect(
+        find.text(localizations.formatShortMonthDay(DateTime(2025, 10, 13))),
+        findsOneWidget,
+      );
+      expect(
+        find.text(localizations.formatShortMonthDay(DateTime(2026, 10, 12))),
+        findsOneWidget,
+      );
+      expect(
+        find.text(localizations.formatCompactDate(DateTime(2025, 10, 13))),
+        findsNothing,
+      );
+      expect(
+        find.text(localizations.formatCompactDate(DateTime(2026, 10, 12))),
+        findsNothing,
+      );
     },
   );
 
