@@ -31,6 +31,10 @@ class MemListWidget extends ConsumerWidget {
             mems.map((e) => e.toDomain()).toList(),
             ref.watch(preferenceProvider(startOfDayKey)),
             ref.watch(savedMemNotificationsProvider),
+            () async {
+              ref.invalidate(loadMemListProvider);
+              await ref.read(loadMemListProvider.future);
+            },
           );
         },
       );
@@ -41,12 +45,14 @@ class _MemListWidget extends StatelessWidget {
   final List<Mem> _memList;
   final TimeOfDay _startOfDay;
   final Iterable<MemNotificationEntityV1> _memNotifications;
+  final Future<void> Function() _onRefresh;
 
   const _MemListWidget(
     this._scrollController,
     this._memList,
     this._startOfDay,
     this._memNotifications,
+    this._onRefresh,
   );
 
   @override
@@ -62,62 +68,66 @@ class _MemListWidget extends StatelessWidget {
             },
           );
 
-          return CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              const MemListAppBar(),
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final mem = hasActMemList[true]![index];
-                    return MemListItemView(
-                      mem,
-                      key: ValueKey(mem.id),
-                    );
-                  },
-                  childCount: hasActMemList[true]?.length ?? 0,
-                ),
-              ),
-              ...(hasActMemList[false] ?? [])
-                  .groupListsBy(
-                    (element) {
-                      final memNotifications = _memNotifications
-                          .where((e) => e.value.memId == element.id)
-                          .map((e) => e.value);
-                      return element.memListSectionDate(
-                        startOfToday,
-                        memNotifications,
+          return RefreshIndicator(
+            onRefresh: _onRefresh,
+            child: CustomScrollView(
+              controller: _scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+                const MemListAppBar(),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final mem = hasActMemList[true]![index];
+                      return MemListItemView(
+                        mem,
+                        key: ValueKey(mem.id),
                       );
                     },
-                  )
-                  .entries
-                  .sorted((a, b) => nullableCompare(a.key, b.key))
-                  .map(
-                    (e) => SliverStickyHeader(
-                      header: Container(
-                        height: 60.0,
-                        color: Theme.of(context).colorScheme.surface,
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        alignment: Alignment.centerLeft,
-                        child: e.key == null
-                            ? Text(l10n.memListToDoSubHeader)
-                            : DateAndTimeText(e.key!),
-                      ),
-                      sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            final mem = e.value[index];
-                            return MemListItemView(
-                              mem,
-                              key: ValueKey(mem.id),
-                            );
-                          },
-                          childCount: e.value.length,
+                    childCount: hasActMemList[true]?.length ?? 0,
+                  ),
+                ),
+                ...(hasActMemList[false] ?? [])
+                    .groupListsBy(
+                      (element) {
+                        final memNotifications = _memNotifications
+                            .where((e) => e.value.memId == element.id)
+                            .map((e) => e.value);
+                        return element.memListSectionDate(
+                          startOfToday,
+                          memNotifications,
+                        );
+                      },
+                    )
+                    .entries
+                    .sorted((a, b) => nullableCompare(a.key, b.key))
+                    .map(
+                      (e) => SliverStickyHeader(
+                        header: Container(
+                          height: 60.0,
+                          color: Theme.of(context).colorScheme.surface,
+                          padding: EdgeInsets.symmetric(horizontal: 16.0),
+                          alignment: Alignment.centerLeft,
+                          child: e.key == null
+                              ? Text(l10n.memListToDoSubHeader)
+                              : DateAndTimeText(e.key!),
+                        ),
+                        sliver: SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              final mem = e.value[index];
+                              return MemListItemView(
+                                mem,
+                                key: ValueKey(mem.id),
+                              );
+                            },
+                            childCount: e.value.length,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-            ],
+              ],
+            ),
           );
         },
         {
