@@ -32,6 +32,24 @@ class _FakeMemEntities extends MemEntities {
   Iterable<MemEntity> build() => _state;
 }
 
+class _ActThenFinishedMemEntities extends MemEntities {
+  var _loadCount = 0;
+
+  @override
+  Iterable<MemEntity> build() => [];
+
+  @override
+  Future<void> loadMemList({bool? archived, bool? done}) async {
+    _loadCount += 1;
+    final next = _loadCount == 1
+        ? _savedMemWithActiveAct(1, 'Running')
+        : _savedMemWithFinishedAct(1, 'Running');
+    // loadMemListProvider の build 中に state を更新すると Riverpod が拒否する
+    await Future<void>.value();
+    state = [next];
+  }
+}
+
 class _FakeActEntities extends ActEntities {
   @override
   Iterable<SavedActEntityV1> build() => [];
@@ -86,6 +104,18 @@ MemEntity _savedMemWithActiveAct(int id, String name) => savedMem(
       createdAt: DateTime(2024, 1, id),
       updatedAt: DateTime(2024, 1, id),
       latestAct: ActiveAct(id, DateAndTime(2024, 1, 1)),
+    );
+
+MemEntity _savedMemWithFinishedAct(int id, String name) => savedMem(
+      id: id,
+      name: name,
+      createdAt: DateTime(2024, 1, id),
+      updatedAt: DateTime(2024, 1, id),
+      latestAct: FinishedAct(
+        id,
+        DateAndTime(2024, 1, 1),
+        DateAndTime(2024, 1, 1, 1),
+      ),
     );
 
 void main() {
@@ -273,6 +303,59 @@ void main() {
           findsOneWidget,
         );
         expect(find.byType(MemListItemView), findsOneWidget);
+      });
+
+      testWidgets(
+          'pull to refresh shows play after an active mem becomes finished',
+          (tester) async {
+        final notification = _savedRepeatAtHour(301, 1, 9);
+        final scrollController = ScrollController();
+        addTearDown(scrollController.dispose);
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              preferenceProvider(startOfDayKey).overrideWith(
+                () => _FakePreference(),
+              ),
+              memEntitiesProvider.overrideWith(
+                () => _ActThenFinishedMemEntities(),
+              ),
+              memNotificationsProvider.overrideWith(
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([
+                  notification,
+                ]),
+              ),
+              memNotificationsByMemIdProvider(1).overrideWith(
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([
+                  notification,
+                ]),
+              ),
+              actEntitiesProvider.overrideWith(() => _FakeActEntities()),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                body: MemListWidget(scrollController),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byIcon(Icons.pause), findsOneWidget);
+        expect(find.byIcon(Icons.play_arrow), findsNothing);
+
+        await tester.fling(
+          find.byType(CustomScrollView),
+          const Offset(0, 300),
+          1000,
+        );
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
+        await tester.pump(const Duration(seconds: 1));
+
+        expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+        expect(find.byIcon(Icons.pause), findsNothing);
       });
     });
   });
