@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period_view.dart';
-import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_status_labels.dart';
@@ -39,8 +38,7 @@ class TotalActTimeListItem extends ConsumerWidget {
     if (_isDateView) {
       return isViewedDayToday(_groupDate, startOfDay);
     }
-    final today = DateAndTime.now().logicalDay(startOfDay);
-    return _groupDate.year == today.year && _groupDate.month == today.month;
+    return isSameLogicalMonth(_groupDate, startOfDay);
   }
 
   @override

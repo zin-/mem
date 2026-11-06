@@ -30,7 +30,20 @@ WithStartAndEnd viewedDayWindow(DateTime viewedDay, TimeOfDay startOfDay) {
   return Period.aDay.toPeriod(atStartOfDay, startOfDay)!;
 }
 
-bool isViewedDayToday(DateTime viewedDay, TimeOfDay startOfDay) {
-  final today = Period.aDay.toPeriod(DateAndTime.now(), startOfDay)!;
+bool isViewedDayToday(
+  DateTime viewedDay,
+  TimeOfDay startOfDay, [
+  DateAndTime? now,
+]) {
+  final today = Period.aDay.toPeriod(now ?? DateAndTime.now(), startOfDay)!;
   return today.start == viewedDayWindow(viewedDay, startOfDay).start;
+}
+
+bool isSameLogicalMonth(
+  DateTime groupDate,
+  TimeOfDay startOfDay, [
+  DateAndTime? now,
+]) {
+  final today = (now ?? DateAndTime.now()).logicalDay(startOfDay);
+  return groupDate.year == today.year && groupDate.month == today.month;
 }
