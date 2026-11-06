@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
+import 'package:mem/features/mems/list/filter_value.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
@@ -201,26 +202,61 @@ void main() {
       addTearDown(container.dispose);
 
       final subscription = container.listen(memListProvider, (_, __) {});
-      container.read(showArchivedProvider.notifier).updatedBy(true);
-      container.read(showNotArchivedProvider.notifier).updatedBy(false);
+      container.read(memListFilterProvider.notifier).updatedBy(
+            const MemListFilterValue(
+              showNotArchived: false,
+              showArchived: true,
+            ),
+          );
 
       expect(sortedMemIds(container), [archived.id]);
 
-      container.read(showNotArchivedProvider.notifier).updatedBy(true);
-      container.read(showArchivedProvider.notifier).updatedBy(false);
-      container.read(showNotDoneProvider.notifier).updatedBy(false);
-      container.read(showDoneProvider.notifier).updatedBy(true);
+      container.read(memListFilterProvider.notifier).updatedBy(
+            const MemListFilterValue(
+              showNotDone: false,
+              showDone: true,
+            ),
+          );
 
       expect(sortedMemIds(container), [done.id]);
 
       subscription.close();
       await container.pump();
 
-      expect(container.read(showNotArchivedProvider), isTrue);
-      expect(container.read(showArchivedProvider), isFalse);
-      expect(container.read(showNotDoneProvider), isTrue);
-      expect(container.read(showDoneProvider), isFalse);
+      expect(
+        container.read(memListFilterProvider),
+        const MemListFilterValue(),
+      );
       expect(sortedMemIds(container), [active.id]);
+    });
+  });
+
+  group('search text', () {
+    test('keeps every mem when empty and keeps name matches otherwise', () {
+      final alpha = savedMem(
+        id: 1,
+        name: 'Alpha',
+        createdAt: DateTime(2024, 6, 1),
+        updatedAt: DateTime(2024, 6, 1),
+      );
+      final beta = savedMem(
+        id: 2,
+        name: 'Beta',
+        createdAt: DateTime(2024, 6, 1),
+        updatedAt: DateTime(2024, 6, 1),
+      );
+      final container = memListTestContainer([alpha, beta]);
+      addTearDown(container.dispose);
+      final subscription = container.listen(memListProvider, (_, __) {});
+      addTearDown(subscription.close);
+
+      expect(sortedMemIds(container), [alpha.id, beta.id]);
+
+      container.read(searchTextProvider.notifier).updatedBy('');
+      expect(sortedMemIds(container), [alpha.id, beta.id]);
+
+      container.read(searchTextProvider.notifier).updatedBy('Alp');
+      expect(sortedMemIds(container), [alpha.id]);
     });
   });
 
@@ -292,8 +328,8 @@ void main() {
           updatedAt: DateTime(2024, 10, 12),
           latestAct: skippedOnToday(id),
         ).updatedWith(
-              scheduleAnchorAct: () => scheduleAnchorAct,
-            );
+          scheduleAnchorAct: () => scheduleAnchorAct,
+        );
 
     test(
         'skipped on today with weekly anchor is not grouped under skip day section',
@@ -372,7 +408,8 @@ void main() {
       );
     });
 
-    test('memListProvider notifyAt order uses same startOfToday as section date',
+    test(
+        'memListProvider notifyAt order uses same startOfToday as section date',
         () {
       final sortStartOfToday = DateTimeExt.startOfToday(startOfDay, now);
       final mem = savedMem(
@@ -387,7 +424,8 @@ void main() {
         hour: 8,
       );
 
-      final container = memListTestContainer([mem], notifications: [notification]);
+      final container =
+          memListTestContainer([mem], notifications: [notification]);
       addTearDown(container.dispose);
 
       final sortedMem = container.read(memListProvider).single.toDomain();

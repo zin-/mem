@@ -4,6 +4,7 @@ import 'package:mem/databases/database.dart' hide Mem, MemParent;
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/features/mem_parents/mem_parent.dart';
 import 'package:mem/features/mem_relations/mem_relation_repository.dart';
+import 'package:mem/features/mems/list/filter_value.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'list/helpers.dart';
 import 'package:mem/features/mems/mem.dart';
@@ -93,8 +94,12 @@ void main() {
     );
     expect(sortedMemIds(container), [active.id]);
 
-    container.read(showArchivedProvider.notifier).updatedBy(true);
-    container.read(showNotArchivedProvider.notifier).updatedBy(false);
+    container.read(memListFilterProvider.notifier).updatedBy(
+          const MemListFilterValue(
+            showNotArchived: false,
+            showArchived: true,
+          ),
+        );
     await container.read(loadMemListProvider.future);
 
     expect(
@@ -103,10 +108,12 @@ void main() {
     );
     expect(sortedMemIds(container), [archived.id]);
 
-    container.read(showNotArchivedProvider.notifier).updatedBy(true);
-    container.read(showArchivedProvider.notifier).updatedBy(false);
-    container.read(showNotDoneProvider.notifier).updatedBy(false);
-    container.read(showDoneProvider.notifier).updatedBy(true);
+    container.read(memListFilterProvider.notifier).updatedBy(
+          const MemListFilterValue(
+            showNotDone: false,
+            showDone: true,
+          ),
+        );
     await container.read(loadMemListProvider.future);
 
     expect(
