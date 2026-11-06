@@ -2,12 +2,15 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/states.dart';
+import 'package:mem/features/settings/preference/keys.dart';
+import 'package:mem/features/settings/states.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/widgets/infinite_scroll.dart';
 
@@ -69,6 +72,7 @@ class _ActListState extends ConsumerState<ActList> {
             memId,
             ref.watch(dateViewProvider),
             ref.watch(timeViewProvider),
+            ref.watch(preferenceProvider(startOfDayKey)),
             ref.watch(actListProvider(memId)),
             listed?.map((e) => e.toDomain()).toList() ?? const [],
             targets,
@@ -85,6 +89,7 @@ class _ActList extends StatelessWidget {
   final int? _memId;
   final bool _isDateView;
   final bool _isTimeView;
+  final TimeOfDay _startOfDay;
   final List<SavedActEntityV1> _actList;
   final List<Mem> _memList;
   final List<Target> _targetList;
@@ -94,6 +99,7 @@ class _ActList extends StatelessWidget {
     this._memId,
     this._isDateView,
     this._isTimeView,
+    this._startOfDay,
     this._actList,
     this._memList,
     this._targetList,
@@ -113,11 +119,16 @@ class _ActList extends StatelessWidget {
                   (e) => e.value.period != null,
                 )
                 .groupListsBy(
-                  (element) => DateTime(
-                    element.value.period!.start!.year,
-                    element.value.period!.start!.month,
-                    _isDateView ? element.value.period!.start!.day : 1,
-                  ),
+                  (element) {
+                    final day = element.value.period!.start!.logicalDay(
+                      _startOfDay,
+                    );
+                    return DateTime(
+                      day.year,
+                      day.month,
+                      _isDateView ? day.day : 1,
+                    );
+                  },
                 )
                 .entries
                 .map(
@@ -152,6 +163,7 @@ class _ActList extends StatelessWidget {
           '_memId': _memId,
           '_isDateView': _isDateView,
           '_isTimeView': _isTimeView,
+          '_startOfDay': _startOfDay,
           '_actList': _actList,
           '_memList': _memList,
           '_targetList': _targetList,
