@@ -231,6 +231,35 @@ void main() {
     });
   });
 
+  group('search text', () {
+    test('keeps every mem when empty and keeps name matches otherwise', () {
+      final alpha = savedMem(
+        id: 1,
+        name: 'Alpha',
+        createdAt: DateTime(2024, 6, 1),
+        updatedAt: DateTime(2024, 6, 1),
+      );
+      final beta = savedMem(
+        id: 2,
+        name: 'Beta',
+        createdAt: DateTime(2024, 6, 1),
+        updatedAt: DateTime(2024, 6, 1),
+      );
+      final container = memListTestContainer([alpha, beta]);
+      addTearDown(container.dispose);
+      final subscription = container.listen(memListProvider, (_, __) {});
+      addTearDown(subscription.close);
+
+      expect(sortedMemIds(container), [alpha.id, beta.id]);
+
+      container.read(searchTextProvider.notifier).updatedBy('');
+      expect(sortedMemIds(container), [alpha.id, beta.id]);
+
+      container.read(searchTextProvider.notifier).updatedBy('Alp');
+      expect(sortedMemIds(container), [alpha.id]);
+    });
+  });
+
   group('memListProvider', () {
     test('sorts PausedAct mems by pausedAt descending', () {
       final olderPaused = savedMem(
