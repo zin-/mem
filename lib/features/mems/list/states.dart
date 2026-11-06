@@ -13,13 +13,22 @@ import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final memListFilterProvider = StateNotifierProvider.autoDispose<
-    ValueStateNotifier<MemListFilterValue>, MemListFilterValue>(
-  (ref) => v(
-    () => ValueStateNotifier(const MemListFilterValue()),
-  ),
-);
+part 'states.g.dart';
+
+// ウィジェット MemListFilter とクラス名が衝突するため、provider 名だけ指定する
+@Riverpod(name: 'memListFilterProvider')
+class MemListFilterNotifier extends _$MemListFilterNotifier {
+  @override
+  MemListFilterValue build() => v(() => const MemListFilterValue());
+
+  MemListFilterValue updatedBy(MemListFilterValue value) => v(
+        () => state = value,
+        {'current': state, 'updating': value},
+      );
+}
+
 final _filteredMemsProvider = StateNotifierProvider.autoDispose<
     ListValueStateNotifier<MemEntity>, List<MemEntity>>(
   (ref) {
