@@ -9,6 +9,15 @@ DateTime logicalToday(TimeOfDay startOfDay) {
   return DateTime(start.year, start.month, start.day);
 }
 
+DateTime logicalGroupDate(
+  DateAndTime start,
+  TimeOfDay startOfDay,
+  bool isDateView,
+) {
+  final day = start.logicalDay(startOfDay);
+  return DateTime(day.year, day.month, isDateView ? day.day : 1);
+}
+
 WithStartAndEnd viewedDayWindow(DateTime viewedDay, TimeOfDay startOfDay) {
   // 行の日付は 0 時。startOfDay より前を Period.aDay に渡すと前日になる
   final atStartOfDay = DateAndTime(

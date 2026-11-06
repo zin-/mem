@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period_view.dart';
+import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_status_labels.dart';
@@ -34,13 +35,12 @@ class TotalActTimeListItem extends ConsumerWidget {
     super.key,
   });
 
-  bool _isCurrentPeriod(DateTime now) {
-    final sameMonth =
-        _groupDate.year == now.year && _groupDate.month == now.month;
-    if (!_isDateView) {
-      return sameMonth;
+  bool _isCurrentPeriod(TimeOfDay startOfDay) {
+    if (_isDateView) {
+      return isViewedDayToday(_groupDate, startOfDay);
     }
-    return sameMonth && _groupDate.day == now.day;
+    final today = DateAndTime.now().logicalDay(startOfDay);
+    return _groupDate.year == today.year && _groupDate.month == today.month;
   }
 
   @override
@@ -54,10 +54,10 @@ class TotalActTimeListItem extends ConsumerWidget {
           // 実行中が前日始まりでも、今の行のボタンがずれないように期間内 Act は見ない
           final latestAct =
               loadedMem != null ? loadedMem.latestAct : _mem?.latestAct;
-          final actions = _isCurrentPeriod(DateTime.now())
+          final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
+          final actions = _isCurrentPeriod(startOfDay)
               ? _actions(ref, memId, latestAct)
               : (leading: null, trailing: null);
-          final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
           final isToday =
               _isDateView && isViewedDayToday(_groupDate, startOfDay);
           final target = _target;
