@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/framework/date_and_time/date_and_time.dart';
+import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_status_labels.dart';
 import 'package:mem/features/acts/day_act_amount.dart';
 import 'package:mem/features/acts/states.dart';
-import 'package:mem/features/acts/viewed_day.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/mems/transitions.dart';
@@ -187,7 +188,9 @@ DayActAmount? _amount(WidgetRef ref, int memId, Target? target) {
   if (!DayTargetLabel.shows(target)) {
     return null;
   }
-  final day = logicalToday(ref.watch(preferenceProvider(startOfDayKey)));
+  final day = DateAndTime.now().logicalDay(
+    ref.watch(preferenceProvider(startOfDayKey)),
+  );
   return ref.watch(viewedDayActAmountProvider(memId, day)).value;
 }
 

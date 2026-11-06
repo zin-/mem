@@ -2,9 +2,9 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/states.dart';
-import 'package:mem/features/acts/viewed_day.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
@@ -119,11 +119,16 @@ class _ActList extends StatelessWidget {
                   (e) => e.value.period != null,
                 )
                 .groupListsBy(
-                  (element) => logicalGroupDate(
-                    element.value.period!.start!,
-                    _startOfDay,
-                    _isDateView,
-                  ),
+                  (element) {
+                    final day = element.value.period!.start!.logicalDay(
+                      _startOfDay,
+                    );
+                    return DateTime(
+                      day.year,
+                      day.month,
+                      _isDateView ? day.day : 1,
+                    );
+                  },
                 )
                 .entries
                 .map(

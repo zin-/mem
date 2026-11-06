@@ -84,6 +84,17 @@ void main() {
     });
   });
 
+  group('dayPeriod', () {
+    const startOfDay = TimeOfDay(hour: 5, minute: 0);
+
+    test('ends at the next startOfDay', () {
+      final window = DateTime(2026, 10, 30).dayPeriod(startOfDay);
+
+      expect(window.start, DateTime(2026, 10, 30, 5));
+      expect(window.end, DateTime(2026, 10, 31, 5));
+    });
+  });
+
   group('isSameLogicalDay', () {
     const startOfDay = TimeOfDay(hour: 5, minute: 0);
 
