@@ -24,4 +24,16 @@ extension DateAndTimeExt on DateAndTime {
     }
     return date;
   }
+
+  bool isSameLogicalDay(DateTime day, TimeOfDay startOfDay) {
+    final today = logicalDay(startOfDay);
+    return day.year == today.year &&
+        day.month == today.month &&
+        day.day == today.day;
+  }
+
+  bool isSameLogicalMonth(DateTime month, TimeOfDay startOfDay) {
+    final today = logicalDay(startOfDay);
+    return month.year == today.year && month.month == today.month;
+  }
 }

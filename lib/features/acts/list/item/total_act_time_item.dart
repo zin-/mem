@@ -3,13 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period_view.dart';
+import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_status_labels.dart';
 import 'package:mem/features/acts/day_act_amount.dart';
 import 'package:mem/features/acts/list/duration.dart';
 import 'package:mem/features/acts/states.dart';
-import 'package:mem/features/acts/viewed_day.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/states.dart';
@@ -34,11 +34,11 @@ class TotalActTimeListItem extends ConsumerWidget {
     super.key,
   });
 
-  bool _isCurrentPeriod(TimeOfDay startOfDay) {
+  bool _isCurrentPeriod(DateAndTime now, TimeOfDay startOfDay) {
     if (_isDateView) {
-      return isViewedDayToday(_groupDate, startOfDay);
+      return now.isSameLogicalDay(_groupDate, startOfDay);
     }
-    return isSameLogicalMonth(_groupDate, startOfDay);
+    return now.isSameLogicalMonth(_groupDate, startOfDay);
   }
 
   @override
@@ -53,11 +53,12 @@ class TotalActTimeListItem extends ConsumerWidget {
           final latestAct =
               loadedMem != null ? loadedMem.latestAct : _mem?.latestAct;
           final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
-          final actions = _isCurrentPeriod(startOfDay)
+          final now = DateAndTime.now();
+          final actions = _isCurrentPeriod(now, startOfDay)
               ? _actions(ref, memId, latestAct)
               : (leading: null, trailing: null);
           final isToday =
-              _isDateView && isViewedDayToday(_groupDate, startOfDay);
+              _isDateView && now.isSameLogicalDay(_groupDate, startOfDay);
           final target = _target;
           final amount = _dayAmount(ref, memId, target);
 
