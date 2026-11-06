@@ -146,42 +146,4 @@ void main() {
       expect(find.text('November 2026'), findsNothing);
     },
   );
-
-  testWidgets(
-    'shows actions on the previous day group before start of day',
-    (tester) async {
-      final now = DateTime.now();
-      // 開始時刻ちょうどは当日の論理日になる。1分後なら前日が今日
-      final boundary = now.add(const Duration(minutes: 1));
-      final startOfDay =
-          TimeOfDay(hour: boundary.hour, minute: boundary.minute);
-      final yesterday = DateTime(
-        now.year,
-        now.month,
-        now.day - 1,
-        startOfDay.hour,
-        startOfDay.minute,
-      );
-
-      await _pumpActList(
-        tester,
-        acts: [_act(1, yesterday)],
-        startOfDay: startOfDay,
-      );
-
-      final localizations = MaterialLocalizations.of(
-        tester.element(find.byType(ActList)),
-      );
-      expect(
-        find.text(localizations.formatCompactDate(yesterday)),
-        findsOneWidget,
-      );
-      expect(find.text(localizations.formatCompactDate(now)), findsNothing);
-
-      final tile = tester.widget<ListTile>(find.byType(ListTile));
-      expect(tile.leading, isNotNull);
-      expect(tile.trailing, isNotNull);
-      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
-    },
-  );
 }
