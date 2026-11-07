@@ -94,7 +94,7 @@ void main() {
     );
     expect(sortedMemIds(container), [active.id]);
 
-    container.read(memListFilterProvider.notifier).updatedBy(
+    container.read(memListFilterStateProvider.notifier).updatedBy(
           const MemListFilterValue(
             showNotArchived: false,
             showArchived: true,
@@ -108,7 +108,7 @@ void main() {
     );
     expect(sortedMemIds(container), [archived.id]);
 
-    container.read(memListFilterProvider.notifier).updatedBy(
+    container.read(memListFilterStateProvider.notifier).updatedBy(
           const MemListFilterValue(
             showNotDone: false,
             showDone: true,

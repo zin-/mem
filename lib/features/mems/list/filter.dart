@@ -17,10 +17,10 @@ class MemListFilter extends StatelessWidget {
 
           return Consumer(
             builder: (context, ref, child) {
-              final filter = ref.watch(memListFilterProvider);
+              final filter = ref.watch(memListFilterStateProvider);
 
               void update(MemListFilterValue value) =>
-                  ref.read(memListFilterProvider.notifier).updatedBy(value);
+                  ref.read(memListFilterStateProvider.notifier).updatedBy(value);
 
               final sections = [
                 Column(

@@ -202,7 +202,7 @@ void main() {
       addTearDown(container.dispose);
 
       final subscription = container.listen(memListProvider, (_, __) {});
-      container.read(memListFilterProvider.notifier).updatedBy(
+      container.read(memListFilterStateProvider.notifier).updatedBy(
             const MemListFilterValue(
               showNotArchived: false,
               showArchived: true,
@@ -211,7 +211,7 @@ void main() {
 
       expect(sortedMemIds(container), [archived.id]);
 
-      container.read(memListFilterProvider.notifier).updatedBy(
+      container.read(memListFilterStateProvider.notifier).updatedBy(
             const MemListFilterValue(
               showNotDone: false,
               showDone: true,
@@ -224,7 +224,7 @@ void main() {
       await container.pump();
 
       expect(
-        container.read(memListFilterProvider),
+        container.read(memListFilterStateProvider),
         const MemListFilterValue(),
       );
       expect(sortedMemIds(container), [active.id]);

@@ -17,9 +17,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'states.g.dart';
 
-// ウィジェット MemListFilter とクラス名が衝突するため、provider 名だけ指定する
-@Riverpod(name: 'memListFilterProvider')
-class MemListFilterNotifier extends _$MemListFilterNotifier {
+@riverpod
+class MemListFilterState extends _$MemListFilterState {
   @override
   MemListFilterValue build() => v(() => const MemListFilterValue());
 
@@ -33,7 +32,7 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
     ListValueStateNotifier<MemEntity>, List<MemEntity>>(
   (ref) {
     final savedMemEntities = ref.watch(memEntitiesProvider);
-    final filter = ref.watch(memListFilterProvider);
+    final filter = ref.watch(memListFilterStateProvider);
     final searchText = ref.watch(searchTextProvider);
 
     return ListValueStateNotifier(
@@ -57,7 +56,7 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
 );
 
 final loadMemListProvider = FutureProvider.autoDispose<void>((ref) {
-  final filter = ref.watch(memListFilterProvider);
+  final filter = ref.watch(memListFilterStateProvider);
 
   return v(
     () => ref.read(memEntitiesProvider.notifier).loadMemList(
