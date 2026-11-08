@@ -5,6 +5,8 @@
   "actChartPageTitle": "Act chart",
   "timePeriod": "Time period",
 
+  "homeDestinationLabel": "Home",
+  "homeUpcomingSubHeader": "Upcoming",
   "memListDestinationLabel": "List",
   "memListToDoSubHeader": "ToDo",
   "actListDestinationLabel": "Acts",
