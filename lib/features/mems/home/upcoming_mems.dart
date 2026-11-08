@@ -1,5 +1,36 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
+import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mems/mems_state.dart';
+import 'package:mem/features/settings/preference/keys.dart';
+import 'package:mem/features/settings/states.dart';
+import 'package:mem/framework/date_and_time/date_time_ext.dart';
+
+final upcomingMemsProvider = Provider.autoDispose<List<MemEntity>>((ref) {
+  ref.listen(loadMemListProvider, (_, __) {});
+
+  final mems = ref.watch(memEntitiesProvider);
+  final savedMemNotifications = ref.watch(savedMemNotificationsProvider);
+  final startOfToday = DateTimeExt.startOfToday(
+    ref.watch(preferenceProvider(startOfDayKey)),
+  );
+
+  return v(
+    () => upcomingMems(
+      mems,
+      savedMemNotifications,
+      now: DateTime.now(),
+      startOfToday: startOfToday,
+    ),
+    {
+      'mems': mems,
+      'savedMemNotifications': savedMemNotifications,
+      'startOfToday': startOfToday,
+    },
+  );
+});
 
 List<MemEntity> upcomingMems(
   Iterable<MemEntity> mems,
