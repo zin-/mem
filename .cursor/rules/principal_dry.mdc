@@ -12,6 +12,29 @@ alwaysApply: true
 
 ドメインが異なっている場合を除き、コードの重複はするべきではない
 
+同じ処理を複数箇所で使うなら、ローカル変数やローカル関数にまとめて単一の定義にする。呼び出しごとに引数が違っても、共通部分はそこに置く。
+
+**❌ 同じ更新を各所に書く:**
+
+```dart
+onChanged: (value) => ref
+    .read(memListFilterStateProvider.notifier)
+    .updatedBy(filter.copyWith(showNotArchived: value)),
+onChanged: (value) => ref
+    .read(memListFilterStateProvider.notifier)
+    .updatedBy(filter.copyWith(showArchived: value)),
+```
+
+**✅ 共通の更新をローカル関数にする:**
+
+```dart
+void update(MemListFilterValue value) =>
+    ref.read(memListFilterStateProvider.notifier).updatedBy(value);
+
+onChanged: (value) => update(filter.copyWith(showNotArchived: value)),
+onChanged: (value) => update(filter.copyWith(showArchived: value)),
+```
+
 ### 実装とコメント
 
 **❌ 不要なコメント（書いてはいけない）:**

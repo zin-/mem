@@ -7,80 +7,47 @@ import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/mems/list/filter_value.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-// FIXME: [一覧のアーカイブと完了フィルターを一つの値にする](https://github.com/zin-/mem/issues/692)
-final showNotArchivedProvider =
-    StateNotifierProvider.autoDispose<ValueStateNotifier<bool>, bool>(
-  (ref) => v(
-    () => ValueStateNotifier(true),
-  ),
-);
-final showArchivedProvider =
-    StateNotifierProvider.autoDispose<ValueStateNotifier<bool>, bool>(
-  (ref) => v(
-    () => ValueStateNotifier(false),
-  ),
-);
-final showNotDoneProvider =
-    StateNotifierProvider.autoDispose<ValueStateNotifier<bool>, bool>(
-  (ref) => v(
-    () => ValueStateNotifier(true),
-  ),
-);
-final showDoneProvider =
-    StateNotifierProvider.autoDispose<ValueStateNotifier<bool>, bool>(
-  (ref) => v(
-    () => ValueStateNotifier(false),
-  ),
-);
+part 'states.g.dart';
+
+@riverpod
+class MemListFilterState extends _$MemListFilterState {
+  @override
+  MemListFilterValue build() => v(() => const MemListFilterValue());
+
+  MemListFilterValue updatedBy(MemListFilterValue value) => v(
+        () => state = value,
+        {'current': state, 'updating': value},
+      );
+}
+
 final _filteredMemsProvider = StateNotifierProvider.autoDispose<
     ListValueStateNotifier<MemEntity>, List<MemEntity>>(
   (ref) {
     final savedMemEntities = ref.watch(memEntitiesProvider);
-
-    final showNotArchived = ref.watch(showNotArchivedProvider);
-    final showArchived = ref.watch(showArchivedProvider);
-    final showNotDone = ref.watch(showNotDoneProvider);
-    final showDone = ref.watch(showDoneProvider);
+    final filter = ref.watch(memListFilterStateProvider);
     final searchText = ref.watch(searchTextProvider);
 
     return ListValueStateNotifier(
       v(
-        () => savedMemEntities
-            .where((mem) {
-              if (showNotArchived == showArchived) {
-                return true;
-              } else {
-                return showArchived ? mem.isArchived : !mem.isArchived;
-              }
-            })
-            .where((mem) {
-              if (showNotDone == showDone) {
-                return true;
-              } else {
-                return showDone ? mem.doneAt != null : mem.doneAt == null;
-              }
-            })
-            .where((mem) {
-              // FIXME searchTextがある場合、Memの状態に関わらずsearchTextだけでフィルターした方が良いかも
-              if (searchText == null || searchText.isEmpty) {
-                return true;
-              } else {
-                return mem.name.contains(searchText);
-              }
-            })
-            .toList(),
+        () => savedMemEntities.where(filter.includes).where((mem) {
+          // FIXME searchTextがある場合、Memの状態に関わらずsearchTextだけでフィルターした方が良いかも
+          if (searchText == null || searchText.isEmpty) {
+            return true;
+          } else {
+            return mem.name.contains(searchText);
+          }
+        }).toList(),
         {
           'savedMemEntities': savedMemEntities,
-          'showNotArchived': showNotArchived,
-          'showArchived': showArchived,
-          'showNotDone': showNotDone,
-          'showDone': showDone,
+          'filter': filter,
           'searchText': searchText,
         },
       ),
@@ -89,22 +56,14 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
 );
 
 final loadMemListProvider = FutureProvider.autoDispose<void>((ref) {
-  final showNotArchived = ref.watch(showNotArchivedProvider);
-  final showArchived = ref.watch(showArchivedProvider);
-  final showNotDone = ref.watch(showNotDoneProvider);
-  final showDone = ref.watch(showDoneProvider);
+  final filter = ref.watch(memListFilterStateProvider);
 
   return v(
     () => ref.read(memEntitiesProvider.notifier).loadMemList(
-          archived: showNotArchived == showArchived ? null : showArchived,
-          done: showNotDone == showDone ? null : showDone,
+          archived: filter.archived,
+          done: filter.done,
         ),
-    {
-      'showNotArchived': showNotArchived,
-      'showArchived': showArchived,
-      'showNotDone': showNotDone,
-      'showDone': showDone,
-    },
+    {'filter': filter},
   );
 });
 
@@ -123,8 +82,7 @@ int compareMemListEntries(
   if (comparedActState != 0) {
     return comparedActState;
   } else if (latestActOfA is ActiveAct && latestActOfB is ActiveAct) {
-    return latestActOfB.period!.start!
-        .compareTo(latestActOfA.period!.start!);
+    return latestActOfB.period!.start!.compareTo(latestActOfA.period!.start!);
   } else if (latestActOfA is PausedAct && latestActOfB is PausedAct) {
     return latestActOfB.pausedAt!.compareTo(latestActOfA.pausedAt!);
   }
@@ -163,12 +121,10 @@ int compareMemListEntries(
     }
   }
 
-  final thisHasAfterActStarted = memNotificationsOfA
-      .where((e) => e.value.isAfterActStarted())
-      .isNotEmpty;
-  final otherHasAfterActStarted = memNotificationsOfB
-      .where((e) => e.value.isAfterActStarted())
-      .isNotEmpty;
+  final thisHasAfterActStarted =
+      memNotificationsOfA.where((e) => e.value.isAfterActStarted()).isNotEmpty;
+  final otherHasAfterActStarted =
+      memNotificationsOfB.where((e) => e.value.isAfterActStarted()).isNotEmpty;
   if (thisHasAfterActStarted != otherHasAfterActStarted) {
     return thisHasAfterActStarted ? -1 : 1;
   }
