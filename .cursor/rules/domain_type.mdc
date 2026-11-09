@@ -1,0 +1,52 @@
+---
+alwaysApply: true
+---
+
+# ドメインは型にする
+
+ドメインの値は、公開した個別の関数にしない。型として定義し、その型が値を持つ。
+
+作れないときは `null` を返す。コンストラクタは外から呼べないようにし、生成は `of` に置く。
+
+親が膨らむなら、サブドメインとして親が持つ。`Mem.notifyAt` は `MemNotifyAt` を返す。
+
+同じ手続きを一箇所にまとめるローカル関数は、DRY のまま使ってよい。テストから参照するための公開は `no_meta` のままトップレベル関数でよい。
+
+## Example(具体例)
+
+**❌ 通知時刻を関数で返す:**
+
+```dart
+DateTime? dailyCountNotifyAt({
+  required DateTime? withBase,
+  required DateTime? withoutBase,
+}) { /* ... */ }
+```
+
+**✅ 通知時刻は型が持つ:**
+
+```dart
+class MemNotifyAt {
+  final DateTime at;
+
+  MemNotifyAt._(this.at);
+
+  static MemNotifyAt? of({
+    required DateTime? withBase,
+    required DateTime? withoutBase,
+  }) {
+    final at = /* withBase か withoutBase */;
+    if (at == null) return null;
+    return MemNotifyAt._(at);
+  }
+}
+```
+
+## Relations(関連)
+
+- Entity（永続化される実体とは別）
+- Dry（手続きの共通化はローカル関数）
+- `no_meta`（テスト用の公開）
+- `NextAtAfterLastAct`
+- `CountTarget`
+- `MemNotifyAt`
