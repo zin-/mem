@@ -10,9 +10,9 @@ import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 
 class MemListItemSubtitle extends ConsumerWidget {
   final int _memId;
-  final DateTime? _clockAt;
+  final DateTime? _listAt;
 
-  const MemListItemSubtitle(this._memId, this._clockAt, {super.key});
+  const MemListItemSubtitle(this._memId, this._listAt, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
@@ -26,12 +26,12 @@ class MemListItemSubtitle extends ConsumerWidget {
                 (v) => v.whereType<SavedMemNotificationEntityV1>(),
               ),
             ),
-            _clockAt,
+            _listAt,
           );
         },
         {
           '_memId': _memId,
-          '_clockAt': _clockAt,
+          '_listAt': _listAt,
         },
       );
 }
@@ -40,19 +40,19 @@ class _MemListItemSubtitle extends StatelessWidget {
   final int _memId;
   final DateAndTimePeriod? _memPeriod;
   final Iterable<SavedMemNotificationEntityV1> _savedMemNotificationEntities;
-  final DateTime? _clockAt;
+  final DateTime? _listAt;
 
   const _MemListItemSubtitle(
     this._memId,
     this._memPeriod,
     this._savedMemNotificationEntities,
-    this._clockAt,
+    this._listAt,
   );
 
   @override
   Widget build(BuildContext context) => v(
         () {
-          final clockAt = _clockAt;
+          final listAt = _listAt;
           final enabled =
               _savedMemNotificationEntities.where((e) => e.value.isEnabled());
           final hasRepeatClock = enabled.any((e) => e.value.isRepeated());
@@ -62,13 +62,13 @@ class _MemListItemSubtitle extends StatelessWidget {
               if (enabled.isNotEmpty)
                 MemNotificationText(
                   _memId,
-                  clockAt: hasRepeatClock ? clockAt : null,
+                  listAt: hasRepeatClock ? listAt : null,
                 ),
-              if (clockAt != null && !hasRepeatClock)
+              if (listAt != null && !hasRepeatClock)
                 renderClockTime(
                   context,
-                  TimeOfDay.fromDateTime(clockAt),
-                  clockAt,
+                  TimeOfDay.fromDateTime(listAt),
+                  listAt,
                 ),
             ],
           );
@@ -77,7 +77,7 @@ class _MemListItemSubtitle extends StatelessWidget {
           '_memId': _memId,
           '_memPeriod': _memPeriod,
           '_savedMemNotificationEntities': _savedMemNotificationEntities,
-          '_clockAt': _clockAt,
+          '_listAt': _listAt,
         },
       );
 }

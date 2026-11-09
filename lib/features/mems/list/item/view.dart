@@ -52,7 +52,7 @@ class MemListItemView extends ConsumerWidget {
             periodCount,
             startOfDay,
           );
-          final clockAt = _needsPeriodCount(target) && periodCount == null
+          final listAt = _needsPeriodCount(target) && periodCount == null
               ? null
               : _mem
                   .memListAt(
@@ -101,7 +101,7 @@ class MemListItemView extends ConsumerWidget {
             notifications,
             target,
             amount,
-            clockAt,
+            listAt,
           );
         },
         {
@@ -125,7 +125,7 @@ ListTile _render(
   Iterable<MemNotificationEntityV1> memNotificationEntities,
   Target? target,
   DayActAmount? amount,
-  DateTime? clockAt,
+  DateTime? listAt,
 ) =>
     v(
       () {
@@ -188,9 +188,9 @@ ListTile _render(
               : null,
           subtitle: mem.period == null &&
                   !hasEnableMemNotifications &&
-                  clockAt == null
+                  listAt == null
               ? null
-              : MemListItemSubtitle(mem.id as int, clockAt),
+              : MemListItemSubtitle(mem.id as int, listAt),
           isThreeLine: mem.period != null && hasEnableMemNotifications,
         );
       },
@@ -200,7 +200,7 @@ ListTile _render(
         'memNotificationEntities': memNotificationEntities,
         'target': target,
         'amount': amount,
-        'clockAt': clockAt,
+        'listAt': listAt,
       },
     );
 
