@@ -78,13 +78,15 @@ class MemNotification {
   ) =>
       v(
         () {
-          if (memNotifications.isEmpty) {
+          final enabled = memNotifications
+              .where((notification) => notification.isEnabled());
+          if (enabled.isEmpty) {
             return null;
           } else {
             var notifyAt = startOfToday;
 
             // repeat
-            final repeat = memNotifications.singleWhereOrNull(
+            final repeat = enabled.singleWhereOrNull(
               (e) => e.isRepeated(),
             );
             if (repeat != null) {
@@ -102,7 +104,7 @@ class MemNotification {
             }
 
             // repeatByNDay
-            final repeatByNDay = memNotifications.singleWhereOrNull(
+            final repeatByNDay = enabled.singleWhereOrNull(
               (e) => e.isRepeatByNDay(),
             );
             if (scheduleAnchor != null && scheduleAnchor.isScheduleAnchor) {
@@ -123,7 +125,7 @@ class MemNotification {
             }
 
             // repeatByDayOfWeek
-            final repeatByDayOfWeekList = memNotifications
+            final repeatByDayOfWeekList = enabled
                 .where((e) => e.isRepeatByDayOfWeek())
                 .map((e) => e.time)
                 .sorted((a, b) => a!.compareTo(b!));

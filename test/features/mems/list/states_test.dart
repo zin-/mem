@@ -3,12 +3,14 @@ import 'helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/list/filter_value.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/targets/target.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
 
@@ -436,9 +438,338 @@ void main() {
         DateAndTime(2024, 10, 11),
       );
       expect(
-        sortedMem.notifyAt(sortStartOfToday, notificationsForMem, null),
+        sortedMem.notifyAt(sortStartOfToday, notificationsForMem, null)?.at,
         DateTime(2024, 10, 12, 8, 0),
       );
+    });
+  });
+
+  group('mem list section by count', () {
+    final startOfToday = DateTime(2024, 10, 12);
+    const dailyTargetValue = 3;
+    const belowDailyTarget = 2;
+    const weeklyTargetValue = 2;
+    const belowWeeklyTarget = 1;
+    const notifyHour = 10;
+    const earlyNotifyHour = 8;
+    const laterNotifyHour = 15;
+    const middayHour = 12;
+    const eveningHour = 22;
+    const hoursUntilToday = 3;
+    const intervalHours = 4;
+    const hourSeconds = Duration.secondsPerHour;
+
+    Target countTarget({
+      required int memId,
+      required int value,
+      required Period period,
+      int? secondsAfterLastAct,
+    }) =>
+        Target(
+          memId: memId,
+          targetType: TargetType.equalTo,
+          targetUnit: TargetUnit.count,
+          value: value,
+          period: period,
+          secondsAfterLastAct: secondsAfterLastAct,
+        );
+
+    Act finishedAt(int memId, DateTime end) {
+      final ended = DateAndTime.from(end, timeOfDay: end);
+      return Act.by(
+        memId,
+        startWhen: ended.subtract(const Duration(minutes: 30)),
+        endWhen: ended,
+      );
+    }
+
+    Mem memEnded(int id, DateTime end) => Mem(
+          id,
+          'Mem $id',
+          null,
+          null,
+          latestAct: finishedAt(id, end),
+        );
+
+    List<MemNotification> repeatAt(int memId, int hour) => [
+          MemNotification.by(
+            memId,
+            MemNotificationType.repeat,
+            hour * hourSeconds,
+            'repeat at $hour:00',
+          ),
+        ];
+
+    List<MemNotification> repeatOnWednesday(int memId, int hour) => [
+          ...repeatAt(memId, hour),
+          MemNotification.by(
+            memId,
+            MemNotificationType.repeatByDayOfWeek,
+            DateTime.wednesday,
+            'wednesday',
+          ),
+        ];
+
+    MemEntity entity({
+      required int id,
+      required DateTime end,
+      required Target target,
+    }) =>
+        savedMem(
+          id: id,
+          name: 'Mem $id',
+          createdAt: DateTime(2024, 10, 1),
+          updatedAt: DateTime(2024, 10, 1),
+          latestAct: finishedAt(id, end),
+          target: target,
+        );
+
+    test('groups a daily count below the target on today', () {
+      final section = memEnded(1, DateTime(2024, 10, 12, 9)).memListSectionDate(
+        startOfToday,
+        repeatAt(1, notifyHour),
+        target: countTarget(
+          memId: 1,
+          value: dailyTargetValue,
+          period: Period.aDay,
+          secondsAfterLastAct: hourSeconds,
+        ),
+        todayCount: belowDailyTarget,
+      );
+
+      expect(section, DateAndTime(2024, 10, 12));
+    });
+
+    test(
+        'groups a daily count below the target on today when the interval alone is tomorrow',
+        () {
+      final section =
+          memEnded(1, DateTime(2024, 10, 12, 22)).memListSectionDate(
+        startOfToday,
+        repeatAt(1, notifyHour),
+        target: countTarget(
+          memId: 1,
+          value: dailyTargetValue,
+          period: Period.aDay,
+          secondsAfterLastAct: intervalHours * hourSeconds,
+        ),
+        todayCount: belowDailyTarget,
+      );
+
+      expect(section, DateAndTime(2024, 10, 12));
+    });
+
+    test('groups a reached daily count by notifyAt after the last act', () {
+      final section =
+          memEnded(1, DateTime(2024, 10, 11, eveningHour)).memListSectionDate(
+        startOfToday,
+        repeatAt(1, notifyHour),
+        target: countTarget(
+          memId: 1,
+          value: dailyTargetValue,
+          period: Period.aDay,
+          secondsAfterLastAct: hoursUntilToday * hourSeconds,
+        ),
+        todayCount: dailyTargetValue,
+      );
+
+      expect(section, DateAndTime(2024, 10, 12));
+    });
+
+    test('sorts a reached daily count with notifyAt against a mem still on today',
+        () {
+      final reached = entity(
+        id: 1,
+        end: DateTime(2024, 10, 11, eveningHour),
+        target: countTarget(
+          memId: 1,
+          value: dailyTargetValue,
+          period: Period.aDay,
+          secondsAfterLastAct: hoursUntilToday * hourSeconds,
+        ),
+      );
+      final stillToday = savedMem(
+        id: 2,
+        name: 'Still today',
+        createdAt: DateTime(2024, 10, 1),
+        updatedAt: DateTime(2024, 10, 1),
+      );
+      final notifications = [
+        savedRepeatAtHourNotification(id: 1, memId: 1, hour: notifyHour),
+        savedRepeatAtHourNotification(id: 2, memId: 2, hour: laterNotifyHour),
+      ];
+
+      expect(
+        compareMemListEntries(
+          reached,
+          stillToday,
+          startOfToday: startOfToday,
+          savedMemNotifications: notifications,
+          periodCountByMemId: {1: dailyTargetValue},
+        ),
+        lessThan(0),
+      );
+    });
+
+    test('groups a weekly count below the target by notifyAt', () {
+      final onToday = memEnded(1, DateTime(2024, 10, 11, laterNotifyHour))
+          .memListSectionDate(
+        startOfToday,
+        repeatAt(1, notifyHour),
+        target: countTarget(
+          memId: 1,
+          value: weeklyTargetValue,
+          period: Period.aWeek,
+        ),
+        todayCount: belowWeeklyTarget,
+      );
+      final onALaterNotification =
+          memEnded(1, DateTime(2024, 10, 12, laterNotifyHour))
+              .memListSectionDate(
+        startOfToday,
+        repeatOnWednesday(1, notifyHour),
+        target: countTarget(
+          memId: 1,
+          value: weeklyTargetValue,
+          period: Period.aWeek,
+        ),
+        todayCount: belowWeeklyTarget,
+      );
+
+      expect(onToday, DateAndTime(2024, 10, 12));
+      expect(onALaterNotification, DateAndTime(2024, 10, 16));
+    });
+
+    test('groups a reached weekly count by notifyAt after the last act', () {
+      const startOfDay = TimeOfDay(hour: 9, minute: 0);
+      final start = DateTime(2024, 10, 12, startOfDay.hour, startOfDay.minute);
+      final endedBeforeStartOfDay = DateTime(2024, 10, 12, earlyNotifyHour);
+      final target = countTarget(
+        memId: 1,
+        value: weeklyTargetValue,
+        period: Period.aWeek,
+      );
+
+      expect(
+        memEnded(1, endedBeforeStartOfDay).memListSectionDate(
+          start,
+          repeatAt(1, earlyNotifyHour),
+          target: target,
+          todayCount: weeklyTargetValue,
+        ),
+        DateAndTime(2024, 10, 12),
+      );
+    });
+
+    test('sorts a reached weekly count by the notification time on that day',
+        () {
+      const startOfDay = TimeOfDay(hour: 9, minute: 0);
+      final start = DateTime(2024, 10, 12, startOfDay.hour, startOfDay.minute);
+      final end = DateTime(2024, 10, 12, earlyNotifyHour);
+      Target weekly(int memId) => countTarget(
+            memId: memId,
+            value: weeklyTargetValue,
+            period: Period.aWeek,
+          );
+      final early = entity(id: 1, end: end, target: weekly(1));
+      final later = entity(id: 2, end: end, target: weekly(2));
+      final notifications = [
+        savedRepeatAtHourNotification(id: 1, memId: 1, hour: earlyNotifyHour),
+        savedRepeatAtHourNotification(id: 2, memId: 2, hour: notifyHour),
+      ];
+
+      expect(
+        compareMemListEntries(
+          early,
+          later,
+          startOfToday: start,
+          savedMemNotifications: notifications,
+          periodCountByMemId: {
+            1: weeklyTargetValue,
+            2: weeklyTargetValue,
+          },
+        ),
+        lessThan(0),
+      );
+    });
+
+    test(
+        'groups a weekly count on the usual notification day after a week from the last act',
+        () {
+      final section = memEnded(1, DateTime(2024, 10, 4, laterNotifyHour))
+          .memListSectionDate(
+        startOfToday,
+        repeatOnWednesday(1, notifyHour),
+        target: countTarget(
+          memId: 1,
+          value: weeklyTargetValue,
+          period: Period.aWeek,
+        ),
+        todayCount: weeklyTargetValue,
+      );
+
+      expect(section, DateAndTime(2024, 10, 16));
+    });
+
+    test('keeps notifyAt order when the interval alone places the mem', () {
+      Target daily(int memId) => countTarget(
+            memId: memId,
+            value: dailyTargetValue,
+            period: Period.aDay,
+            secondsAfterLastAct: 2 * hourSeconds,
+          );
+      final earlier = entity(
+        id: 1,
+        end: DateTime(2024, 10, 12, earlyNotifyHour),
+        target: daily(1),
+      );
+      final later = entity(
+        id: 2,
+        end: DateTime(2024, 10, 12, middayHour),
+        target: daily(2),
+      );
+      final notifications = [
+        savedRepeatAtHourNotification(id: 1, memId: 1, hour: laterNotifyHour),
+        savedRepeatAtHourNotification(id: 2, memId: 2, hour: laterNotifyHour),
+      ];
+      const counts = {1: belowDailyTarget, 2: belowDailyTarget};
+
+      final listed = compareMemListEntries(
+        earlier,
+        later,
+        startOfToday: startOfToday,
+        savedMemNotifications: notifications,
+        periodCountByMemId: counts,
+      );
+      final byNotifyAt = earlier
+          .toDomain()
+          .notifyAt(
+            startOfToday,
+            notifications
+                .where((e) => e.value.memId == earlier.id)
+                .map((e) => e.value),
+            earlier.latestAct,
+            target: earlier.target,
+            todayCount: belowDailyTarget,
+          )!
+          .at
+          .compareTo(
+            later
+                .toDomain()
+                .notifyAt(
+                  startOfToday,
+                  notifications
+                      .where((e) => e.value.memId == later.id)
+                      .map((e) => e.value),
+                  later.latestAct,
+                  target: later.target,
+                  todayCount: belowDailyTarget,
+                )!
+                .at,
+          );
+
+      expect(listed, byNotifyAt);
+      expect(listed, lessThan(0));
     });
   });
 }

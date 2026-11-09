@@ -6,6 +6,7 @@ import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_status_labels.dart';
 import 'package:mem/features/acts/day_act_amount.dart';
 import 'package:mem/features/acts/states.dart';
+import 'package:mem/features/mems/count_target.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/mems/transitions.dart';
@@ -15,7 +16,8 @@ import 'package:mem/features/mems/list/item/completion_dialog.dart';
 import 'package:mem/features/mems/mem_done_checkbox.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
-import 'package:mem/features/targets/next_at_after_last_act.dart';
+import 'package:mem/features/mems/list/list_frame_count.dart';
+import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
@@ -39,6 +41,27 @@ class MemListItemView extends ConsumerWidget {
                   ?.target,
             ),
           );
+          final notifications =
+              ref.watch(memNotificationsByMemIdProvider(_mem.id as int));
+          final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
+          final periodCount = _periodCount(ref, _mem.id as int);
+          final amount = _labelAmount(
+            ref,
+            _mem,
+            target,
+            periodCount,
+            startOfDay,
+          );
+          final listAt = _needsPeriodCount(target) && periodCount == null
+              ? null
+              : _mem
+                  .memListAt(
+                    DateTimeExt.startOfToday(startOfDay),
+                    notifications.map((e) => e.value),
+                    target: target,
+                    periodCount: periodCount ?? 0,
+                  )
+                  ?.at;
           return _render(
             context,
             _mem,
@@ -75,9 +98,10 @@ class MemListItemView extends ConsumerWidget {
             () => ref
                 .read(actEntitiesProvider.notifier)
                 .closeByMemId(_mem.id as int),
-            ref.watch(memNotificationsByMemIdProvider(_mem.id as int)),
+            notifications,
             target,
-            _amount(ref, _mem.id as int, target),
+            amount,
+            listAt,
           );
         },
         {
@@ -101,6 +125,7 @@ ListTile _render(
   Iterable<MemNotificationEntityV1> memNotificationEntities,
   Target? target,
   DayActAmount? amount,
+  DateTime? listAt,
 ) =>
     v(
       () {
@@ -113,13 +138,6 @@ ListTile _render(
               (e) => e is SavedMemNotificationEntityV1 && e.value.isEnabled(),
             )
             .isNotEmpty;
-        final nextAt = target == null
-            ? null
-            : NextAtAfterLastAct.of(
-                target: target,
-                latestAct: latestActByMem,
-                scheduleAnchorAct: mem.scheduleAnchorAct,
-              )?.at;
         final enableSkipMenu = hasEnableMemNotifications && !hasActiveAct;
 
         void showCompletionDialog(BuildContext dialogContext) {
@@ -168,10 +186,11 @@ ListTile _render(
                   ? stopIconButton
                   : startIconButton
               : null,
-          subtitle:
-              mem.period == null && !hasEnableMemNotifications && nextAt == null
-                  ? null
-                  : MemListItemSubtitle(mem.id as int),
+          subtitle: mem.period == null &&
+                  !hasEnableMemNotifications &&
+                  listAt == null
+              ? null
+              : MemListItemSubtitle(mem.id as int, listAt),
           isThreeLine: mem.period != null && hasEnableMemNotifications,
         );
       },
@@ -181,17 +200,57 @@ ListTile _render(
         'memNotificationEntities': memNotificationEntities,
         'target': target,
         'amount': amount,
+        'listAt': listAt,
       },
     );
 
-DayActAmount? _amount(WidgetRef ref, int memId, Target? target) {
+bool _needsPeriodCount(Target? target) => CountTarget.of(target, 0) != null;
+
+int? _periodCount(WidgetRef ref, int memId) {
+  final counts = ref.watch(listPeriodCountByMemIdProvider);
+  if (!counts.hasValue) return null;
+  return counts.value![memId] ?? 0;
+}
+
+DayActAmount? _timeAmount(
+  WidgetRef ref,
+  int memId,
+  Target target,
+  TimeOfDay startOfDay,
+) {
+  final day = DateAndTime.now().logicalDay(startOfDay);
+  return ref.watch(viewedDayActAmountProvider(memId, day)).value;
+}
+
+DayActAmount? _labelAmount(
+  WidgetRef ref,
+  Mem mem,
+  Target? target,
+  int? periodCount,
+  TimeOfDay startOfDay,
+) {
   if (!DayTargetLabel.shows(target)) {
     return null;
   }
-  final day = DateAndTime.now().logicalDay(
-    ref.watch(preferenceProvider(startOfDayKey)),
+  if (target!.targetUnit == TargetUnit.time) {
+    return _timeAmount(ref, mem.id as int, target, startOfDay);
+  }
+  if (target.targetUnit != TargetUnit.count || periodCount == null) {
+    return null;
+  }
+
+  final shown = ListFrameCount.of(
+    target: target,
+    periodCount: periodCount,
+    latestAct: mem.latestAct,
+    scheduleAnchorAct: mem.scheduleAnchorAct,
+    startOfToday: DateTimeExt.startOfToday(startOfDay),
+    startOfDay: startOfDay,
   );
-  return ref.watch(viewedDayActAmountProvider(memId, day)).value;
+  return DayActAmount(
+    shown?.value ?? periodCount,
+    Duration.zero,
+  );
 }
 
 Widget _title(

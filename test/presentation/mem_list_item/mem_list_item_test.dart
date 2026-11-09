@@ -1,16 +1,19 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../../entity_factories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/day_act_amount.dart';
+import 'package:mem/features/acts/list/duration.dart';
 import 'package:mem/features/acts/states.dart';
-import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/mems/list/item/view.dart';
+import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/preference/preference_key.dart';
 import 'package:mem/features/settings/states.dart';
@@ -22,6 +25,7 @@ import 'package:mem/features/mems/mem_done_checkbox.dart';
 import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
+import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/modules/live_elapsed_time_text.dart';
@@ -60,13 +64,79 @@ class _FakeStartOfDay extends Preference<TimeOfDay> {
       const TimeOfDay(hour: 0, minute: 0);
 }
 
-Target _countTarget(int memId) => Target(
+const _noonHour = 12;
+const _actMinutes = 30;
+
+Target _countTarget(
+  int memId, {
+  int value = 3,
+  Period period = Period.aDay,
+}) =>
+    Target(
       memId: memId,
       targetType: TargetType.equalTo,
       targetUnit: TargetUnit.count,
-      value: 3,
-      period: Period.aWeek,
+      value: value,
+      period: period,
     );
+
+Mem _memEndedDaysBefore(int memId, int days) {
+  final now = DateTime.now();
+  final endedAt = DateTime(
+    now.year,
+    now.month,
+    now.day - days,
+    _noonHour,
+  );
+  final end = DateAndTime.from(endedAt, timeOfDay: endedAt);
+  return Mem(
+    memId,
+    'Test Mem',
+    null,
+    null,
+    latestAct: Act.by(
+      memId,
+      startWhen: end.subtract(const Duration(minutes: _actMinutes)),
+      endWhen: end,
+    ),
+  );
+}
+
+Future<void> _pumpMemListCount(
+  WidgetTester tester, {
+  required int memId,
+  required Mem mem,
+  required Target target,
+  required int todayCount,
+  Map<int, int>? periodCounts,
+}) async {
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        memNotificationsByMemIdProvider(memId).overrideWith(
+          (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
+        ),
+        memEntitiesProvider.overrideWith(
+          () => _FakeMemEntities([
+            savedMemFromDomain(mem).updatedWith(
+              target: () => target,
+            ),
+          ]),
+        ),
+        preferenceProvider(startOfDayKey).overrideWith(() => _FakeStartOfDay()),
+        listPeriodCountByMemIdProvider.overrideWith(
+          (ref) async => periodCounts ?? {memId: todayCount},
+        ),
+      ],
+      child: MaterialApp(
+        home: Scaffold(
+          body: MemListItemView(mem),
+        ),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
 
 class _FakeActEntities extends ActEntities {
   int startActbyCallCount = 0;
@@ -1079,9 +1149,6 @@ void main() {
       });
 
       testWidgets('shows today count and target', (tester) async {
-        final today = DateAndTime.now().logicalDay(
-          const TimeOfDay(hour: 0, minute: 0),
-        );
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
@@ -1096,8 +1163,8 @@ void main() {
               ),
               preferenceProvider(startOfDayKey)
                   .overrideWith(() => _FakeStartOfDay()),
-              viewedDayActAmountProvider(memId, today).overrideWith(
-                (ref) async => const DayActAmount(2, Duration.zero),
+              listPeriodCountByMemIdProvider.overrideWith(
+                (ref) async => {memId: 2},
               ),
             ],
             child: MaterialApp(
@@ -1117,9 +1184,6 @@ void main() {
 
       testWidgets('keeps state time when the target is a count',
           (tester) async {
-        final today = DateAndTime.now().logicalDay(
-          const TimeOfDay(hour: 0, minute: 0),
-        );
         final mem = Mem(
           memId,
           'Test Mem',
@@ -1146,8 +1210,8 @@ void main() {
               ),
               preferenceProvider(startOfDayKey)
                   .overrideWith(() => _FakeStartOfDay()),
-              viewedDayActAmountProvider(memId, today).overrideWith(
-                (ref) async => const DayActAmount(2, Duration.zero),
+              listPeriodCountByMemIdProvider.overrideWith(
+                (ref) async => {memId: 2},
               ),
             ],
             child: MaterialApp(
@@ -1183,6 +1247,206 @@ void main() {
           lessThan(tester.getTopLeft(find.text('2')).dx),
         );
       });
+
+      testWidgets('shows 0 and the target once the daily count is reached',
+          (tester) async {
+        const targetValue = 3;
+        await _pumpMemListCount(
+          tester,
+          memId: memId,
+          mem: baseMem,
+          target: _countTarget(memId, value: targetValue),
+          todayCount: targetValue,
+        );
+
+        expect(find.text('0'), findsOneWidget);
+        expect(find.text('$targetValue'), findsOneWidget);
+      });
+
+      testWidgets('shows the week count while the weekly target is unmet',
+          (tester) async {
+        const todayCount = 9;
+        const weekCount = 1;
+        const targetValue = 2;
+        await _pumpMemListCount(
+          tester,
+          memId: memId,
+          mem: _memEndedDaysBefore(memId, DateTime.daysPerWeek - 1),
+          target: _countTarget(
+            memId,
+            value: targetValue,
+            period: Period.aWeek,
+          ),
+          todayCount: todayCount,
+          periodCounts: {memId: weekCount},
+        );
+
+        expect(find.text('$weekCount'), findsOneWidget);
+        expect(find.text('$targetValue'), findsOneWidget);
+        expect(find.text('$todayCount'), findsNothing);
+      });
+
+      testWidgets('shows 0 once the weekly count is reached', (tester) async {
+        const todayCount = 9;
+        const targetValue = 2;
+        await _pumpMemListCount(
+          tester,
+          memId: memId,
+          mem: _memEndedDaysBefore(memId, 0),
+          target: _countTarget(
+            memId,
+            value: targetValue,
+            period: Period.aWeek,
+          ),
+          todayCount: todayCount,
+          periodCounts: {memId: targetValue},
+        );
+
+        expect(find.text('0'), findsOneWidget);
+        expect(find.text('$targetValue'), findsOneWidget);
+        expect(find.text('$todayCount'), findsNothing);
+      });
+
+      testWidgets('shows 0 when a week has passed since the last act',
+          (tester) async {
+        const todayCount = 9;
+        const weekCount = 1;
+        const targetValue = 2;
+        await _pumpMemListCount(
+          tester,
+          memId: memId,
+          mem: _memEndedDaysBefore(memId, DateTime.daysPerWeek),
+          target: _countTarget(
+            memId,
+            value: targetValue,
+            period: Period.aWeek,
+          ),
+          todayCount: todayCount,
+          periodCounts: {memId: weekCount},
+        );
+
+        expect(find.text('0'), findsOneWidget);
+        expect(find.text('$targetValue'), findsOneWidget);
+        expect(find.text('$weekCount'), findsNothing);
+        expect(find.text('$todayCount'), findsNothing);
+      });
+
+      testWidgets(
+          'shows the period count for a count target that is not a day or a week',
+          (tester) async {
+        const periodCount = 4;
+        const targetValue = 3;
+        await _pumpMemListCount(
+          tester,
+          memId: memId,
+          mem: baseMem,
+          target: _countTarget(
+            memId,
+            value: targetValue,
+            period: Period.aMonth,
+          ),
+          todayCount: periodCount,
+        );
+
+        expect(find.text('$periodCount'), findsOneWidget);
+        expect(find.text('$targetValue'), findsOneWidget);
+        expect(find.text('0'), findsNothing);
+      });
+
+      testWidgets('hides the count while the period count is still loading',
+          (tester) async {
+        final pending = Completer<Map<int, int>>();
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              memNotificationsByMemIdProvider(memId).overrideWith(
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
+              ),
+              memEntitiesProvider.overrideWith(
+                () => _FakeMemEntities([
+                  savedMemFromDomain(baseMem).updatedWith(
+                    target: () => _countTarget(memId),
+                  ),
+                ]),
+              ),
+              preferenceProvider(startOfDayKey)
+                  .overrideWith(() => _FakeStartOfDay()),
+              listPeriodCountByMemIdProvider.overrideWith(
+                (ref) => pending.future,
+              ),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                body: MemListItemView(baseMem),
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+
+        expect(find.text('Test Mem'), findsOneWidget);
+        expect(find.text('3'), findsNothing);
+        expect(
+          tester.widget<ListTile>(find.byType(ListTile)).subtitle,
+          isNull,
+        );
+
+        pending.complete({memId: 2});
+        await tester.pumpAndSettle();
+
+        expect(find.text('2'), findsOneWidget);
+        expect(find.text('3'), findsOneWidget);
+      });
+
+      testWidgets('shows recorded time and the time target', (tester) async {
+        const targetSeconds = 2 * Duration.secondsPerHour;
+        const recorded = Duration(hours: 1, minutes: 30);
+        final day = DateAndTime.now().logicalDay(
+          const TimeOfDay(hour: 0, minute: 0),
+        );
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              memNotificationsByMemIdProvider(memId).overrideWith(
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
+              ),
+              memEntitiesProvider.overrideWith(
+                () => _FakeMemEntities([
+                  savedMemFromDomain(baseMem).updatedWith(
+                    target: () => Target(
+                      memId: memId,
+                      targetType: TargetType.equalTo,
+                      targetUnit: TargetUnit.time,
+                      value: targetSeconds,
+                      period: Period.aDay,
+                    ),
+                  ),
+                ]),
+              ),
+              preferenceProvider(startOfDayKey)
+                  .overrideWith(() => _FakeStartOfDay()),
+              listPeriodCountByMemIdProvider.overrideWith(
+                (ref) async => <int, int>{},
+              ),
+              viewedDayActAmountProvider(memId, day).overrideWith(
+                (ref) async => const DayActAmount(0, recorded),
+              ),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                body: MemListItemView(baseMem),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text(recorded.formatHHmm()), findsOneWidget);
+        expect(
+          find.text(const Duration(seconds: targetSeconds).formatHHmm()),
+          findsOneWidget,
+        );
+      });
     });
 
     group('next time after last act', () {
@@ -1196,6 +1460,10 @@ void main() {
             period: Period.aDay,
             secondsAfterLastAct: interval.inSeconds,
           );
+
+      const endedHoursAgo = 3;
+      const notifyMinutesAgo = 90;
+      const belowTargetCount = 1;
 
       Mem memEndedAt(DateTime endedAt) {
         final end = DateAndTime.from(endedAt, timeOfDay: endedAt);
@@ -1224,6 +1492,11 @@ void main() {
                     target: () => intervalTarget(),
                   ),
                 ]),
+              ),
+              preferenceProvider(startOfDayKey)
+                  .overrideWith(() => _FakeStartOfDay()),
+              listPeriodCountByMemIdProvider.overrideWith(
+                (ref) async => {memId: belowTargetCount},
               ),
             ],
             child: MaterialApp(
@@ -1276,6 +1549,149 @@ void main() {
           tester,
           DateTime.now().subtract(const Duration(minutes: 30)),
           isNot(equals(warningColor)),
+        );
+      });
+
+      Future<void> pumpWithNotify(
+        WidgetTester tester, {
+        required Mem mem,
+        required TimeOfDay notify,
+        required int todayCount,
+      }) async {
+        final now = DateTime.now();
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              memNotificationsByMemIdProvider(memId).overrideWith(
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([
+                  savedMemNotification(
+                    id: 1,
+                    memId: memId,
+                    type: MemNotificationType.repeat,
+                    timeOfDaySeconds: notify.hour * Duration.secondsPerHour +
+                        notify.minute * Duration.secondsPerMinute,
+                    message: 'Repeat',
+                    createdAt: now,
+                    updatedAt: now,
+                  ),
+                ]),
+              ),
+              memEntitiesProvider.overrideWith(
+                () => _FakeMemEntities([
+                  savedMemFromDomain(mem).updatedWith(
+                    target: () => intervalTarget(),
+                  ),
+                ]),
+              ),
+              preferenceProvider(startOfDayKey)
+                  .overrideWith(() => _FakeStartOfDay()),
+              listPeriodCountByMemIdProvider.overrideWith(
+                (ref) async => {memId: todayCount},
+              ),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                body: MemListItemView(mem),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+      }
+
+      testWidgets(
+          'shows one clock with the time after the last act when a notification time is also set',
+          (tester) async {
+        final now = DateTime.now();
+        final endedAt = now.subtract(const Duration(hours: endedHoursAgo));
+        final notify = TimeOfDay.fromDateTime(
+          now.subtract(const Duration(minutes: notifyMinutesAgo)),
+        );
+        await pumpWithNotify(
+          tester,
+          mem: memEndedAt(endedAt),
+          notify: notify,
+          todayCount: belowTargetCount,
+        );
+
+        final context = tester.element(find.byType(MemListItemSubtitle));
+        final next =
+            DateAndTime.from(endedAt, timeOfDay: endedAt).add(interval);
+        expect(
+          find.text(TimeOfDay.fromDateTime(next).format(context)),
+          findsOneWidget,
+        );
+        expect(find.text(notify.format(context)), findsNothing);
+      });
+
+      testWidgets(
+          'shows the next day notification time once the daily count is reached',
+          (tester) async {
+        final now = DateTime.now();
+        final endedAt = now.subtract(const Duration(hours: endedHoursAgo));
+        final notify = TimeOfDay.fromDateTime(
+          now.subtract(const Duration(minutes: notifyMinutesAgo)),
+        );
+        await pumpWithNotify(
+          tester,
+          mem: memEndedAt(endedAt),
+          notify: notify,
+          todayCount: intervalTarget().value,
+        );
+
+        final context = tester.element(find.byType(MemListItemSubtitle));
+        final next =
+            DateAndTime.from(endedAt, timeOfDay: endedAt).add(interval);
+        final notifyText = find.text(notify.format(context));
+        expect(notifyText, findsOneWidget);
+        expect(
+          find.text(TimeOfDay.fromDateTime(next).format(context)),
+          findsNothing,
+        );
+        expect(
+          tester.widget<Text>(notifyText).style?.color,
+          isNot(equals(warningColor)),
+        );
+      });
+
+      testWidgets(
+          'hides the interval clock once the daily count is reached and there is no notification',
+          (tester) async {
+        final endedAt = DateTime.now().subtract(
+          const Duration(hours: endedHoursAgo),
+        );
+        final mem = memEndedAt(endedAt);
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              memNotificationsByMemIdProvider(memId).overrideWith(
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
+              ),
+              memEntitiesProvider.overrideWith(
+                () => _FakeMemEntities([
+                  savedMemFromDomain(mem).updatedWith(
+                    target: () => intervalTarget(),
+                  ),
+                ]),
+              ),
+              preferenceProvider(startOfDayKey)
+                  .overrideWith(() => _FakeStartOfDay()),
+              listPeriodCountByMemIdProvider.overrideWith(
+                (ref) async => {memId: intervalTarget().value},
+              ),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                body: MemListItemView(mem),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          tester.widget<ListTile>(find.byType(ListTile)).subtitle,
+          isNull,
         );
       });
     });

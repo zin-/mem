@@ -23,7 +23,8 @@ void main() => group('Mem', () {
           scheduleAnchorAct: anchor,
         );
 
-        expect(mem.done(DateTime(2024, 10, 12)).scheduleAnchorAct, same(anchor));
+        expect(
+            mem.done(DateTime(2024, 10, 12)).scheduleAnchorAct, same(anchor));
         expect(mem.undone().scheduleAnchorAct, same(anchor));
       });
 
@@ -42,7 +43,7 @@ void main() => group('Mem', () {
           );
 
           expect(
-            mem.notifyAt(startOfToday, [], null),
+            mem.notifyAt(startOfToday, [], null)?.at,
             DateTime(2024, 10, 15, 14, 30),
           );
         });
@@ -59,7 +60,7 @@ void main() => group('Mem', () {
           );
 
           expect(
-            mem.notifyAt(startOfToday, [], null),
+            mem.notifyAt(startOfToday, [], null)?.at,
             DateTime(2024, 10, 12, 10),
           );
         });
@@ -73,7 +74,7 @@ void main() => group('Mem', () {
           );
 
           expect(
-            mem.notifyAt(startOfToday, [], null),
+            mem.notifyAt(startOfToday, [], null)?.at,
             DateTime(2024, 10, 15, 8),
           );
         });
@@ -95,7 +96,7 @@ void main() => group('Mem', () {
           ];
 
           expect(
-            mem.notifyAt(startOfToday, notifications, null),
+            mem.notifyAt(startOfToday, notifications, null)?.at,
             DateTime(2024, 10, 20, 10),
           );
         });
@@ -124,7 +125,7 @@ void main() => group('Mem', () {
           ];
 
           expect(
-            mem.notifyAt(startOfToday, notifications, mem.latestAct),
+            mem.notifyAt(startOfToday, notifications, mem.latestAct)?.at,
             DateTime(2024, 10, 19, 9, 0),
           );
         });
@@ -153,13 +154,109 @@ void main() => group('Mem', () {
           ];
 
           expect(
-            mem.notifyAt(
-              DateTime(2024, 10, 12),
-              notifications,
-              mem.latestAct,
-            ),
+            mem
+                .notifyAt(
+                  DateTime(2024, 10, 12),
+                  notifications,
+                  mem.latestAct,
+                )
+                ?.at,
             DateTime(2024, 10, 13, 1, 2),
+          );
+        });
+
+        test('keeps a time that is already after the skip day', () {
+          final skipDay = DateAndTime(2024, 10, 12, 12);
+          final mem = Mem(
+            1,
+            'm',
+            null,
+            DateAndTimePeriod(end: DateAndTime(2024, 10, 15, 14, 30)),
+            latestAct: Act.by(
+              1,
+              startWhen: skipDay,
+              endWhen: skipDay,
+              completionKind: ActKind.skipped,
+            ),
+          );
+
+          expect(
+            mem
+                .notifyAt(
+                  startOfToday,
+                  [
+                    MemNotification.by(
+                      1,
+                      MemNotificationType.repeat,
+                      3600,
+                      'repeat at 01:00',
+                    ),
+                  ],
+                  mem.latestAct,
+                )
+                ?.at,
+            DateTime(2024, 10, 15, 14, 30),
+          );
+        });
+
+        test(
+            'keeps a period time on the skip day when there is no notification',
+            () {
+          final skipDay = DateAndTime(2024, 10, 12, 12);
+          final mem = Mem(
+            1,
+            'm',
+            null,
+            DateAndTimePeriod(end: DateAndTime(2024, 10, 12, 15)),
+            latestAct: Act.by(
+              1,
+              startWhen: skipDay,
+              endWhen: skipDay,
+              completionKind: ActKind.skipped,
+            ),
+          );
+
+          expect(
+            mem.notifyAt(startOfToday, [], mem.latestAct)?.at,
+            DateTime(2024, 10, 12, 15),
+          );
+          expect(
+            mem.notifyAt(startOfToday, null, mem.latestAct)?.at,
+            DateTime(2024, 10, 12, 15),
+          );
+        });
+
+        test('keeps notifyAt when a skipped act has no end', () {
+          final mem = Mem(
+            1,
+            'm',
+            null,
+            DateAndTimePeriod(end: DateAndTime(2024, 10, 20, 10)),
+            latestAct: _SkippedWithoutEnd(),
+          );
+
+          expect(
+            mem.notifyAt(startOfToday, [], mem.latestAct)?.at,
+            DateTime(2024, 10, 20, 10),
           );
         });
       });
     });
+
+class _SkippedWithoutEnd extends Act {
+  _SkippedWithoutEnd()
+      : super(
+          1,
+          null,
+          null,
+          ActState.finished,
+          ActKind.skipped,
+        );
+
+  @override
+  FinishedAct finish(DateAndTime when) =>
+      FinishedAct(memId, when, when, actKind: ActKind.skipped);
+
+  @override
+  ActiveAct start(DateAndTime when) => ActiveAct(memId, when);
+}

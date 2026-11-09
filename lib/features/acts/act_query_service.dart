@@ -1,12 +1,16 @@
 import 'package:drift/drift.dart';
-import 'package:mem/databases/database.dart' hide Act;
+import 'package:mem/databases/database.dart' hide Act, Target;
 import 'package:mem/databases/database.dart' as drift_schema;
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_service.dart';
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/mems/list/list_period_count.dart';
 import 'package:mem/features/mems/mem.dart';
+import 'package:mem/features/mems/today_act_count.dart';
+import 'package:mem/features/targets/target.dart';
+import 'package:mem/features/targets/target_repository.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/singleton.dart';
@@ -237,6 +241,61 @@ class ActQueryService {
           return out;
         },
         {'memIds': memIds},
+      );
+
+  Future<TodayActCount?> todayActCount({
+    required int memId,
+    required DateAndTimePeriod period,
+    Target? target,
+    TargetRepository? targets,
+  }) =>
+      v(
+        () async {
+          Target? resolved = target;
+          if (resolved == null) {
+            final rows =
+                await (targets ?? TargetRepository()).shipByMemId(memId);
+            if (rows.isNotEmpty) {
+              resolved = rows.first.toDomain();
+            }
+          }
+          final count = await countByMemIdAndPeriod(memId, period);
+          return TodayActCount.of(resolved, count);
+        },
+        {
+          'memId': memId,
+          'period': period,
+          'target': target,
+        },
+      );
+
+  Future<Map<int, int>> listPeriodCountsByMemId({
+    required Iterable<
+            ({
+              int id,
+              Target? target,
+              DateAndTimePeriod? period,
+            })>
+        mems,
+  }) =>
+      v(
+        () async {
+          final counts = <int, int>{};
+          for (final mem in mems) {
+            final target = mem.target;
+            if (target == null) continue;
+            final period = mem.period;
+            if (period == null) continue;
+            final count = await countByMemIdAndPeriod(mem.id, period);
+            if (ListPeriodCount.of(target: target, value: count) != null) {
+              counts[mem.id] = count;
+            }
+          }
+          return counts;
+        },
+        {
+          'mems': mems,
+        },
       );
 
   ActQueryService._();

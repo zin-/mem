@@ -1,5 +1,7 @@
 import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/mems/mem.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
+import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:test/test.dart';
 
@@ -259,6 +261,65 @@ void main() => group(_name, () {
               latestAct: finishedAct(),
               scheduleAnchorAct: null,
               expected: expected,
+            );
+          });
+
+          test('disabled notifications are ignored', () {
+            expect(
+              MemNotification.nextNotifyAt(
+                [
+                  MemNotification.by(
+                    0,
+                    MemNotificationType.repeat,
+                    null,
+                    null,
+                  ),
+                  MemNotification.by(
+                    0,
+                    MemNotificationType.repeatByNDay,
+                    null,
+                    null,
+                  ),
+                ],
+                startOfToday,
+                null,
+              ),
+              isNull,
+            );
+          });
+
+          test('disabled notifications do not move list time after a skip', () {
+            final periodStart = DateAndTime.from(startOfToday);
+            final mem = Mem(
+              2,
+              'name',
+              null,
+              DateAndTimePeriod(start: periodStart),
+              latestAct: Act.by(
+                2,
+                startWhen: periodStart.subtract(const Duration(days: 1)),
+                endWhen: periodStart,
+                completionKind: ActKind.skipped,
+              ),
+            );
+            final disabled = [
+              MemNotification.by(
+                2,
+                MemNotificationType.repeat,
+                null,
+                null,
+              ),
+              MemNotification.by(
+                2,
+                MemNotificationType.repeatByNDay,
+                null,
+                null,
+              ),
+            ];
+
+            expect(
+              mem.memListAt(startOfToday, disabled)?.at,
+              mem.memListAt(startOfToday, const [])?.at,
             );
           });
 
