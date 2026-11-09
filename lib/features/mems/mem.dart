@@ -3,6 +3,7 @@ import 'package:mem/features/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/mems/mem_list_at.dart';
 import 'package:mem/features/mems/mem_notify_at.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/targets/target.dart';
@@ -54,33 +55,63 @@ class Mem {
     Target? target,
     int todayCount = 0,
   }) {
-    final nextNotifyAt = notifyAt(
+    final at = memListAt(
       startOfToday,
       memNotifications,
-      latestAct,
       target: target,
-      todayCount: todayCount,
+      periodCount: todayCount,
     )?.at;
-    if (nextNotifyAt == null) return null;
+    if (at == null) return null;
     final scheduledNotifications = memNotifications?.where(
       (e) => !e.isAfterActStarted(),
     );
     if (scheduledNotifications != null &&
         scheduledNotifications.isNotEmpty &&
-        TimeOfDay.fromDateTime(nextNotifyAt)
+        TimeOfDay.fromDateTime(at)
             .isBefore(TimeOfDay.fromDateTime(startOfToday))) {
       return DateAndTime(
-        nextNotifyAt.year,
-        nextNotifyAt.month,
-        nextNotifyAt.day,
+        at.year,
+        at.month,
+        at.day,
       ).subtract(const Duration(days: 1));
     }
     return DateAndTime(
-      nextNotifyAt.year,
-      nextNotifyAt.month,
-      nextNotifyAt.day,
+      at.year,
+      at.month,
+      at.day,
     );
   }
+
+  MemListAt? memListAt(
+    DateTime startOfToday,
+    Iterable<MemNotification>? memNotifications, {
+    Target? target,
+    int periodCount = 0,
+  }) =>
+      v(
+        () => MemListAt.of(
+          startOfToday: startOfToday,
+          notifyAt: notifyAt(
+            startOfToday,
+            memNotifications,
+            latestAct,
+            target: target,
+            todayCount: periodCount,
+          )?.at,
+          target: target,
+          latestAct: latestAct,
+          scheduleAnchorAct: scheduleAnchorAct,
+          notifications: memNotifications,
+          periodCount: periodCount,
+        ),
+        {
+          'this': this,
+          'startOfToday': startOfToday,
+          'memNotifications': memNotifications,
+          'target': target,
+          'periodCount': periodCount,
+        },
+      );
 
   MemNotifyAt? notifyAt(
     DateTime startOfToday,

@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/mems/list/list_period_count.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
@@ -9,7 +10,6 @@ import 'package:mem/framework/view/value_state_notifier.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/list/filter_value.dart';
 import 'package:mem/features/mems/mem_entity.dart';
-import 'package:mem/features/mems/today_act_count.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/settings/preference/keys.dart';
@@ -72,9 +72,15 @@ final todayActCountByMemIdProvider =
     FutureProvider.autoDispose<Map<int, int>>((ref) {
   final mems = ref.watch(memEntitiesProvider);
   final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
-  return TodayActCount.byMemId(
+  return ListPeriodCount.byMemId(
     mems: [
-      for (final mem in mems) (id: mem.id, target: mem.target),
+      for (final mem in mems)
+        (
+          id: mem.id,
+          target: mem.target,
+          latestAct: mem.latestAct,
+          scheduleAnchorAct: mem.scheduleAnchorAct,
+        ),
     ],
     startOfDay: startOfDay,
   );
@@ -116,22 +122,20 @@ int compareMemListEntries(
 
   final timeOfThis = a
       .toDomain()
-      .notifyAt(
+      .memListAt(
         startOfToday,
         memNotificationsOfA.map((e) => e.value),
-        latestActOfA,
         target: a.target,
-        todayCount: todayActCountByMemId[a.id] ?? 0,
+        periodCount: todayActCountByMemId[a.id] ?? 0,
       )
       ?.at;
   final timeOfOther = b
       .toDomain()
-      .notifyAt(
+      .memListAt(
         startOfToday,
         memNotificationsOfB.map((e) => e.value),
-        latestActOfB,
         target: b.target,
-        todayCount: todayActCountByMemId[b.id] ?? 0,
+        periodCount: todayActCountByMemId[b.id] ?? 0,
       )
       ?.at;
 
