@@ -65,13 +65,15 @@ void main() {
     Act? anchor,
     List<MemNotification>? notifications,
   }) =>
-      memWith(latest, anchor: anchor).notifyAt(
-        startOfToday,
-        notifications ?? dailyAtNine,
-        latest,
-        target: target,
-        todayCount: todayCount,
-      );
+      memWith(latest, anchor: anchor)
+          .notifyAt(
+            startOfToday,
+            notifications ?? dailyAtNine,
+            latest,
+            target: target,
+            todayCount: todayCount,
+          )
+          ?.at;
 
   DateTime? fireAt(
     Act latest,

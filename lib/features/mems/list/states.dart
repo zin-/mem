@@ -100,16 +100,22 @@ int compareMemListEntries(
   final memNotificationsOfB =
       savedMemNotifications.where((e) => e.value.memId == b.id);
 
-  final timeOfThis = a.toDomain().notifyAt(
+  final timeOfThis = a
+      .toDomain()
+      .notifyAt(
         startOfToday,
         memNotificationsOfA.map((e) => e.value),
         latestActOfA,
-      );
-  final timeOfOther = b.toDomain().notifyAt(
+      )
+      ?.at;
+  final timeOfOther = b
+      .toDomain()
+      .notifyAt(
         startOfToday,
         memNotificationsOfB.map((e) => e.value),
         latestActOfB,
-      );
+      )
+      ?.at;
 
   if (timeOfThis != null || timeOfOther != null) {
     if (timeOfThis == null) {

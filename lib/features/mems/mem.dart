@@ -1,9 +1,9 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/mems/mem_notify_at.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/framework/notifications/notification/type.dart';
@@ -56,7 +56,7 @@ class Mem {
       startOfToday,
       memNotifications,
       latestAct,
-    );
+    )?.at;
     if (nextNotifyAt == null) return null;
     final scheduledNotifications = memNotifications?.where(
       (e) => !e.isAfterActStarted(),
@@ -78,7 +78,7 @@ class Mem {
     );
   }
 
-  DateTime? notifyAt(
+  MemNotifyAt? notifyAt(
     DateTime startOfToday,
     Iterable<MemNotification>? memNotifications,
     Act? latestAct, {
@@ -86,32 +86,15 @@ class Mem {
     int todayCount = 0,
   }) =>
       v(
-        () {
-          final scheduledNotifications = memNotifications?.where(
-            (e) => !e.isAfterActStarted(),
-          );
-          final notifyAt = _selectNonNullOrGreater(
-            period?.start != null || period?.end != null
-                ? period?.start != null && period?.end != null
-                    ? period!.start!.compareTo(startOfToday) < 0
-                        ? period?.end
-                        : period?.start
-                    : period?.start ?? period?.end
-                : null,
-            scheduledNotifications == null || scheduledNotifications.isEmpty
-                ? null
-                : MemNotification.nextNotifyAt(
-                    scheduledNotifications,
-                    startOfToday,
-                    resolvedScheduleAnchor,
-                  ),
-          );
-          return _notifyAtAfterSkipFloor(
-            notifyAt,
-            latestAct,
-            scheduledNotifications,
-          );
-        },
+        () => MemNotifyAt.of(
+          period: period,
+          scheduleAnchor: resolvedScheduleAnchor,
+          startOfToday: startOfToday,
+          memNotifications: memNotifications,
+          latestAct: latestAct,
+          target: target,
+          todayCount: todayCount,
+        ),
         {
           'this': this,
           'startOfToday': startOfToday,
@@ -119,84 +102,6 @@ class Mem {
           'latestAct': latestAct,
           'target': target,
           'todayCount': todayCount,
-        },
-      );
-
-  static DateTime _dateOnly(DateTime dateTime) =>
-      DateTime(dateTime.year, dateTime.month, dateTime.day);
-
-  static DateTime? _notifyAtAfterSkipFloor(
-    DateTime? notifyAt,
-    Act? latestAct,
-    Iterable<MemNotification>? scheduledNotifications,
-  ) {
-    if (notifyAt == null || latestAct?.isSkipped != true) {
-      return notifyAt;
-    }
-    final skipEnd = latestAct!.period?.end;
-    if (skipEnd == null) {
-      return notifyAt;
-    }
-    final skipDay = _dateOnly(skipEnd.dateTime);
-    if (_dateOnly(notifyAt).compareTo(skipDay) > 0) {
-      return notifyAt;
-    }
-    if (scheduledNotifications == null || scheduledNotifications.isEmpty) {
-      return notifyAt;
-    }
-
-    var result = notifyAt;
-    final repeatByNDay =
-        scheduledNotifications.where((e) => e.isRepeatByNDay()).firstOrNull;
-    if (repeatByNDay != null) {
-      final nDays = repeatByNDay.time ?? 1;
-      while (_dateOnly(result).compareTo(skipDay) <= 0) {
-        result = DateTime(
-          result.year,
-          result.month,
-          result.day + nDays,
-          result.hour,
-          result.minute,
-        );
-      }
-      return result;
-    }
-
-    final repeatByDayOfWeekWeekdays = scheduledNotifications
-        .where((e) => e.isRepeatByDayOfWeek())
-        .map((e) => e.time)
-        .whereType<int>()
-        .toList();
-    if (repeatByDayOfWeekWeekdays.isNotEmpty) {
-      while (_dateOnly(result).compareTo(skipDay) <= 0 ||
-          !repeatByDayOfWeekWeekdays.contains(result.weekday)) {
-        result = result.add(const Duration(days: 1));
-      }
-      return result;
-    }
-
-    if (scheduledNotifications.any((e) => e.isRepeated())) {
-      while (_dateOnly(result).compareTo(skipDay) <= 0) {
-        result = result.add(const Duration(days: 1));
-      }
-    }
-
-    return result;
-  }
-
-  DateTime? _selectNonNullOrGreater(
-    DateTime? a,
-    DateTime? b,
-  ) =>
-      v(
-        () {
-          if (a == null) return b;
-          if (b == null) return a;
-          return a.compareTo(b) > 0 ? a : b;
-        },
-        {
-          'a': a,
-          'b': b,
         },
       );
 

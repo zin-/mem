@@ -23,7 +23,8 @@ void main() => group('Mem', () {
           scheduleAnchorAct: anchor,
         );
 
-        expect(mem.done(DateTime(2024, 10, 12)).scheduleAnchorAct, same(anchor));
+        expect(
+            mem.done(DateTime(2024, 10, 12)).scheduleAnchorAct, same(anchor));
         expect(mem.undone().scheduleAnchorAct, same(anchor));
       });
 
@@ -42,7 +43,7 @@ void main() => group('Mem', () {
           );
 
           expect(
-            mem.notifyAt(startOfToday, [], null),
+            mem.notifyAt(startOfToday, [], null)?.at,
             DateTime(2024, 10, 15, 14, 30),
           );
         });
@@ -59,7 +60,7 @@ void main() => group('Mem', () {
           );
 
           expect(
-            mem.notifyAt(startOfToday, [], null),
+            mem.notifyAt(startOfToday, [], null)?.at,
             DateTime(2024, 10, 12, 10),
           );
         });
@@ -73,7 +74,7 @@ void main() => group('Mem', () {
           );
 
           expect(
-            mem.notifyAt(startOfToday, [], null),
+            mem.notifyAt(startOfToday, [], null)?.at,
             DateTime(2024, 10, 15, 8),
           );
         });
@@ -95,7 +96,7 @@ void main() => group('Mem', () {
           ];
 
           expect(
-            mem.notifyAt(startOfToday, notifications, null),
+            mem.notifyAt(startOfToday, notifications, null)?.at,
             DateTime(2024, 10, 20, 10),
           );
         });
@@ -124,7 +125,7 @@ void main() => group('Mem', () {
           ];
 
           expect(
-            mem.notifyAt(startOfToday, notifications, mem.latestAct),
+            mem.notifyAt(startOfToday, notifications, mem.latestAct)?.at,
             DateTime(2024, 10, 19, 9, 0),
           );
         });
@@ -153,11 +154,13 @@ void main() => group('Mem', () {
           ];
 
           expect(
-            mem.notifyAt(
-              DateTime(2024, 10, 12),
-              notifications,
-              mem.latestAct,
-            ),
+            mem
+                .notifyAt(
+                  DateTime(2024, 10, 12),
+                  notifications,
+                  mem.latestAct,
+                )
+                ?.at,
             DateTime(2024, 10, 13, 1, 2),
           );
         });

@@ -1,8 +1,8 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
+import 'package:mem/features/mems/mem_notify_at.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/targets/target.dart';
 
@@ -68,59 +68,15 @@ class MemNotifications {
     int todayCount = 0,
   }) =>
       v(
-        () {
-          DateTime? notifyAt;
-
-          if (latestAct?.isActive == true) {
-            return null;
-          } else if (memNotifications
-              .where((e) => !e.isAfterActStarted())
-              .isNotEmpty) {
-            final repeatAt = memNotifications
-                .singleWhereOrNull((e) => e.isRepeated() && e.isEnabled())
-                ?.time;
-            final timeOfDay = repeatAt == null
-                ? startOfDay
-                : TimeOfDay(hour: 0, minute: (repeatAt / 60).floor());
-
-            if (scheduleAnchor == null || !scheduleAnchor.isScheduleAnchor) {
-              notifyAt = now.copyWith(
-                  hour: timeOfDay.hour,
-                  minute: timeOfDay.minute,
-                  second: 0,
-                  millisecond: 0,
-                  microsecond: 0);
-            } else {
-              notifyAt = (scheduleAnchor.period?.end ?? now)
-                  .copyWith(
-                      hour: timeOfDay.hour,
-                      minute: timeOfDay.minute,
-                      second: 0,
-                      millisecond: 0,
-                      microsecond: 0)
-                  .add(Duration(
-                    days: memNotifications
-                            .singleWhereOrNull((e) => e.isRepeatByNDay())
-                            ?.time ??
-                        1,
-                  ));
-            }
-
-            while (notifyAt != null && now.compareTo(notifyAt) > 0) {
-              notifyAt = notifyAt.add(const Duration(days: 1));
-            }
-
-            final daysOfWeeks = memNotifications
-                .where((e) => e.isRepeatByDayOfWeek() && e.isEnabled());
-
-            while (daysOfWeeks.isNotEmpty &&
-                !daysOfWeeks.map((e) => e.time).contains(notifyAt?.weekday)) {
-              notifyAt = notifyAt?.add(const Duration(days: 1));
-            }
-          }
-
-          return notifyAt;
-        },
+        () => MemNotifyAt.repeat(
+          memNotifications: memNotifications,
+          startOfDay: startOfDay,
+          latestAct: latestAct,
+          scheduleAnchor: scheduleAnchor,
+          now: now,
+          target: target,
+          todayCount: todayCount,
+        )?.at,
         {
           'memNotifications': memNotifications,
           'startOfDay': startOfDay,

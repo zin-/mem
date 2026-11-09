@@ -436,7 +436,7 @@ void main() {
         DateAndTime(2024, 10, 11),
       );
       expect(
-        sortedMem.notifyAt(sortStartOfToday, notificationsForMem, null),
+        sortedMem.notifyAt(sortStartOfToday, notificationsForMem, null)?.at,
         DateTime(2024, 10, 12, 8, 0),
       );
     });

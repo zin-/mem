@@ -38,13 +38,16 @@ List<MemEntity> upcomingMems(
   required DateTime now,
   required DateTime startOfToday,
 }) {
-  DateTime? notifyAtOf(MemEntity mem) => mem.toDomain().notifyAt(
+  DateTime? notifyAtOf(MemEntity mem) => mem
+      .toDomain()
+      .notifyAt(
         startOfToday,
         savedMemNotifications
             .where((notification) => notification.value.memId == mem.id)
             .map((notification) => notification.value),
         mem.latestAct,
-      );
+      )
+      ?.at;
 
   final upcoming = <({MemEntity mem, DateTime notifyAt})>[];
   for (final mem in mems) {
