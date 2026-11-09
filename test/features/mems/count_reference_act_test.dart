@@ -7,7 +7,8 @@ import 'package:mem/framework/date_and_time/date_and_time.dart';
 
 void main() {
   const startOfDay = TimeOfDay(hour: 5, minute: 0);
-  final startOfToday = DateTime(2024, 10, 12, startOfDay.hour, startOfDay.minute);
+  final startOfToday =
+      DateTime(2024, 10, 12, startOfDay.hour, startOfDay.minute);
 
   Act finished(DateTime end) {
     final at = DateAndTime.from(end, timeOfDay: end);
@@ -58,6 +59,43 @@ void main() {
         same(latest),
       );
     });
+
+    test('uses a finished schedule anchor when the latest act cannot be used',
+        () {
+      final anchor = finished(DateTime(2024, 10, 10, 10));
+      final skipped = Act.by(
+        1,
+        startWhen: DateAndTime(2024, 10, 12, 9),
+        endWhen: DateAndTime(2024, 10, 12, 10),
+        completionKind: ActKind.skipped,
+      );
+      final running = Act.by(
+        1,
+        startWhen: DateAndTime(2024, 10, 12, 11),
+      );
+
+      expect(
+        CountReferenceAct.of(
+          latestAct: skipped,
+          scheduleAnchorAct: anchor,
+        )?.act,
+        same(anchor),
+      );
+      expect(
+        CountReferenceAct.of(
+          latestAct: running,
+          scheduleAnchorAct: anchor,
+        )?.act,
+        same(anchor),
+      );
+      expect(
+        CountReferenceAct.of(
+          latestAct: null,
+          scheduleAnchorAct: anchor,
+        )?.act,
+        same(anchor),
+      );
+    });
   });
 
   group('CountReferenceAct week window', () {
@@ -75,7 +113,7 @@ void main() {
         ),
         startOfDay,
       )!;
-      final week = reference.week(startOfToday, startOfDay)!;
+      final week = reference.week(startOfToday, startOfDay);
 
       expect(week.start, expected.start);
       expect(week.end, expected.end);
@@ -101,13 +139,13 @@ void main() {
       expect(onToday.isWithinWeek(startOfToday, startOfDay), isTrue);
 
       expect(
-        inWindow.week(startOfToday, startOfDay)!.includesStart(
+        inWindow.week(startOfToday, startOfDay).includesStart(
               inWindow.act.period!.end!,
             ),
         inWindow.isWithinWeek(startOfToday, startOfDay),
       );
       expect(
-        beforeWindow.week(startOfToday, startOfDay)!.includesStart(
+        beforeWindow.week(startOfToday, startOfDay).includesStart(
               beforeWindow.act.period!.end!,
             ),
         beforeWindow.isWithinWeek(startOfToday, startOfDay),
@@ -121,8 +159,8 @@ void main() {
       final newer = CountReferenceAct.of(
         latestAct: finished(DateTime(2024, 10, 11, 10)),
       )!;
-      final olderWeek = older.week(startOfToday, startOfDay)!;
-      final newerWeek = newer.week(startOfToday, startOfDay)!;
+      final olderWeek = older.week(startOfToday, startOfDay);
+      final newerWeek = newer.week(startOfToday, startOfDay);
 
       expect(olderWeek.start, newerWeek.start);
       expect(olderWeek.end, newerWeek.end);

@@ -111,8 +111,7 @@ class MemNotifyAt {
       notifyAt = notifyAt?.add(const Duration(days: 1));
     }
 
-    if (notifyAt == null) return null;
-    return MemNotifyAt._(notifyAt);
+    return MemNotifyAt._(notifyAt!);
   }
 
   static DateTime? _choose({

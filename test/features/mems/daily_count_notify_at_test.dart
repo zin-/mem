@@ -65,12 +65,14 @@ void main() {
     Act? anchor,
     List<MemNotification>? notifications,
   }) =>
-      memWith(latest, anchor: anchor).memListAt(
-        startOfToday,
-        notifications ?? dailyAtNine,
-        target: target,
-        periodCount: todayCount,
-      )?.at;
+      memWith(latest, anchor: anchor)
+          .memListAt(
+            startOfToday,
+            notifications ?? dailyAtNine,
+            target: target,
+            periodCount: todayCount,
+          )
+          ?.at;
 
   DateTime? fireAt(
     Act latest,
@@ -258,6 +260,82 @@ void main() {
           todayCount: belowTargetCount,
         ),
         todayAtNine,
+      );
+    });
+  });
+
+  group('repeat notify at', () {
+    test('is null while an act is still running', () {
+      final running = Act.by(
+        1,
+        startWhen: DateAndTime(2026, 11, 9, 8),
+      );
+
+      expect(
+        fireAt(
+          running,
+          DateTime(2026, 11, 9, 8, 30),
+          target: countTarget(),
+          todayCount: belowTargetCount,
+        ),
+        isNull,
+      );
+    });
+
+    test('is null when there is no repeat notification', () {
+      expect(
+        MemNotifications.nextRepeatNotifyAt(
+          [],
+          startOfDay,
+          doneToday,
+          doneToday,
+          DateTime(2026, 11, 9, 8),
+        ),
+        isNull,
+      );
+      expect(
+        MemNotifications.nextRepeatNotifyAt(
+          [
+            MemNotification.by(
+              1,
+              MemNotificationType.afterActStarted,
+              60,
+              null,
+            ),
+          ],
+          startOfDay,
+          doneToday,
+          doneToday,
+          DateTime(2026, 11, 9, 8),
+        ),
+        isNull,
+      );
+    });
+
+    test(
+        'uses start of day and the next selected weekday when there is no fixed time',
+        () {
+      const dayStart = TimeOfDay(hour: 5, minute: 30);
+      final now = DateTime(2026, 11, 9, 10);
+      final dayAfterAnchor = DateTime(2026, 11, 10);
+      final wantedWeekday = dayAfterAnchor.weekday % DateTime.daysPerWeek + 1;
+
+      expect(
+        MemNotifications.nextRepeatNotifyAt(
+          [
+            MemNotification.by(
+              1,
+              MemNotificationType.repeatByDayOfWeek,
+              wantedWeekday,
+              'weekday',
+            ),
+          ],
+          dayStart,
+          doneToday,
+          doneToday,
+          now,
+        ),
+        DateTime(2026, 11, 11, dayStart.hour, dayStart.minute),
       );
     });
   });

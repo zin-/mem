@@ -32,24 +32,18 @@ class CountReferenceAct {
     return null;
   }
 
-  bool isWithinWeek(DateTime startOfToday, TimeOfDay startOfDay) {
-    final end = act.period?.end;
-    if (end == null) return false;
-    final period = week(startOfToday, startOfDay);
-    if (period == null) return false;
-    return period.includesStart(end);
-  }
+  bool isWithinWeek(DateTime startOfToday, TimeOfDay startOfDay) =>
+      week(startOfToday, startOfDay).includesStart(act.period!.end!);
 
-  DateAndTimePeriod? week(DateTime startOfToday, TimeOfDay startOfDay) {
-    return Period.aWeek.toPeriod(
-      DateAndTime(
-        startOfToday.year,
-        startOfToday.month,
-        startOfToday.day,
-        startOfDay.hour,
-        startOfDay.minute,
-      ),
-      startOfDay,
-    );
-  }
+  DateAndTimePeriod week(DateTime startOfToday, TimeOfDay startOfDay) =>
+      Period.aWeek.toPeriod(
+        DateAndTime(
+          startOfToday.year,
+          startOfToday.month,
+          startOfToday.day,
+          startOfDay.hour,
+          startOfDay.minute,
+        ),
+        startOfDay,
+      )!;
 }

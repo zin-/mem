@@ -1,10 +1,12 @@
 import 'package:drift/drift.dart' hide isNull;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/databases/database.dart' hide Act;
+import 'package:mem/databases/database.dart' hide Act, Target;
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/acts/acts_summary.dart';
+import 'package:mem/features/acts/line_chart/states.dart';
+import 'package:mem/features/targets/target.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
@@ -147,7 +149,8 @@ void main() {
       expect(summary.getValue(acts), 2);
     });
 
-    test('fetchScheduleAnchorByMemIds returns latest non-skipped act', () async {
+    test('fetchScheduleAnchorByMemIds returns latest non-skipped act',
+        () async {
       final memId = await insertMem();
       final finishStart = DateTime(2024, 6, 1, 10);
       final skipStart = DateTime(2024, 6, 3, 10);
@@ -206,8 +209,7 @@ void main() {
         actKind: 'skipped',
       );
 
-      final latest =
-          (await query.fetchLatestByMemIds(memId))?.toDomain();
+      final latest = (await query.fetchLatestByMemIds(memId))?.toDomain();
 
       final resolved = await query.resolveScheduleAnchorForNotifications(
         memId: memId,
@@ -218,7 +220,8 @@ void main() {
       expect(resolved?.period?.start?.day, finishStart.day);
     });
 
-    test('resolveScheduleAnchorForNotifications uses provided anchor', () async {
+    test('resolveScheduleAnchorForNotifications uses provided anchor',
+        () async {
       final anchor = Act.by(
         1,
         startWhen: DateAndTime(2024, 6, 1),
@@ -420,6 +423,29 @@ void main() {
       );
 
       expect(count, 2);
+    });
+
+    test('listPeriodCountsByMemId skips a mem when the period is null',
+        () async {
+      final memId = await insertMem();
+
+      final counts = await query.listPeriodCountsByMemId(
+        mems: [
+          (
+            id: memId,
+            target: Target(
+              memId: memId,
+              targetType: TargetType.equalTo,
+              targetUnit: TargetUnit.count,
+              value: 2,
+              period: Period.aDay,
+            ),
+            period: null,
+          ),
+        ],
+      );
+
+      expect(counts, isEmpty);
     });
   });
 }

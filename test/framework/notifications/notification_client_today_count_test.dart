@@ -197,5 +197,23 @@ void main() {
 
       expect(await shouldNotifyRepeat(memId), isFalse);
     });
+
+    test('shouldNotifyRepeat is false when today is not a selected weekday',
+        () async {
+      final memId = await insertMem();
+      final now = DateTime(2026, 11, 9, 10);
+      final otherWeekday =
+          now.weekday == DateTime.monday ? DateTime.tuesday : DateTime.monday;
+      await MemRepository().receiveRepeatedNotification(
+        MemNotification.by(
+          memId,
+          MemNotificationType.repeatByDayOfWeek,
+          otherWeekday,
+          'weekday',
+        ),
+      );
+
+      expect(await shouldNotifyRepeat(memId, now: now), isFalse);
+    });
   });
 }
