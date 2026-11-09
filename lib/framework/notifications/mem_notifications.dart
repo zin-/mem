@@ -21,6 +21,8 @@ class MemNotifications {
     Act? latestAct,
     DateTime now, {
     Act? scheduleAnchor,
+    Target? target,
+    int todayCount = 0,
   }) =>
       v(
         () => memNotifications
@@ -41,6 +43,8 @@ class MemNotifications {
                       latestAct,
                       scheduleAnchor ?? mem.resolvedScheduleAnchor,
                       now,
+                      target: target,
+                      todayCount: todayCount,
                     ) ??
                     now,
                 const Duration(days: 1),
@@ -55,6 +59,8 @@ class MemNotifications {
           'memNotifications': memNotifications,
           'latestAct': latestAct,
           'now': now,
+          'target': target,
+          'todayCount': todayCount,
         },
       );
 

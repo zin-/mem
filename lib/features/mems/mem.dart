@@ -50,12 +50,16 @@ class Mem {
 
   DateAndTime? memListSectionDate(
     DateTime startOfToday,
-    Iterable<MemNotification>? memNotifications,
-  ) {
+    Iterable<MemNotification>? memNotifications, {
+    Target? target,
+    int todayCount = 0,
+  }) {
     final nextNotifyAt = notifyAt(
       startOfToday,
       memNotifications,
       latestAct,
+      target: target,
+      todayCount: todayCount,
     )?.at;
     if (nextNotifyAt == null) return null;
     final scheduledNotifications = memNotifications?.where(

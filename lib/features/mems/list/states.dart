@@ -9,6 +9,7 @@ import 'package:mem/framework/view/value_state_notifier.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/list/filter_value.dart';
 import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mems/today_act_count.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/settings/preference/keys.dart';
@@ -67,11 +68,24 @@ final loadMemListProvider = FutureProvider.autoDispose<void>((ref) {
   );
 });
 
+final todayActCountByMemIdProvider =
+    FutureProvider.autoDispose<Map<int, int>>((ref) {
+  final mems = ref.watch(memEntitiesProvider);
+  final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
+  return TodayActCount.byMemId(
+    mems: [
+      for (final mem in mems) (id: mem.id, target: mem.target),
+    ],
+    startOfDay: startOfDay,
+  );
+});
+
 int compareMemListEntries(
   MemEntity a,
   MemEntity b, {
   required DateTime startOfToday,
   required Iterable<SavedMemNotificationEntityV1> savedMemNotifications,
+  Map<int, int> todayActCountByMemId = const {},
 }) {
   final latestActOfA = a.latestAct;
   final latestActOfB = b.latestAct;
@@ -106,6 +120,8 @@ int compareMemListEntries(
         startOfToday,
         memNotificationsOfA.map((e) => e.value),
         latestActOfA,
+        target: a.target,
+        todayCount: todayActCountByMemId[a.id] ?? 0,
       )
       ?.at;
   final timeOfOther = b
@@ -114,6 +130,8 @@ int compareMemListEntries(
         startOfToday,
         memNotificationsOfB.map((e) => e.value),
         latestActOfB,
+        target: b.target,
+        todayCount: todayActCountByMemId[b.id] ?? 0,
       )
       ?.at;
 
@@ -144,6 +162,8 @@ final memListProvider = StateNotifierProvider.autoDispose<
 
   final filtered = ref.watch(_filteredMemsProvider);
   final savedMemNotifications = ref.watch(savedMemNotificationsProvider);
+  final todayActCountByMemId =
+      ref.watch(todayActCountByMemIdProvider).value ?? const {};
 
   final startOfToday = DateTimeExt.startOfToday(
     ref.watch(preferenceProvider(startOfDayKey)),
@@ -158,12 +178,14 @@ final memListProvider = StateNotifierProvider.autoDispose<
               b,
               startOfToday: startOfToday,
               savedMemNotifications: savedMemNotifications,
+              todayActCountByMemId: todayActCountByMemId,
             ),
           )
           .toList(),
       {
         'filtered': filtered,
         'savedMemNotifications': savedMemNotifications,
+        'todayActCountByMemId': todayActCountByMemId,
       },
     ),
   );

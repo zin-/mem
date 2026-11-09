@@ -2,6 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/mems/mem.dart';
+import 'package:mem/features/mems/today_act_count.dart';
+import 'package:mem/features/targets/target_repository.dart';
 import 'package:mem/features/settings/constants.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -27,6 +29,7 @@ class NotificationClient {
   final MemRepository _memRepository;
   final MemNotificationRepository _memNotificationRepository;
   final ActQueryService _actQueryService;
+  final TargetRepository _targetRepository;
 
   NotificationClient._(
     this.notificationChannels,
@@ -36,6 +39,7 @@ class NotificationClient {
     this._memRepository,
     this._memNotificationRepository,
     this._actQueryService,
+    this._targetRepository,
   );
 
   static NotificationClient? _instance;
@@ -49,6 +53,7 @@ class NotificationClient {
           MemRepository(),
           MemNotificationRepository(),
           ActQueryService(),
+          TargetRepository(),
         ),
         {
           'context': context,
@@ -147,6 +152,14 @@ class NotificationClient {
                 (await _preferenceClientRepository.shipByKey(startOfDayKey))
                         .value ??
                     defaultStartOfDay;
+            final now = DateTime.now();
+            final today = await TodayActCount.forMem(
+              memId: mem.id!,
+              startOfDay: startOfDay,
+              now: now,
+              acts: _actQueryService,
+              targets: _targetRepository,
+            );
 
             final atList = [
               ...mem.periodSchedules(startOfDay),
@@ -157,8 +170,10 @@ class NotificationClient {
                     .ship(memId: mem.id!)
                     .then((v) => v.map((e) => e.toDomain())),
                 latestAct,
-                DateTime.now(),
+                now,
                 scheduleAnchor: scheduleAnchor,
+                target: today?.target,
+                todayCount: today?.value ?? 0,
               )
             ].map((e) {
               _scheduleClient.receive(e);
@@ -290,52 +305,12 @@ class NotificationClient {
         },
       );
 
-  Future<bool> _shouldNotify(int memId) => v(
-        () async {
-          final savedMemNotifications =
-              await _memNotificationRepository.ship(memId: memId);
-          final repeatByDayOfWeekMemNotifications = savedMemNotifications.where(
-            (e) =>
-                e.toDomain().isEnabled() && e.toDomain().isRepeatByDayOfWeek(),
-          );
-
-          if (repeatByDayOfWeekMemNotifications.isNotEmpty) {
-            final now = DateTime.now();
-            if (!repeatByDayOfWeekMemNotifications
-                .map((e) => e.toDomain().time)
-                .contains(now.weekday)) {
-              return false;
-            }
-          }
-
-          final repeatByNDayMemNotification =
-              savedMemNotifications.singleWhereOrNull(
-            (e) => e.toDomain().isEnabled() && e.toDomain().isRepeatByNDay(),
-          );
-          final latestAct = await _actQueryService
-              .fetchLatestByMemIds(memId)
-              .then((v) => v?.toDomain());
-          final scheduleAnchor =
-              await _actQueryService.resolveScheduleAnchorForNotifications(
-            memId: memId,
-            latestAct: latestAct,
-          );
-          final lastActTime = scheduleAnchor?.period?.end?.dateTime ??
-              scheduleAnchor?.period?.start?.dateTime;
-
-          if (lastActTime != null) {
-            if (Duration(
-                    days:
-                        // FIXME 永続化されている時点でtimeは必ずあるので型で表現する
-                        //  repeatByNDayMemNotification自体がないのは別の話
-                        repeatByNDayMemNotification?.toDomain().time! ?? 1) >
-                DateTime.now().difference(lastActTime)) {
-              return false;
-            }
-          }
-
-          return true;
-        },
+  Future<bool> _shouldNotify(int memId) => shouldNotifyRepeat(
+        memId,
+        notifications: _memNotificationRepository,
+        acts: _actQueryService,
+        targets: _targetRepository,
+        preferences: _preferenceClientRepository,
       );
 
   Future<void> resetAll() => v(
@@ -357,3 +332,76 @@ class NotificationClient {
 }
 
 const notificationTypeKey = "notificationType";
+
+Future<bool> shouldNotifyRepeat(
+  int memId, {
+  MemNotificationRepository? notifications,
+  ActQueryService? acts,
+  TargetRepository? targets,
+  PreferenceRepository? preferences,
+  DateTime? now,
+}) =>
+    v(
+      () async {
+        final notificationRepository =
+            notifications ?? MemNotificationRepository();
+        final actQuery = acts ?? ActQueryService();
+        final targetRepository = targets ?? TargetRepository();
+        final preferenceRepository = preferences ?? PreferenceRepository();
+        final clock = now ?? DateTime.now();
+
+        final savedMemNotifications =
+            await notificationRepository.ship(memId: memId);
+        final repeatByDayOfWeekMemNotifications = savedMemNotifications.where(
+          (e) => e.toDomain().isEnabled() && e.toDomain().isRepeatByDayOfWeek(),
+        );
+
+        if (repeatByDayOfWeekMemNotifications.isNotEmpty &&
+            !repeatByDayOfWeekMemNotifications
+                .map((e) => e.toDomain().time)
+                .contains(clock.weekday)) {
+          return false;
+        }
+
+        final repeatByNDayMemNotification =
+            savedMemNotifications.singleWhereOrNull(
+          (e) => e.toDomain().isEnabled() && e.toDomain().isRepeatByNDay(),
+        );
+        final latestAct = await actQuery
+            .fetchLatestByMemIds(memId)
+            .then((value) => value?.toDomain());
+        final scheduleAnchor =
+            await actQuery.resolveScheduleAnchorForNotifications(
+          memId: memId,
+          latestAct: latestAct,
+        );
+        final lastActTime = scheduleAnchor?.period?.end?.dateTime ??
+            scheduleAnchor?.period?.start?.dateTime;
+        final startOfDay =
+            (await preferenceRepository.shipByKey(startOfDayKey)).value ??
+                defaultStartOfDay;
+        final today = await TodayActCount.forMem(
+          memId: memId,
+          startOfDay: startOfDay,
+          now: clock,
+          acts: actQuery,
+          targets: targetRepository,
+        );
+        final requiredDays = repeatByNDayMemNotification?.toDomain().time! ?? 1;
+        final unmetDailyCount = today != null &&
+            today.value < today.target.value &&
+            requiredDays == 1;
+
+        if (lastActTime != null && !unmetDailyCount) {
+          if (Duration(days: requiredDays) > clock.difference(lastActTime)) {
+            return false;
+          }
+        }
+
+        return true;
+      },
+      {
+        'memId': memId,
+        'now': now,
+      },
+    );
