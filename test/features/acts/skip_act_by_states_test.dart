@@ -38,6 +38,8 @@ void main() {
       );
       mockNotification = MockNotificationClient();
       when(mockNotification.cancelActNotification(any)).thenAnswer((_) async {});
+      when(mockNotification.registerMemNotifications(any))
+          .thenAnswer((_) async => null);
       when(mockNotification.setNotificationAfterInactivity())
           .thenAnswer((_) async {});
       ActsClient(
@@ -73,6 +75,7 @@ void main() {
       expect(mems.single.latestAct?.actKind, ActKind.skipped);
 
       verify(mockNotification.cancelActNotification(mem.id)).called(1);
+      verify(mockNotification.registerMemNotifications(any)).called(1);
       verify(mockNotification.setNotificationAfterInactivity()).called(1);
     });
   });
