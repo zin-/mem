@@ -25,13 +25,13 @@ class MemListWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
           final mems = ref.watch(memListProvider);
-          final todayActCountByMemId =
-              ref.watch(todayActCountByMemIdProvider).value ?? const {};
+          final periodCountByMemId =
+              ref.watch(listPeriodCountByMemIdProvider).value ?? const {};
 
           return _MemListWidget(
             _scrollController,
             mems,
-            todayActCountByMemId,
+            periodCountByMemId,
             ref.watch(preferenceProvider(startOfDayKey)),
             ref.watch(savedMemNotificationsProvider),
             () async {
@@ -46,7 +46,7 @@ class MemListWidget extends ConsumerWidget {
 class _MemListWidget extends StatelessWidget {
   final ScrollController _scrollController;
   final List<MemEntity> _memList;
-  final Map<int, int> _todayActCountByMemId;
+  final Map<int, int> _periodCountByMemId;
   final TimeOfDay _startOfDay;
   final Iterable<MemNotificationEntityV1> _memNotifications;
   final Future<void> Function() _onRefresh;
@@ -54,7 +54,7 @@ class _MemListWidget extends StatelessWidget {
   const _MemListWidget(
     this._scrollController,
     this._memList,
-    this._todayActCountByMemId,
+    this._periodCountByMemId,
     this._startOfDay,
     this._memNotifications,
     this._onRefresh,
@@ -103,7 +103,7 @@ class _MemListWidget extends StatelessWidget {
                               memNotifications,
                               target: element.target,
                               todayCount:
-                                  _todayActCountByMemId[element.id] ?? 0,
+                                  _periodCountByMemId[element.id] ?? 0,
                             );
                       },
                     )

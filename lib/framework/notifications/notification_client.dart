@@ -2,7 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/mems/mem.dart';
-import 'package:mem/features/mems/today_act_count.dart';
 import 'package:mem/features/targets/target_repository.dart';
 import 'package:mem/features/settings/constants.dart';
 import 'package:mem/l10n/l10n.dart';
@@ -153,11 +152,10 @@ class NotificationClient {
                         .value ??
                     defaultStartOfDay;
             final now = DateTime.now();
-            final today = await TodayActCount.forMem(
+            final today = await _actQueryService.todayActCount(
               memId: mem.id!,
               startOfDay: startOfDay,
               now: now,
-              acts: _actQueryService,
               targets: _targetRepository,
             );
 
@@ -380,11 +378,10 @@ Future<bool> shouldNotifyRepeat(
         final startOfDay =
             (await preferenceRepository.shipByKey(startOfDayKey)).value ??
                 defaultStartOfDay;
-        final today = await TodayActCount.forMem(
+        final today = await actQuery.todayActCount(
           memId: memId,
           startOfDay: startOfDay,
           now: clock,
-          acts: actQuery,
           targets: targetRepository,
         );
         final requiredDays = repeatByNDayMemNotification?.toDomain().time! ?? 1;

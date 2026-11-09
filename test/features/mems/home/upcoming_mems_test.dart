@@ -42,14 +42,14 @@ void main() {
   List<int> ids(
     Iterable<MemEntity> mems, [
     Iterable<SavedMemNotificationEntityV1> savedMemNotifications = const [],
-    Map<int, int> todayActCountByMemId = const {},
+    Map<int, int> periodCountByMemId = const {},
   ]) =>
       upcomingMems(
         mems,
         savedMemNotifications,
         now: now,
         startOfToday: startOfToday,
-        todayActCountByMemId: todayActCountByMemId,
+        periodCountByMemId: periodCountByMemId,
       ).map((mem) => mem.id).toList();
 
   group('upcomingMems', () {

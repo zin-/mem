@@ -3,9 +3,7 @@ import '../../entity_factories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
-import 'package:mem/features/acts/day_act_amount.dart';
 import 'package:mem/features/acts/states.dart';
-import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/detail/states.dart';
@@ -105,11 +103,8 @@ Future<void> _pumpMemListCount(
   required Mem mem,
   required Target target,
   required int todayCount,
-  Map<int, int> periodCounts = const {},
+  Map<int, int>? periodCounts,
 }) async {
-  final today = DateAndTime.now().logicalDay(
-    const TimeOfDay(hour: 0, minute: 0),
-  );
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
@@ -124,11 +119,8 @@ Future<void> _pumpMemListCount(
           ]),
         ),
         preferenceProvider(startOfDayKey).overrideWith(() => _FakeStartOfDay()),
-        viewedDayActAmountProvider(memId, today).overrideWith(
-          (ref) async => DayActAmount(todayCount, Duration.zero),
-        ),
-        todayActCountByMemIdProvider.overrideWith(
-          (ref) async => periodCounts,
+        listPeriodCountByMemIdProvider.overrideWith(
+          (ref) async => periodCounts ?? {memId: todayCount},
         ),
       ],
       child: MaterialApp(
@@ -1152,9 +1144,6 @@ void main() {
       });
 
       testWidgets('shows today count and target', (tester) async {
-        final today = DateAndTime.now().logicalDay(
-          const TimeOfDay(hour: 0, minute: 0),
-        );
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
@@ -1169,8 +1158,8 @@ void main() {
               ),
               preferenceProvider(startOfDayKey)
                   .overrideWith(() => _FakeStartOfDay()),
-              viewedDayActAmountProvider(memId, today).overrideWith(
-                (ref) async => const DayActAmount(2, Duration.zero),
+              listPeriodCountByMemIdProvider.overrideWith(
+                (ref) async => {memId: 2},
               ),
             ],
             child: MaterialApp(
@@ -1190,9 +1179,6 @@ void main() {
 
       testWidgets('keeps state time when the target is a count',
           (tester) async {
-        final today = DateAndTime.now().logicalDay(
-          const TimeOfDay(hour: 0, minute: 0),
-        );
         final mem = Mem(
           memId,
           'Test Mem',
@@ -1219,8 +1205,8 @@ void main() {
               ),
               preferenceProvider(startOfDayKey)
                   .overrideWith(() => _FakeStartOfDay()),
-              viewedDayActAmountProvider(memId, today).overrideWith(
-                (ref) async => const DayActAmount(2, Duration.zero),
+              listPeriodCountByMemIdProvider.overrideWith(
+                (ref) async => {memId: 2},
               ),
             ],
             child: MaterialApp(
@@ -1353,6 +1339,10 @@ void main() {
             secondsAfterLastAct: interval.inSeconds,
           );
 
+      const endedHoursAgo = 3;
+      const notifyMinutesAgo = 90;
+      const belowTargetCount = 1;
+
       Mem memEndedAt(DateTime endedAt) {
         final end = DateAndTime.from(endedAt, timeOfDay: endedAt);
         return Mem(
@@ -1380,6 +1370,11 @@ void main() {
                     target: () => intervalTarget(),
                   ),
                 ]),
+              ),
+              preferenceProvider(startOfDayKey)
+                  .overrideWith(() => _FakeStartOfDay()),
+              listPeriodCountByMemIdProvider.overrideWith(
+                (ref) async => {memId: belowTargetCount},
               ),
             ],
             child: MaterialApp(
@@ -1435,10 +1430,6 @@ void main() {
         );
       });
 
-      const endedHoursAgo = 3;
-      const notifyMinutesAgo = 90;
-      const belowTargetCount = 1;
-
       Future<void> pumpWithNotify(
         WidgetTester tester, {
         required Mem mem,
@@ -1446,9 +1437,6 @@ void main() {
         required int todayCount,
       }) async {
         final now = DateTime.now();
-        final today = DateAndTime.now().logicalDay(
-          const TimeOfDay(hour: 0, minute: 0),
-        );
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
@@ -1475,8 +1463,8 @@ void main() {
               ),
               preferenceProvider(startOfDayKey)
                   .overrideWith(() => _FakeStartOfDay()),
-              viewedDayActAmountProvider(memId, today).overrideWith(
-                (ref) async => DayActAmount(todayCount, Duration.zero),
+              listPeriodCountByMemIdProvider.overrideWith(
+                (ref) async => {memId: todayCount},
               ),
             ],
             child: MaterialApp(
@@ -1550,9 +1538,6 @@ void main() {
         final endedAt = DateTime.now().subtract(
           const Duration(hours: endedHoursAgo),
         );
-        final today = DateAndTime.now().logicalDay(
-          const TimeOfDay(hour: 0, minute: 0),
-        );
         final mem = memEndedAt(endedAt);
         await tester.pumpWidget(
           ProviderScope(
@@ -1569,11 +1554,8 @@ void main() {
               ),
               preferenceProvider(startOfDayKey)
                   .overrideWith(() => _FakeStartOfDay()),
-              viewedDayActAmountProvider(memId, today).overrideWith(
-                (ref) async => DayActAmount(
-                  intervalTarget().value,
-                  Duration.zero,
-                ),
+              listPeriodCountByMemIdProvider.overrideWith(
+                (ref) async => {memId: intervalTarget().value},
               ),
             ],
             child: MaterialApp(

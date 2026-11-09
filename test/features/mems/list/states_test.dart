@@ -605,7 +605,7 @@ void main() {
           stillToday,
           startOfToday: startOfToday,
           savedMemNotifications: notifications,
-          todayActCountByMemId: {1: dailyTargetValue},
+          periodCountByMemId: {1: dailyTargetValue},
         ),
         lessThan(0),
       );
@@ -684,7 +684,7 @@ void main() {
           later,
           startOfToday: start,
           savedMemNotifications: notifications,
-          todayActCountByMemId: {
+          periodCountByMemId: {
             1: weeklyTargetValue,
             2: weeklyTargetValue,
           },
@@ -739,7 +739,7 @@ void main() {
         later,
         startOfToday: startOfToday,
         savedMemNotifications: notifications,
-        todayActCountByMemId: counts,
+        periodCountByMemId: counts,
       );
       final byNotifyAt = earlier
           .toDomain()
