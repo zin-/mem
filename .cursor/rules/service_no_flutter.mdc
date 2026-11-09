@@ -1,0 +1,44 @@
+---
+description: service は package:flutter を import しない
+globs: lib/**/*_service.dart
+alwaysApply: false
+---
+
+# service は Flutter に依存しない
+
+`lib/**/*_service.dart` は `package:flutter` を import しない。
+
+一日の区切りは `TimeOfDay` ではなく、`DateAndTime` または `DateAndTimePeriod` で受ける。`TimeOfDay` からの変換は UI や通知の境界で行う。
+
+## Example(具体例)
+
+**❌ service が `TimeOfDay` を受けて material を import する:**
+
+```dart
+import 'package:flutter/material.dart';
+
+Future<TodayActCount?> todayActCount({
+  required TimeOfDay startOfDay,
+  required DateTime now,
+}) { /* ... */ }
+```
+
+**✅ 期間は `DateAndTimePeriod` で受け、変換は呼び出し側で行う:**
+
+```dart
+import 'package:mem/framework/date_and_time/date_and_time_period.dart';
+
+Future<TodayActCount?> todayActCount({
+  required DateAndTimePeriod period,
+}) { /* ... */ }
+
+// 通知側
+TodayActCount.period(clock, startOfDay)
+```
+
+## Relations(関連)
+
+- `DateAndTime`
+- `DateAndTimePeriod`
+- `TodayActCount`
+- `ListPeriodCount`
