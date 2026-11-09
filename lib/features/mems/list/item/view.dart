@@ -15,7 +15,7 @@ import 'package:mem/features/mems/list/item/completion_dialog.dart';
 import 'package:mem/features/mems/mem_done_checkbox.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
-import 'package:mem/features/targets/next_at_after_last_act.dart';
+import 'package:mem/features/mems/list/mem_list_clock.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
@@ -39,6 +39,17 @@ class MemListItemView extends ConsumerWidget {
                   ?.target,
             ),
           );
+          final notifications =
+              ref.watch(memNotificationsByMemIdProvider(_mem.id as int));
+          final amount = _amount(ref, _mem.id as int, target);
+          final clockAt = MemListClock.of(
+            target: target,
+            latestAct: _mem.latestAct,
+            scheduleAnchorAct: _mem.scheduleAnchorAct,
+            notifications: notifications.map((e) => e.value),
+            startOfDay: ref.watch(preferenceProvider(startOfDayKey)),
+            todayCount: amount?.count ?? 0,
+          )?.at;
           return _render(
             context,
             _mem,
@@ -75,9 +86,10 @@ class MemListItemView extends ConsumerWidget {
             () => ref
                 .read(actEntitiesProvider.notifier)
                 .closeByMemId(_mem.id as int),
-            ref.watch(memNotificationsByMemIdProvider(_mem.id as int)),
+            notifications,
             target,
-            _amount(ref, _mem.id as int, target),
+            amount,
+            clockAt,
           );
         },
         {
@@ -101,6 +113,7 @@ ListTile _render(
   Iterable<MemNotificationEntityV1> memNotificationEntities,
   Target? target,
   DayActAmount? amount,
+  DateTime? clockAt,
 ) =>
     v(
       () {
@@ -113,13 +126,6 @@ ListTile _render(
               (e) => e is SavedMemNotificationEntityV1 && e.value.isEnabled(),
             )
             .isNotEmpty;
-        final nextAt = target == null
-            ? null
-            : NextAtAfterLastAct.of(
-                target: target,
-                latestAct: latestActByMem,
-                scheduleAnchorAct: mem.scheduleAnchorAct,
-              )?.at;
         final enableSkipMenu = hasEnableMemNotifications && !hasActiveAct;
 
         void showCompletionDialog(BuildContext dialogContext) {
@@ -168,10 +174,11 @@ ListTile _render(
                   ? stopIconButton
                   : startIconButton
               : null,
-          subtitle:
-              mem.period == null && !hasEnableMemNotifications && nextAt == null
-                  ? null
-                  : MemListItemSubtitle(mem.id as int),
+          subtitle: mem.period == null &&
+                  !hasEnableMemNotifications &&
+                  clockAt == null
+              ? null
+              : MemListItemSubtitle(mem.id as int, clockAt),
           isThreeLine: mem.period != null && hasEnableMemNotifications,
         );
       },
@@ -181,6 +188,7 @@ ListTile _render(
         'memNotificationEntities': memNotificationEntities,
         'target': target,
         'amount': amount,
+        'clockAt': clockAt,
       },
     );
 

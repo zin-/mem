@@ -16,11 +16,13 @@ import 'package:mem/values/colors.dart';
 
 class MemNotificationText extends ConsumerWidget {
   final int? _memId;
+  final DateTime? _clockAt;
 
   const MemNotificationText(
     this._memId, {
+    DateTime? clockAt,
     super.key,
-  });
+  }) : _clockAt = clockAt;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
@@ -34,9 +36,11 @@ class MemNotificationText extends ConsumerWidget {
                   ?.resolvedScheduleAnchor,
             ),
           ),
+          _clockAt,
         ),
         {
           '_memId': _memId,
+          '_clockAt': _clockAt,
         },
       );
 }
@@ -45,11 +49,13 @@ class _MemNotificationText extends StatelessWidget {
   final Iterable<MemNotificationEntityV1> _memNotificationEntities;
   final TimeOfDay _startOfDay;
   final Act? _scheduleAnchor;
+  final DateTime? _clockAt;
 
   const _MemNotificationText(
     this._memNotificationEntities,
     this._startOfDay,
     this._scheduleAnchor,
+    this._clockAt,
   );
 
   @override
@@ -82,6 +88,8 @@ class _MemNotificationText extends StatelessWidget {
               .map((e) => e.value)
               .whereType<RepeatByNDayMemNotification>()
               .singleOrNull;
+          final clockAt = _clockAt;
+          final shownAt = clockAt ?? nextNotifyAt;
 
           return enables.isEmpty
               ? Text(
@@ -93,11 +101,14 @@ class _MemNotificationText extends StatelessWidget {
               : Wrap(
                   spacing: 4.0,
                   children: [
-                    if (repeatMemNotification != null && nextNotifyAt != null)
+                    if (repeatMemNotification != null && shownAt != null)
                       renderRepeatMemNotification(
                         context,
                         repeatMemNotification,
-                        nextNotifyAt,
+                        shownAt,
+                        time: clockAt == null
+                            ? null
+                            : TimeOfDay.fromDateTime(clockAt),
                       ),
                     if (nDayMemNotification != null)
                       renderRepeatByNDayMemNotification(
@@ -117,6 +128,7 @@ class _MemNotificationText extends StatelessWidget {
         {
           '_memNotificationEntities': _memNotificationEntities,
           '_startOfDay': _startOfDay,
+          '_clockAt': _clockAt,
         },
       );
 }
@@ -124,14 +136,16 @@ class _MemNotificationText extends StatelessWidget {
 Widget renderRepeatMemNotification(
   BuildContext context,
   RepeatMemNotification repeat,
-  DateTime startOfToday,
-) =>
+  DateTime at, {
+  TimeOfDay? time,
+}) =>
     v(
-      () => renderClockTime(context, repeat.timeOfDay!, startOfToday),
+      () => renderClockTime(context, time ?? repeat.timeOfDay!, at),
       {
         'context': context,
         'repeatMemNotification': repeat,
-        'startOfToday': startOfToday,
+        'at': at,
+        'time': time,
       },
     );
 

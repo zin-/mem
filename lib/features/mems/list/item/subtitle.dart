@@ -7,18 +7,17 @@ import 'package:mem/features/mem_notifications/mem_notifications_text.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
-import 'package:mem/features/targets/next_at_after_last_act.dart';
 
 class MemListItemSubtitle extends ConsumerWidget {
   final int _memId;
+  final DateTime? _clockAt;
 
-  const MemListItemSubtitle(this._memId, {super.key});
+  const MemListItemSubtitle(this._memId, this._clockAt, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
           final mem = ref.watch(memByMemIdProvider(_memId));
-          final target = mem?.target;
           return _MemListItemSubtitle(
             _memId,
             mem?.period,
@@ -27,17 +26,12 @@ class MemListItemSubtitle extends ConsumerWidget {
                 (v) => v.whereType<SavedMemNotificationEntityV1>(),
               ),
             ),
-            target == null
-                ? null
-                : NextAtAfterLastAct.of(
-                    target: target,
-                    latestAct: mem?.latestAct,
-                    scheduleAnchorAct: mem?.scheduleAnchorAct,
-                  )?.at,
+            _clockAt,
           );
         },
         {
           '_memId': _memId,
+          '_clockAt': _clockAt,
         },
       );
 }
@@ -46,31 +40,35 @@ class _MemListItemSubtitle extends StatelessWidget {
   final int _memId;
   final DateAndTimePeriod? _memPeriod;
   final Iterable<SavedMemNotificationEntityV1> _savedMemNotificationEntities;
-  final DateTime? _nextAt;
+  final DateTime? _clockAt;
 
   const _MemListItemSubtitle(
     this._memId,
     this._memPeriod,
     this._savedMemNotificationEntities,
-    this._nextAt,
+    this._clockAt,
   );
 
   @override
   Widget build(BuildContext context) => v(
         () {
-          final nextAt = _nextAt;
+          final clockAt = _clockAt;
+          final enabled =
+              _savedMemNotificationEntities.where((e) => e.value.isEnabled());
+          final hasRepeatClock = enabled.any((e) => e.value.isRepeated());
           return Wrap(
             children: [
               if (_memPeriod != null) MemPeriodTexts(_memId),
-              if (_savedMemNotificationEntities
-                  .where((e) => e.value.isEnabled())
-                  .isNotEmpty)
-                MemNotificationText(_memId),
-              if (nextAt != null)
+              if (enabled.isNotEmpty)
+                MemNotificationText(
+                  _memId,
+                  clockAt: hasRepeatClock ? clockAt : null,
+                ),
+              if (clockAt != null && !hasRepeatClock)
                 renderClockTime(
                   context,
-                  TimeOfDay.fromDateTime(nextAt),
-                  nextAt,
+                  TimeOfDay.fromDateTime(clockAt),
+                  clockAt,
                 ),
             ],
           );
@@ -79,7 +77,7 @@ class _MemListItemSubtitle extends StatelessWidget {
           '_memId': _memId,
           '_memPeriod': _memPeriod,
           '_savedMemNotificationEntities': _savedMemNotificationEntities,
-          '_nextAt': _nextAt,
+          '_clockAt': _clockAt,
         },
       );
 }
