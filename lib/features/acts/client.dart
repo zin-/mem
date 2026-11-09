@@ -139,6 +139,8 @@ class ActsClient {
           await _registerMemNotificationsByMemId(memId);
           await _notificationClient.setNotificationAfterInactivity();
 
+          // TODO #226 Relation Notification and HomeWidget
+
           return SavedActEntityV1.fromEntityV2(finished);
         },
         {
