@@ -5,6 +5,7 @@ import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
+import 'package:mem/features/targets/target.dart';
 import 'package:mem/framework/notifications/notification/type.dart';
 import 'package:mem/framework/notifications/schedule.dart';
 
@@ -33,9 +34,8 @@ class Mem {
 
   bool get isDone => doneAt != null;
 
-  Mem done(DateTime when) =>
-      Mem(id, name, when, period,
-          latestAct: latestAct, scheduleAnchorAct: scheduleAnchorAct);
+  Mem done(DateTime when) => Mem(id, name, when, period,
+      latestAct: latestAct, scheduleAnchorAct: scheduleAnchorAct);
 
   Mem undone() => Mem(id, name, null, period,
       latestAct: latestAct, scheduleAnchorAct: scheduleAnchorAct);
@@ -81,8 +81,10 @@ class Mem {
   DateTime? notifyAt(
     DateTime startOfToday,
     Iterable<MemNotification>? memNotifications,
-    Act? latestAct,
-  ) =>
+    Act? latestAct, {
+    Target? target,
+    int todayCount = 0,
+  }) =>
       v(
         () {
           final scheduledNotifications = memNotifications?.where(
@@ -115,6 +117,8 @@ class Mem {
           'startOfToday': startOfToday,
           'memNotifications': memNotifications,
           'latestAct': latestAct,
+          'target': target,
+          'todayCount': todayCount,
         },
       );
 
@@ -142,9 +146,8 @@ class Mem {
     }
 
     var result = notifyAt;
-    final repeatByNDay = scheduledNotifications
-        .where((e) => e.isRepeatByNDay())
-        .firstOrNull;
+    final repeatByNDay =
+        scheduledNotifications.where((e) => e.isRepeatByNDay()).firstOrNull;
     if (repeatByNDay != null) {
       final nDays = repeatByNDay.time ?? 1;
       while (_dateOnly(result).compareTo(skipDay) <= 0) {

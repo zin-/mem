@@ -4,6 +4,7 @@ import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
+import 'package:mem/features/targets/target.dart';
 
 import 'notification_client.dart';
 import 'notification/type.dart';
@@ -62,8 +63,10 @@ class MemNotifications {
     TimeOfDay startOfDay,
     Act? latestAct,
     Act? scheduleAnchor,
-    DateTime now,
-  ) =>
+    DateTime now, {
+    Target? target,
+    int todayCount = 0,
+  }) =>
       v(
         () {
           DateTime? notifyAt;
@@ -124,6 +127,8 @@ class MemNotifications {
           'latestAct': latestAct,
           'scheduleAnchor': scheduleAnchor,
           'now': now,
+          'target': target,
+          'todayCount': todayCount,
         },
       );
 }
