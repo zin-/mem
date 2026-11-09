@@ -93,7 +93,6 @@ void main() {
       expect(find.text(l10n.homeDestinationLabel), findsOneWidget);
       expect(find.text(l10n.memListDestinationLabel), findsOneWidget);
       expect(find.text(l10n.actListDestinationLabel), findsOneWidget);
-      expect(find.text(l10n.homeUpcomingSubHeader), findsOneWidget);
       expect(find.byIcon(Icons.add), findsNothing);
       expect(
         tester
@@ -110,7 +109,6 @@ void main() {
 
       expect(find.byIcon(Icons.add), findsOneWidget);
       expect(find.text('Mem 3'), findsOneWidget);
-      expect(find.text(l10n.homeUpcomingSubHeader), findsNothing);
     },
   );
 }

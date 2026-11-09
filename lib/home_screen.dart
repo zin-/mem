@@ -36,7 +36,7 @@ class _HomePageState extends State<HomePage> with ScrollControllableStateMixin {
           final isHidden = scrollDirection == ScrollDirection.reverse;
 
           final bodies = [
-            UpcomingMemsView(widget.scrollController),
+            HomeView(widget.scrollController),
             MemListWidget(widget.scrollController),
             ActList(
               null,
