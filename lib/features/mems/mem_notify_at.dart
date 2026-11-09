@@ -24,7 +24,7 @@ class MemNotifyAt {
     int todayCount = 0,
   }) {
     final scheduledNotifications = memNotifications?.where(
-      (e) => !e.isAfterActStarted(),
+      (e) => e.isEnabled() && !e.isAfterActStarted(),
     );
     final chosen = _choose(
       withBase: _notificationAt(
