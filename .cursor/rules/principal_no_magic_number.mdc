@@ -1,0 +1,45 @@
+---
+alwaysApply: true
+---
+
+# No Magic Number
+
+数値や固定値を使用箇所に直書きしない。
+
+必要なら一箇所に名前を付けて定義し、すべての使用箇所はそこを参照する。
+
+- レイアウトの固定値は `lib/values/dimens.dart`（`_pagePaddingValue` や `defaultNavigationBarHeight` がある場所）
+- それ以外は、その値の意味が属する定義の隣
+
+既存コードの一括置換はしない。新たに書く箇所と、その変更で触った箇所だけ従う。
+
+## Example(具体例)
+
+**❌ 見出しに高さと水平パディングを直書きする:**
+
+```dart
+header: Container(
+  height: 60.0,
+  padding: EdgeInsets.symmetric(horizontal: 16.0),
+)
+```
+
+**✅ 高さと水平パディングは `dimens.dart` の定数を参照する:**
+
+```dart
+// lib/values/dimens.dart
+const sectionHeaderHeight = 60.0;
+const sectionHeaderHorizontalPadding = EdgeInsets.symmetric(
+  horizontal: _pagePaddingValue,
+);
+
+header: Container(
+  height: sectionHeaderHeight,
+  padding: sectionHeaderHorizontalPadding,
+)
+```
+
+## Relations(関連)
+
+- Dry(Don't Repeat Yourself)
+- `lib/values/dimens.dart`

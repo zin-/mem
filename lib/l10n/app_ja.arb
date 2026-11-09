@@ -5,6 +5,7 @@
   "actChartPageTitle": "Chart",
   "timePeriod": "対象期間",
 
+  "homeDestinationLabel": "Home",
   "memListDestinationLabel": "List",
   "memListToDoSubHeader": "ToDo",
   "actListDestinationLabel": "Acts",
