@@ -1,15 +1,19 @@
 // MemList → resumeActBy → ActsClient.resume の経路を、リスト画面フローに寄せて検証する。
 // play のタップ自体は mem_list_item_test / actions_test で行う。
+import 'package:drift/drift.dart' show Migrator;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/databases/database.dart' show setOnTest;
+import 'package:mem/databases/database.dart' hide Act, Mem;
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/acts/act_repository.dart';
 import 'package:mem/features/acts/act_service.dart';
 import 'package:mem/features/acts/client.dart';
+import 'package:mem/features/mems/mem.dart';
+import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/notifications/notification_client.dart';
+import 'package:mem/framework/singleton.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
@@ -62,7 +66,8 @@ void main() {
         null,
       );
       when(mockActService.resume(any, any)).thenAnswer((_) async => entity);
-      when(mockNotification.startActNotifications(any)).thenAnswer((_) async {});
+      when(mockNotification.startActNotifications(any))
+          .thenAnswer((_) async {});
 
       final saved = await client.resume(8, whenTime);
 
@@ -87,7 +92,8 @@ void main() {
         actKind: ActKind.skipped,
       );
       when(mockActService.skip(any, any)).thenAnswer((_) async => entity);
-      when(mockNotification.cancelActNotification(any)).thenAnswer((_) async {});
+      when(mockNotification.cancelActNotification(any))
+          .thenAnswer((_) async {});
       when(mockNotification.setNotificationAfterInactivity())
           .thenAnswer((_) async {});
 
@@ -97,6 +103,61 @@ void main() {
       verify(mockNotification.cancelActNotification(9)).called(1);
       verify(mockNotification.setNotificationAfterInactivity()).called(1);
       expect(saved.value.actKind, ActKind.skipped);
+    });
+  });
+
+  group('ActsClient.finish', () {
+    late AppDatabase db;
+
+    setUp(() async {
+      db = AppDatabase.memory();
+      await Migrator(db).createAll();
+      DriftDatabaseAccessor.reset();
+      Singleton.override<DriftDatabaseAccessor>(
+        DriftDatabaseAccessor.withDatabase(db),
+      );
+    });
+
+    tearDown(() async {
+      await db.close();
+      DriftDatabaseAccessor.reset();
+    });
+
+    test('re-registers mem notifications after finish', () async {
+      final whenTime = DateAndTime(2024, 8, 1, 10, 30);
+      final memId = (await db.into(db.mems).insertReturning(
+                MemsCompanion.insert(
+                    name: 'm', createdAt: DateTime(2024, 8, 1)),
+              ))
+          .id;
+      final entity = ActEntity(
+        memId,
+        whenTime,
+        whenTime,
+        null,
+        101,
+        DateTime(2024, 8, 1),
+        DateTime(2024, 8, 1),
+        null,
+        actKind: ActKind.finished,
+      );
+      when(mockActService.finish(any, any)).thenAnswer((_) async => entity);
+      when(mockNotification.cancelActNotification(any))
+          .thenAnswer((_) async {});
+      when(mockNotification.registerMemNotifications(any))
+          .thenAnswer((_) async => null);
+      when(mockNotification.setNotificationAfterInactivity())
+          .thenAnswer((_) async {});
+
+      await client.finish(memId, whenTime);
+
+      verify(mockActService.finish(memId, whenTime)).called(1);
+      verify(mockNotification.cancelActNotification(memId)).called(1);
+      final registered = verify(
+        mockNotification.registerMemNotifications(captureAny),
+      ).captured.single as Mem;
+      expect(registered.id, memId);
+      verify(mockNotification.setNotificationAfterInactivity()).called(1);
     });
   });
 }

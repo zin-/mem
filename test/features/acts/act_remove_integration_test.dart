@@ -34,7 +34,10 @@ void main() {
       );
       query = ActQueryService();
       mockNotification = MockNotificationClient();
-      when(mockNotification.cancelActNotification(any)).thenAnswer((_) async {});
+      when(mockNotification.cancelActNotification(any))
+          .thenAnswer((_) async {});
+      when(mockNotification.registerMemNotifications(any))
+          .thenAnswer((_) async => null);
       when(mockNotification.setNotificationAfterInactivity())
           .thenAnswer((_) async {});
       ActsClient(

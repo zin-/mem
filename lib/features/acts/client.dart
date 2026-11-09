@@ -2,6 +2,7 @@ import 'package:mem/features/acts/act_service.dart';
 import 'package:mem/features/acts/act_repository.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/framework/notifications/notification_client.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_query_service.dart';
@@ -18,6 +19,7 @@ class ActsClient {
   final ActRepository _actRepository;
   final ActQueryService _actQueryService;
   final NotificationClient _notificationClient;
+  final MemRepository _memRepository;
 
   Future<ListWithTotalPage<SavedActEntityV1>> fetch(
     int? memId,
@@ -133,9 +135,11 @@ class ActsClient {
           final finished = await _actService.finish(memId, when);
 
           await _notificationClient.cancelActNotification(memId);
+          final mem = await _memRepository
+              .shipById(memId)
+              .then((entity) => entity.toDomain());
+          await _notificationClient.registerMemNotifications(mem);
           await _notificationClient.setNotificationAfterInactivity();
-
-          // ISSUE #226
 
           return SavedActEntityV1.fromEntityV2(finished);
         },
@@ -196,6 +200,7 @@ class ActsClient {
     this._actRepository,
     this._actQueryService,
     this._notificationClient,
+    this._memRepository,
   );
 
   static ActsClient? _instance;
@@ -205,12 +210,14 @@ class ActsClient {
     ActRepository? actRepository,
     ActQueryService? actQueryService,
     NotificationClient? notificationClient,
+    MemRepository? memRepository,
   }) =>
       _instance ??= ActsClient._(
         actService ?? ActService(),
         actRepository ?? ActRepository(),
         actQueryService ?? ActQueryService(),
         notificationClient ?? NotificationClient(),
+        memRepository ?? MemRepository(),
       );
 
   static void resetSingleton() => v(
