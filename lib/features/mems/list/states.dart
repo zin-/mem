@@ -9,6 +9,7 @@ import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/list/filter_value.dart';
+import 'package:mem/features/mems/list/list_period_count.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/states.dart';
@@ -72,17 +73,24 @@ final listPeriodCountByMemIdProvider =
     FutureProvider.autoDispose<Map<int, int>>((ref) {
   final mems = ref.watch(memEntitiesProvider);
   final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
+  final now = DateTime.now();
   return ActQueryService().listPeriodCountsByMemId(
-    mems: [
-      for (final mem in mems)
-        (
-          id: mem.id,
-          target: mem.target,
-          latestAct: mem.latestAct,
-          scheduleAnchorAct: mem.scheduleAnchorAct,
-        ),
-    ],
-    startOfDay: startOfDay,
+    mems: mems.map((mem) {
+      final target = mem.target;
+      return (
+        id: mem.id,
+        target: target,
+        period: target == null
+            ? null
+            : ListPeriodCount.period(
+                target: target,
+                latestAct: mem.latestAct,
+                scheduleAnchorAct: mem.scheduleAnchorAct,
+                startOfDay: startOfDay,
+                now: now,
+              ),
+      );
+    }),
   );
 });
 

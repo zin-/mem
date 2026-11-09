@@ -1,5 +1,4 @@
 import 'package:drift/drift.dart';
-import 'package:flutter/material.dart';
 import 'package:mem/databases/database.dart' hide Act, Target;
 import 'package:mem/databases/database.dart' as drift_schema;
 import 'package:mem/databases/table_definitions/acts.dart';
@@ -246,8 +245,7 @@ class ActQueryService {
 
   Future<TodayActCount?> todayActCount({
     required int memId,
-    required TimeOfDay startOfDay,
-    DateTime? now,
+    required DateAndTimePeriod period,
     Target? target,
     TargetRepository? targets,
   }) =>
@@ -261,16 +259,12 @@ class ActQueryService {
               resolved = rows.first.toDomain();
             }
           }
-          final count = await countByMemIdAndPeriod(
-            memId,
-            TodayActCount.period(now ?? DateTime.now(), startOfDay),
-          );
+          final count = await countByMemIdAndPeriod(memId, period);
           return TodayActCount.of(resolved, count);
         },
         {
           'memId': memId,
-          'startOfDay': startOfDay,
-          'now': now,
+          'period': period,
           'target': target,
         },
       );
@@ -280,27 +274,17 @@ class ActQueryService {
             ({
               int id,
               Target? target,
-              Act? latestAct,
-              Act? scheduleAnchorAct,
+              DateAndTimePeriod? period,
             })>
         mems,
-    required TimeOfDay startOfDay,
-    DateTime? now,
   }) =>
       v(
         () async {
-          final at = now ?? DateTime.now();
           final counts = <int, int>{};
           for (final mem in mems) {
             final target = mem.target;
             if (target == null) continue;
-            final period = ListPeriodCount.period(
-              target: target,
-              latestAct: mem.latestAct,
-              scheduleAnchorAct: mem.scheduleAnchorAct,
-              startOfDay: startOfDay,
-              now: at,
-            );
+            final period = mem.period;
             if (period == null) continue;
             final count = await countByMemIdAndPeriod(mem.id, period);
             if (ListPeriodCount.of(target: target, value: count) != null) {
@@ -310,8 +294,7 @@ class ActQueryService {
           return counts;
         },
         {
-          'startOfDay': startOfDay,
-          'now': now,
+          'mems': mems,
         },
       );
 
