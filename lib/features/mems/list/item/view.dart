@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/acts/act_status_labels.dart';
 import 'package:mem/features/acts/day_act_amount.dart';
 import 'package:mem/features/acts/states.dart';
@@ -15,7 +16,9 @@ import 'package:mem/features/mems/list/item/completion_dialog.dart';
 import 'package:mem/features/mems/mem_done_checkbox.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
+import 'package:mem/features/mems/list/list_frame_count.dart';
 import 'package:mem/features/mems/list/mem_list_clock.dart';
+import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
@@ -41,14 +44,27 @@ class MemListItemView extends ConsumerWidget {
           );
           final notifications =
               ref.watch(memNotificationsByMemIdProvider(_mem.id as int));
-          final amount = _amount(ref, _mem.id as int, target);
+          final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
+          final dayAmount = _dayAmount(
+            ref,
+            _mem.id as int,
+            target,
+            startOfDay,
+          );
+          final amount = _labelAmount(
+            ref,
+            _mem,
+            target,
+            dayAmount,
+            startOfDay,
+          );
           final clockAt = MemListClock.of(
             target: target,
             latestAct: _mem.latestAct,
             scheduleAnchorAct: _mem.scheduleAnchorAct,
             notifications: notifications.map((e) => e.value),
-            startOfDay: ref.watch(preferenceProvider(startOfDayKey)),
-            todayCount: amount?.count ?? 0,
+            startOfDay: startOfDay,
+            todayCount: dayAmount?.count ?? 0,
           )?.at;
           return _render(
             context,
@@ -192,14 +208,63 @@ ListTile _render(
       },
     );
 
-DayActAmount? _amount(WidgetRef ref, int memId, Target? target) {
+DayActAmount? _dayAmount(
+  WidgetRef ref,
+  int memId,
+  Target? target,
+  TimeOfDay startOfDay,
+) {
   if (!DayTargetLabel.shows(target)) {
     return null;
   }
-  final day = DateAndTime.now().logicalDay(
-    ref.watch(preferenceProvider(startOfDayKey)),
-  );
+  final day = DateAndTime.now().logicalDay(startOfDay);
   return ref.watch(viewedDayActAmountProvider(memId, day)).value;
+}
+
+DayActAmount? _labelAmount(
+  WidgetRef ref,
+  Mem mem,
+  Target? target,
+  DayActAmount? dayAmount,
+  TimeOfDay startOfDay,
+) {
+  if (target == null || target.targetUnit != TargetUnit.count) {
+    return dayAmount;
+  }
+
+  DayActAmount shownAmount(int periodCount) {
+    final shown = ListFrameCount.of(
+      target: target,
+      periodCount: periodCount,
+      latestAct: mem.latestAct,
+      scheduleAnchorAct: mem.scheduleAnchorAct,
+      startOfToday: DateTimeExt.startOfToday(startOfDay),
+      startOfDay: startOfDay,
+    );
+    return DayActAmount(
+      shown?.value ?? periodCount,
+      dayAmount?.recorded ?? Duration.zero,
+    );
+  }
+
+  switch (target.period) {
+    case Period.aDay:
+      final count = dayAmount?.count;
+      if (count == null) return null;
+      return shownAmount(count);
+    case Period.aWeek:
+      final count = _weekCount(ref, mem);
+      if (count == null) return null;
+      return shownAmount(count);
+    default:
+      return dayAmount;
+  }
+}
+
+int? _weekCount(WidgetRef ref, Mem mem) {
+  final counts = ref.watch(todayActCountByMemIdProvider);
+  if (!counts.hasValue) return null;
+  return counts.value![mem.id as int] ?? 0;
 }
 
 Widget _title(
