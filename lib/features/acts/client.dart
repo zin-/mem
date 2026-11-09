@@ -98,6 +98,7 @@ class ActsClient {
           } else {
             _notificationClient.cancelActNotification(replaced.memId!);
           }
+          await _registerMemNotificationsByMemId(replaced.memId!);
 
           return SavedActEntityV1.fromEntityV2(replaced);
         },
@@ -135,10 +136,7 @@ class ActsClient {
           final finished = await _actService.finish(memId, when);
 
           await _notificationClient.cancelActNotification(memId);
-          final mem = await _memRepository
-              .shipById(memId)
-              .then((entity) => entity.toDomain());
-          await _notificationClient.registerMemNotifications(mem);
+          await _registerMemNotificationsByMemId(memId);
           await _notificationClient.setNotificationAfterInactivity();
 
           return SavedActEntityV1.fromEntityV2(finished);
@@ -158,6 +156,7 @@ class ActsClient {
           final skipped = await _actService.skip(memId, when);
 
           await _notificationClient.cancelActNotification(memId);
+          await _registerMemNotificationsByMemId(memId);
           await _notificationClient.setNotificationAfterInactivity();
 
           return SavedActEntityV1.fromEntityV2(skipped);
@@ -187,6 +186,7 @@ class ActsClient {
               await _actRepository.waste(id: actId).then((v) => v.single);
 
           _notificationClient.cancelActNotification(deleted.memId!);
+          await _registerMemNotificationsByMemId(deleted.memId!);
 
           return deleted;
         },
@@ -194,6 +194,13 @@ class ActsClient {
           "actId": actId,
         },
       );
+
+  Future<void> _registerMemNotificationsByMemId(int memId) async {
+    final mem = await _memRepository
+        .shipById(memId)
+        .then((entity) => entity.toDomain());
+    await _notificationClient.registerMemNotifications(mem);
+  }
 
   ActsClient._(
     this._actService,

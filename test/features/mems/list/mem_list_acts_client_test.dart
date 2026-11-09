@@ -77,36 +77,7 @@ void main() {
     });
   });
 
-  group('ActsClient.skip', () {
-    test('calls actService.skip and cancels notifications', () async {
-      final whenTime = DateAndTime(2024, 8, 1, 9, 0);
-      final entity = ActEntity(
-        9,
-        whenTime,
-        whenTime,
-        null,
-        101,
-        DateTime(2024, 8, 1),
-        DateTime(2024, 8, 1),
-        null,
-        actKind: ActKind.skipped,
-      );
-      when(mockActService.skip(any, any)).thenAnswer((_) async => entity);
-      when(mockNotification.cancelActNotification(any))
-          .thenAnswer((_) async {});
-      when(mockNotification.setNotificationAfterInactivity())
-          .thenAnswer((_) async {});
-
-      final saved = await client.skip(9, whenTime);
-
-      verify(mockActService.skip(9, whenTime)).called(1);
-      verify(mockNotification.cancelActNotification(9)).called(1);
-      verify(mockNotification.setNotificationAfterInactivity()).called(1);
-      expect(saved.value.actKind, ActKind.skipped);
-    });
-  });
-
-  group('ActsClient.finish', () {
+  group('ActsClient re-registers mem notifications', () {
     late AppDatabase db;
 
     setUp(() async {
@@ -123,13 +94,14 @@ void main() {
       DriftDatabaseAccessor.reset();
     });
 
-    test('re-registers mem notifications after finish', () async {
+    Future<int> insertMem() async => (await db.into(db.mems).insertReturning(
+              MemsCompanion.insert(name: 'm', createdAt: DateTime(2024, 8, 1)),
+            ))
+        .id;
+
+    test('after finish', () async {
       final whenTime = DateAndTime(2024, 8, 1, 10, 30);
-      final memId = (await db.into(db.mems).insertReturning(
-                MemsCompanion.insert(
-                    name: 'm', createdAt: DateTime(2024, 8, 1)),
-              ))
-          .id;
+      final memId = await insertMem();
       final entity = ActEntity(
         memId,
         whenTime,
@@ -158,6 +130,101 @@ void main() {
       ).captured.single as Mem;
       expect(registered.id, memId);
       verify(mockNotification.setNotificationAfterInactivity()).called(1);
+    });
+
+    test('after skip', () async {
+      final whenTime = DateAndTime(2024, 8, 1, 9, 0);
+      final memId = await insertMem();
+      final entity = ActEntity(
+        memId,
+        whenTime,
+        whenTime,
+        null,
+        101,
+        DateTime(2024, 8, 1),
+        DateTime(2024, 8, 1),
+        null,
+        actKind: ActKind.skipped,
+      );
+      when(mockActService.skip(any, any)).thenAnswer((_) async => entity);
+      when(mockNotification.cancelActNotification(any))
+          .thenAnswer((_) async {});
+      when(mockNotification.registerMemNotifications(any))
+          .thenAnswer((_) async => null);
+      when(mockNotification.setNotificationAfterInactivity())
+          .thenAnswer((_) async {});
+
+      final saved = await client.skip(memId, whenTime);
+
+      verify(mockActService.skip(memId, whenTime)).called(1);
+      verify(mockNotification.cancelActNotification(memId)).called(1);
+      final registered = verify(
+        mockNotification.registerMemNotifications(captureAny),
+      ).captured.single as Mem;
+      expect(registered.id, memId);
+      verify(mockNotification.setNotificationAfterInactivity()).called(1);
+      expect(saved.value.actKind, ActKind.skipped);
+    });
+
+    test('after edit', () async {
+      final whenTime = DateAndTime(2024, 8, 1, 11, 0);
+      final memId = await insertMem();
+      final entity = ActEntity(
+        memId,
+        whenTime,
+        whenTime,
+        null,
+        101,
+        DateTime(2024, 8, 1),
+        DateTime(2024, 8, 1),
+        null,
+        actKind: ActKind.finished,
+      );
+      when(mockActService.edit(any)).thenAnswer((_) async => entity);
+      when(mockNotification.cancelActNotification(any))
+          .thenAnswer((_) async {});
+      when(mockNotification.registerMemNotifications(any))
+          .thenAnswer((_) async => null);
+
+      await client.edit(SavedActEntityV1.fromEntityV2(entity));
+
+      verify(mockActService.edit(any)).called(1);
+      verify(mockNotification.cancelActNotification(memId)).called(1);
+      final registered = verify(
+        mockNotification.registerMemNotifications(captureAny),
+      ).captured.single as Mem;
+      expect(registered.id, memId);
+    });
+
+    test('after delete', () async {
+      final whenTime = DateAndTime(2024, 8, 1, 12, 0);
+      final memId = await insertMem();
+      final entity = ActEntity(
+        memId,
+        whenTime,
+        whenTime,
+        null,
+        101,
+        DateTime(2024, 8, 1),
+        DateTime(2024, 8, 1),
+        null,
+        actKind: ActKind.finished,
+      );
+      when(mockRepo.waste(id: anyNamed('id')))
+          .thenAnswer((_) async => [entity]);
+      when(mockNotification.cancelActNotification(any))
+          .thenAnswer((_) async {});
+      when(mockNotification.registerMemNotifications(any))
+          .thenAnswer((_) async => null);
+
+      await client.delete(entity.id);
+
+      verify(mockRepo.waste(id: entity.id)).called(1);
+      verify(mockNotification.cancelActNotification(memId)).called(1);
+      final registered = verify(
+        mockNotification.registerMemNotifications(captureAny),
+      ).captured.single as Mem;
+      expect(registered.id, memId);
     });
   });
 }
