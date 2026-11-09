@@ -68,7 +68,7 @@ class ListPeriodCount {
       return CountReferenceAct.of(
         latestAct: latestAct,
         scheduleAnchorAct: scheduleAnchorAct,
-      )?.week(startOfDay);
+      )?.week(now, startOfDay);
     }
     return null;
   }

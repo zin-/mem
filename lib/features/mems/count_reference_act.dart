@@ -3,7 +3,6 @@ import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
-import 'package:mem/framework/date_and_time/date_time_ext.dart';
 
 class CountReferenceAct {
   final Act act;
@@ -33,26 +32,20 @@ class CountReferenceAct {
     return null;
   }
 
-  DateAndTime logicalDay(TimeOfDay startOfDay) =>
-      act.period!.end!.logicalDay(startOfDay);
-
   bool isWithinWeek(DateTime startOfToday, TimeOfDay startOfDay) {
-    final today = DateAndTime(
-      startOfToday.year,
-      startOfToday.month,
-      startOfToday.day,
-    );
-    final days = logicalDay(startOfDay).calendarDaysUntil(today);
-    return days >= 0 && days < DateTime.daysPerWeek;
+    final end = act.period?.end;
+    if (end == null) return false;
+    final period = week(startOfToday, startOfDay);
+    if (period == null) return false;
+    return period.includesStart(end);
   }
 
-  DateAndTimePeriod? week(TimeOfDay startOfDay) {
-    final day = logicalDay(startOfDay);
+  DateAndTimePeriod? week(DateTime startOfToday, TimeOfDay startOfDay) {
     return Period.aWeek.toPeriod(
       DateAndTime(
-        day.year,
-        day.month,
-        day.day,
+        startOfToday.year,
+        startOfToday.month,
+        startOfToday.day,
         startOfDay.hour,
         startOfDay.minute,
       ),
