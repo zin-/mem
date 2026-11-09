@@ -17,7 +17,6 @@ import 'package:mem/features/mems/mem_done_checkbox.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:mem/features/mems/list/list_frame_count.dart';
-import 'package:mem/features/mems/list/mem_list_clock.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/mems/mem_name.dart';
@@ -58,14 +57,17 @@ class MemListItemView extends ConsumerWidget {
             dayAmount,
             startOfDay,
           );
-          final clockAt = MemListClock.of(
-            target: target,
-            latestAct: _mem.latestAct,
-            scheduleAnchorAct: _mem.scheduleAnchorAct,
-            notifications: notifications.map((e) => e.value),
-            startOfDay: startOfDay,
-            todayCount: dayAmount?.count ?? 0,
-          )?.at;
+          final periodCount =
+              ref.watch(todayActCountByMemIdProvider).value?[_mem.id as int] ??
+                  0;
+          final clockAt = _mem
+              .memListAt(
+                DateTimeExt.startOfToday(startOfDay),
+                notifications.map((e) => e.value),
+                target: target,
+                periodCount: periodCount,
+              )
+              ?.at;
           return _render(
             context,
             _mem,

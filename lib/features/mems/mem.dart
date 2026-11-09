@@ -90,19 +90,13 @@ class Mem {
   }) =>
       v(
         () => MemListAt.of(
-          startOfToday: startOfToday,
-          notifyAt: notifyAt(
+          notifyAt(
             startOfToday,
             memNotifications,
             latestAct,
             target: target,
             todayCount: periodCount,
-          )?.at,
-          target: target,
-          latestAct: latestAct,
-          scheduleAnchorAct: scheduleAnchorAct,
-          notifications: memNotifications,
-          periodCount: periodCount,
+          ),
         ),
         {
           'this': this,

@@ -541,7 +541,7 @@ void main() {
     });
 
     test(
-        'groups a daily count below the target on the interval day when that day is already tomorrow',
+        'groups a daily count below the target on today when the interval alone is tomorrow',
         () {
       final section =
           memEnded(1, DateTime(2024, 10, 12, 22)).memListSectionDate(
@@ -556,10 +556,10 @@ void main() {
         todayCount: belowDailyTarget,
       );
 
-      expect(section, DateAndTime(2024, 10, 13));
+      expect(section, DateAndTime(2024, 10, 12));
     });
 
-    test('groups a reached daily count on the next day', () {
+    test('groups a reached daily count by notifyAt after the last act', () {
       final section =
           memEnded(1, DateTime(2024, 10, 11, eveningHour)).memListSectionDate(
         startOfToday,
@@ -573,10 +573,11 @@ void main() {
         todayCount: dailyTargetValue,
       );
 
-      expect(section, DateAndTime(2024, 10, 13));
+      expect(section, DateAndTime(2024, 10, 12));
     });
 
-    test('sorts a reached daily count after a mem still on today', () {
+    test('sorts a reached daily count with notifyAt against a mem still on today',
+        () {
       final reached = entity(
         id: 1,
         end: DateTime(2024, 10, 11, eveningHour),
@@ -606,11 +607,11 @@ void main() {
           savedMemNotifications: notifications,
           todayActCountByMemId: {1: dailyTargetValue},
         ),
-        greaterThan(0),
+        lessThan(0),
       );
     });
 
-    test('groups a weekly count below the target on the next day', () {
+    test('groups a weekly count below the target by notifyAt', () {
       final onToday = memEnded(1, DateTime(2024, 10, 11, laterNotifyHour))
           .memListSectionDate(
         startOfToday,
@@ -635,12 +636,11 @@ void main() {
         todayCount: belowWeeklyTarget,
       );
 
-      expect(onToday, DateAndTime(2024, 10, 13));
-      expect(onALaterNotification, DateAndTime(2024, 10, 13));
+      expect(onToday, DateAndTime(2024, 10, 12));
+      expect(onALaterNotification, DateAndTime(2024, 10, 16));
     });
 
-    test('groups a reached weekly count 7 days after the last act logical day',
-        () {
+    test('groups a reached weekly count by notifyAt after the last act', () {
       const startOfDay = TimeOfDay(hour: 9, minute: 0);
       final start = DateTime(2024, 10, 12, startOfDay.hour, startOfDay.minute);
       final endedBeforeStartOfDay = DateTime(2024, 10, 12, earlyNotifyHour);
@@ -657,7 +657,7 @@ void main() {
           target: target,
           todayCount: weeklyTargetValue,
         ),
-        DateAndTime(2024, 10, 18),
+        DateAndTime(2024, 10, 12),
       );
     });
 
@@ -689,7 +689,7 @@ void main() {
             2: weeklyTargetValue,
           },
         ),
-        greaterThan(0),
+        lessThan(0),
       );
     });
 
