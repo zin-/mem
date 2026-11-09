@@ -1,7 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/home/upcoming_mems.dart';
 import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/targets/target.dart';
+import 'package:mem/framework/date_and_time/date_and_time.dart';
 
 import '../../../entity_factories.dart';
 import '../list/helpers.dart';
@@ -38,12 +42,14 @@ void main() {
   List<int> ids(
     Iterable<MemEntity> mems, [
     Iterable<SavedMemNotificationEntityV1> savedMemNotifications = const [],
+    Map<int, int> todayActCountByMemId = const {},
   ]) =>
       upcomingMems(
         mems,
         savedMemNotifications,
         now: now,
         startOfToday: startOfToday,
+        todayActCountByMemId: todayActCountByMemId,
       ).map((mem) => mem.id).toList();
 
   group('upcomingMems', () {
@@ -119,5 +125,58 @@ void main() {
       );
       expect(ids(const <MemEntity>[]), isEmpty);
     });
+
+    test(
+      'orders by notifyAt that uses target and todayCount like the mem list',
+      () {
+        const intervalSeconds = 2 * 60 * 60;
+        const dailyTarget = 4;
+        const belowDailyTarget = 1;
+        final dailyCountTarget = Target(
+          memId: 1,
+          targetType: TargetType.equalTo,
+          targetUnit: TargetUnit.count,
+          value: dailyTarget,
+          period: Period.aDay,
+          secondsAfterLastAct: intervalSeconds,
+        );
+        final latestAct = Act.by(
+          1,
+          startWhen: DateAndTime(2024, 10, 12, 9),
+          endWhen: DateAndTime(2024, 10, 12, 10),
+        );
+        final dailyCountMem = savedMem(
+          id: 1,
+          name: 'Mem 1',
+          createdAt: createdAt,
+          updatedAt: createdAt,
+          target: dailyCountTarget,
+          latestAct: latestAct,
+        );
+        final laterToday = at(2, DateTime(2024, 10, 12, 15));
+        final notifications = [
+          savedRepeatAtHourNotification(id: 1, memId: 1, hour: 9),
+        ];
+
+        expect(
+          ids(
+            [dailyCountMem, laterToday],
+            notifications,
+            {1: belowDailyTarget},
+          ),
+          // below target → same-day interval (12:00) before laterToday (15:00)
+          [1, 2],
+        );
+        expect(
+          ids(
+            [dailyCountMem, laterToday],
+            notifications,
+            {1: dailyTarget},
+          ),
+          // reached → schedule anchor pushes to tomorrow 09:00
+          [2, 1],
+        );
+      },
+    );
   });
 }

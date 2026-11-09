@@ -13,6 +13,8 @@ final upcomingMemsProvider = Provider.autoDispose<List<MemEntity>>((ref) {
 
   final mems = ref.watch(memEntitiesProvider);
   final savedMemNotifications = ref.watch(savedMemNotificationsProvider);
+  final todayActCountByMemId =
+      ref.watch(todayActCountByMemIdProvider).value ?? const {};
   final startOfToday = DateTimeExt.startOfToday(
     ref.watch(preferenceProvider(startOfDayKey)),
   );
@@ -23,11 +25,13 @@ final upcomingMemsProvider = Provider.autoDispose<List<MemEntity>>((ref) {
       savedMemNotifications,
       now: DateTime.now(),
       startOfToday: startOfToday,
+      todayActCountByMemId: todayActCountByMemId,
     ),
     {
       'mems': mems,
       'savedMemNotifications': savedMemNotifications,
       'startOfToday': startOfToday,
+      'todayActCountByMemId': todayActCountByMemId,
     },
   );
 });
@@ -37,6 +41,7 @@ List<MemEntity> upcomingMems(
   Iterable<SavedMemNotificationEntityV1> savedMemNotifications, {
   required DateTime now,
   required DateTime startOfToday,
+  Map<int, int> todayActCountByMemId = const {},
 }) {
   DateTime? notifyAtOf(MemEntity mem) => mem
       .toDomain()
@@ -46,6 +51,8 @@ List<MemEntity> upcomingMems(
             .where((notification) => notification.value.memId == mem.id)
             .map((notification) => notification.value),
         mem.latestAct,
+        target: mem.target,
+        todayCount: todayActCountByMemId[mem.id] ?? 0,
       )
       ?.at;
 
