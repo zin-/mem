@@ -14,6 +14,7 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/list/item/completion_dialog.dart';
 import 'package:mem/features/mems/mem_done_checkbox.dart';
+import 'package:mem/features/mems/mem_done_edit.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:mem/features/mems/list/list_frame_count.dart';
@@ -146,7 +147,11 @@ ListTile _render(
             )
             .isNotEmpty;
         final enableSkipMenu = hasEnableMemNotifications && !hasActiveAct;
-        final showParentIcon = hasUndoneChildren && !mem.isDone;
+        final doneEdit = MemDoneEdit.of(
+          hasUndoneChildren: hasUndoneChildren,
+          isDone: mem.isDone,
+          onChanged: (value) => onMemDoneCheckboxTapped(value, mem.id as int),
+        );
 
         void showCompletionDialog(BuildContext dialogContext) {
           showMemListCompletionDialog(
@@ -184,11 +189,11 @@ ListTile _render(
                   : hasPausedAct
                       ? closeIconButton
                       : stopIconButton
-              : showParentIcon
+              : doneEdit == null
                   ? const Icon(Icons.account_tree)
                   : MemDoneCheckbox(
                       mem,
-                      (value) => onMemDoneCheckboxTapped(value, mem.id as int),
+                      doneEdit.onChanged,
                     ),
           tileColor: mem.isArchived ? secondaryGreyColor : null,
           trailing: !mem.isDone && hasEnableMemNotifications

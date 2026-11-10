@@ -8,6 +8,7 @@ import 'package:mem/framework/date_and_time/created_and_updated_at_texts.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/targets/target_view.dart';
 import 'package:mem/features/mems/mem_done_checkbox.dart';
+import 'package:mem/features/mems/mem_done_edit.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mems/mem_period.dart';
@@ -54,9 +55,11 @@ class MemDetailBody extends ConsumerWidget {
             _memId,
             editingMem,
             savedMem,
-            hasUndoneChildren && !editingMem.value.isDone
-                ? null
-                : onMemDoneChanged,
+            MemDoneEdit.of(
+              hasUndoneChildren: hasUndoneChildren,
+              isDone: editingMem.value.isDone,
+              onChanged: onMemDoneChanged,
+            )?.onChanged,
           );
         },
         _memId.toString(),
