@@ -5,7 +5,9 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/targets/next_at_after_last_act.dart';
 import 'package:mem/features/targets/target.dart';
+import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
+import 'package:mem/framework/date_and_time/date_time_ext.dart';
 
 class MemNotifyAt {
   final DateTime at;
@@ -35,6 +37,7 @@ class MemNotifyAt {
         startOfToday,
         null,
       ),
+      startOfDay: TimeOfDay.fromDateTime(startOfToday),
       target: target,
       todayCount: todayCount,
       latestAct: latestAct,
@@ -90,6 +93,7 @@ class MemNotifyAt {
     var notifyAt = _choose(
       withBase: withBase,
       withoutBase: withoutBase,
+      startOfDay: startOfDay,
       target: target,
       todayCount: todayCount,
       latestAct: latestAct,
@@ -113,6 +117,7 @@ class MemNotifyAt {
   static DateTime? _choose({
     required DateTime? withBase,
     required DateTime? withoutBase,
+    required TimeOfDay startOfDay,
     required Target? target,
     required int todayCount,
     required Act? latestAct,
@@ -124,11 +129,17 @@ class MemNotifyAt {
       return withBase;
     }
 
-    return NextAtAfterLastAct.of(
-          target: target,
-          latestAct: latestAct,
-        )?.at ??
-        withoutBase;
+    final end = latestAct?.period?.end;
+    final intervalAt = NextAtAfterLastAct.of(
+      target: target,
+      latestAct: latestAct,
+    )?.at;
+    if (end != null &&
+        intervalAt != null &&
+        _sameLogicalDay(end, intervalAt, startOfDay)) {
+      return intervalAt;
+    }
+    return withoutBase;
   }
 
   static DateTime? _notificationAt(
@@ -228,5 +239,13 @@ class MemNotifyAt {
     }
 
     return result;
+  }
+
+  static DateAndTime _timed(DateTime value) =>
+      value is DateAndTime ? value : DateAndTime.from(value, timeOfDay: value);
+
+  static bool _sameLogicalDay(DateTime a, DateTime b, TimeOfDay startOfDay) {
+    final day = _timed(a).logicalDay(startOfDay);
+    return _timed(b).isSameLogicalDay(day, startOfDay);
   }
 }
