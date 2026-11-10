@@ -33,6 +33,9 @@ final saveMem =
               if (!ref.mounted) return nextNotifyAt;
 
               ref.read(memEntitiesProvider.notifier).upsert([memEntityV2]);
+              await ref
+                  .read(parentMemIdsWithOpenChildrenProvider.notifier)
+                  .refresh();
 
               ref
                   .read(editingMemByMemIdProvider(memId).notifier)

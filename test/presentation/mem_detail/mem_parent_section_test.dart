@@ -12,6 +12,7 @@ import 'package:mem/features/mems/detail/body.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
+import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/targets/target_repository.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/repository/drift_repository.dart';
@@ -55,14 +56,18 @@ void main() {
   Future<MemEntity> insertMem(String name) =>
       MemRepository().receive(Mem(null, name, null, null));
 
-  Future<void> pumpDetail(WidgetTester tester, int? memId) async {
+  Future<ProviderContainer> pumpDetail(WidgetTester tester, int? memId) async {
     tester.view.physicalSize = const Size(800, 2400);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
     await tester.pumpWidget(
-      ProviderScope(
+      UncontrolledProviderScope(
+        container: container,
         child: MaterialApp(
           locale: const Locale('ja'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -80,6 +85,7 @@ void main() {
       EnginePhase.sendSemanticsUpdate,
       const Duration(seconds: 10),
     );
+    return container;
   }
 
   testWidgets('hides the parent field on an unsaved mem', (tester) async {
@@ -125,8 +131,9 @@ void main() {
     final parentA = await insertMem('Parent A');
     final parentB = await insertMem('Parent B');
 
-    await pumpDetail(tester, child.id);
+    final container = await pumpDetail(tester, child.id);
 
+    expect(container.read(parentMemIdsWithOpenChildrenProvider), isEmpty);
     expect(find.byIcon(Icons.account_tree), findsOneWidget);
     expect(find.text(_l10n.parentNone), findsOneWidget);
     expect(find.byIcon(Icons.close), findsNothing);
@@ -169,6 +176,7 @@ void main() {
       (await MemRepository().shipParentByMemId(child.id))?.parentMemId,
       parentA.id,
     );
+    expect(container.read(parentMemIdsWithOpenChildrenProvider), {parentA.id});
 
     await tester.tap(find.text('Parent A'));
     await tester.pumpAndSettle(
@@ -190,6 +198,7 @@ void main() {
       (await MemRepository().shipParentByMemId(child.id))?.parentMemId,
       parentB.id,
     );
+    expect(container.read(parentMemIdsWithOpenChildrenProvider), {parentB.id});
 
     await tester.tap(find.byIcon(Icons.close));
     await tester.pumpAndSettle(
@@ -202,6 +211,7 @@ void main() {
     expect(find.text(_l10n.parentNone), findsOneWidget);
     expect(find.byIcon(Icons.close), findsNothing);
     expect(await MemRepository().shipParentByMemId(child.id), isNull);
+    expect(container.read(parentMemIdsWithOpenChildrenProvider), isEmpty);
   });
 
   testWidgets('shows direct child names in name order', (tester) async {
