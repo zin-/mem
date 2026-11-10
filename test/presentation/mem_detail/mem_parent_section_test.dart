@@ -53,16 +53,27 @@ void main() {
     Singleton.reset<TargetRepository>();
   });
 
-  Future<MemEntity> insertMem(String name) =>
-      MemRepository().receive(Mem(null, name, null, null));
+  Future<MemEntity> insertMem(String name, {DateTime? doneAt}) =>
+      MemRepository().receive(Mem(null, name, doneAt, null));
 
-  Future<ProviderContainer> pumpDetail(WidgetTester tester, int? memId) async {
+  Future<ProviderContainer> pumpDetail(
+    WidgetTester tester,
+    int? memId, {
+    Set<int>? parentIdsWithOpenChildren,
+  }) async {
     tester.view.physicalSize = const Size(800, 2400);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    final container = ProviderContainer();
+    final container = ProviderContainer(
+      overrides: [
+        if (parentIdsWithOpenChildren != null)
+          parentMemIdsWithOpenChildrenProvider.overrideWithValue(
+            parentIdsWithOpenChildren,
+          ),
+      ],
+    );
     addTearDown(container.dispose);
 
     await tester.pumpWidget(
@@ -385,5 +396,61 @@ void main() {
       (await MemRepository().shipParentByMemId(child.id))?.parentMemId,
       other.id,
     );
+  });
+
+  testWidgets(
+      'disables the undone checkbox when the id is in the set',
+      (tester) async {
+    final parent = await insertMem('Parent');
+    await pumpDetail(
+      tester,
+      parent.id,
+      parentIdsWithOpenChildren: {parent.id},
+    );
+
+    final checkbox = tester.widget<Checkbox>(find.byType(Checkbox));
+    expect(checkbox.value, isFalse);
+    expect(checkbox.onChanged, isNull);
+  });
+
+  testWidgets(
+      'keeps undone available when the mem is done and the id is in the set',
+      (tester) async {
+    final parent = await insertMem('Parent', doneAt: DateTime.now());
+    await pumpDetail(
+      tester,
+      parent.id,
+      parentIdsWithOpenChildren: {parent.id},
+    );
+
+    final checkbox = tester.widget<Checkbox>(find.byType(Checkbox));
+    expect(checkbox.value, isTrue);
+    expect(checkbox.onChanged, isNotNull);
+
+    checkbox.onChanged!(false);
+    await tester.pump();
+
+    final undone = tester.widget<Checkbox>(find.byType(Checkbox));
+    expect(undone.value, isFalse);
+    expect(undone.onChanged, isNull);
+  });
+
+  testWidgets('keeps the checkbox when the id is not in the set',
+      (tester) async {
+    final parent = await insertMem('Parent');
+    await pumpDetail(
+      tester,
+      parent.id,
+      parentIdsWithOpenChildren: {parent.id + 1},
+    );
+
+    final checkbox = tester.widget<Checkbox>(find.byType(Checkbox));
+    expect(checkbox.value, isFalse);
+    expect(checkbox.onChanged, isNotNull);
+
+    checkbox.onChanged!(true);
+    await tester.pump();
+
+    expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isTrue);
   });
 }

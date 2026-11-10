@@ -35,19 +35,28 @@ class MemDetailBody extends ConsumerWidget {
               ref.read(memEntitiesProvider.notifier).loadDetail(memId);
             });
           }
+          final hasOpenChildren = memId != null &&
+              ref.watch(
+                parentMemIdsWithOpenChildrenProvider.select(
+                  (ids) => ids.contains(memId),
+                ),
+              );
+          void onMemDoneChanged(bool? value) => ref
+              .read(editingMemByMemIdProvider(_memId).notifier)
+              .updatedBy(
+                editingMem.updatedWith(
+                  (mem) =>
+                      value == true ? mem.done(DateTime.now()) : mem.undone(),
+                ),
+              );
 
           return _MemDetailBodyComponent(
             _memId,
             editingMem,
             savedMem,
-            (value) => ref
-                .read(editingMemByMemIdProvider(_memId).notifier)
-                .updatedBy(
-                  editingMem.updatedWith(
-                    (mem) =>
-                        value == true ? mem.done(DateTime.now()) : mem.undone(),
-                  ),
-                ),
+            hasOpenChildren && !editingMem.value.isDone
+                ? null
+                : onMemDoneChanged,
           );
         },
         _memId.toString(),
@@ -58,7 +67,7 @@ class _MemDetailBodyComponent extends StatelessWidget {
   final int? _memId;
   final MemViewData _mem;
   final MemEntity? _savedMem;
-  final Function(bool? memDone) _onMemDoneChanged;
+  final void Function(bool? memDone)? _onMemDoneChanged;
 
   const _MemDetailBodyComponent(
     this._memId,
