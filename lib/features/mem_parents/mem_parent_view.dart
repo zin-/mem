@@ -51,6 +51,12 @@ class MemParentView extends ConsumerWidget {
                 ? null
                 : () => _disconnectParent(context, ref, _memId),
             onChildTap: openDetail,
+            onChildDisconnect: (childId) => _disconnectParent(
+              context,
+              ref,
+              childId,
+              previousParentMemId: _memId,
+            ),
           );
         },
         _memId,
@@ -70,6 +76,7 @@ class _MemParentSection extends StatelessWidget {
   final VoidCallback _onParentTap;
   final VoidCallback? _onDisconnect;
   final void Function(int childId) _onChildTap;
+  final void Function(int childId) _onChildDisconnect;
 
   const _MemParentSection({
     required String? parentName,
@@ -77,16 +84,25 @@ class _MemParentSection extends StatelessWidget {
     required VoidCallback onParentTap,
     required VoidCallback? onDisconnect,
     required void Function(int childId) onChildTap,
+    required void Function(int childId) onChildDisconnect,
   })  : _parentName = parentName,
         _children = children,
         _onParentTap = onParentTap,
         _onDisconnect = onDisconnect,
-        _onChildTap = onChildTap;
+        _onChildTap = onChildTap,
+        _onChildDisconnect = onChildDisconnect;
 
   @override
   Widget build(BuildContext context) => v(
         () {
           final l10n = buildL10n(context);
+          final disconnect = _onDisconnect;
+
+          IconButton disconnectButton(VoidCallback onPressed) => IconButton(
+                onPressed: onPressed,
+                tooltip: l10n.disconnectParentAction,
+                icon: const Icon(Icons.close),
+              );
 
           return Column(
             children: [
@@ -95,13 +111,8 @@ class _MemParentSection extends StatelessWidget {
                 leading: const Icon(Icons.account_tree),
                 title: Text(_parentName ?? l10n.parentNone),
                 onTap: _onParentTap,
-                trailing: _onDisconnect == null
-                    ? null
-                    : IconButton(
-                        onPressed: _onDisconnect,
-                        tooltip: l10n.disconnectParentAction,
-                        icon: const Icon(Icons.close),
-                      ),
+                trailing:
+                    disconnect == null ? null : disconnectButton(disconnect),
               ),
               for (final child in _children)
                 ListTile(
@@ -109,6 +120,9 @@ class _MemParentSection extends StatelessWidget {
                   leading: const Icon(Icons.subdirectory_arrow_right),
                   title: Text(child.name),
                   onTap: () => _onChildTap(child.id),
+                  trailing: disconnectButton(
+                    () => _onChildDisconnect(child.id),
+                  ),
                 ),
             ],
           );
@@ -178,21 +192,25 @@ Future<Set<int>> _excludedParentCandidateIds(int memId) => v(
 Future<void> _disconnectParent(
   BuildContext context,
   WidgetRef ref,
-  int memId,
-) =>
+  int memId, {
+  int? previousParentMemId,
+}) =>
     v(
       () async {
-        final previousParentMemId =
+        final parentMemId = previousParentMemId ??
             ref.read(memByMemIdProvider(memId))?.parentMemId;
         await MemRepository().wasteParents(memId: memId);
         if (!context.mounted) return;
         await _reloadParentDetails(
           ref,
           memId: memId,
-          previousParentMemId: previousParentMemId,
+          previousParentMemId: parentMemId,
         );
       },
-      memId,
+      {
+        'memId': memId,
+        'previousParentMemId': previousParentMemId,
+      },
     );
 
 Future<void> _reloadParentDetails(

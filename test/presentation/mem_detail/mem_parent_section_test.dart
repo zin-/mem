@@ -307,6 +307,41 @@ void main() {
     );
   });
 
+  testWidgets('removes only the disconnected child', (tester) async {
+    final parent = await insertMem('Parent');
+    final childA = await insertMem('Child A');
+    final childB = await insertMem('Child B');
+    await MemRepository().receiveParent(
+      MemParent(memId: childA.id, parentMemId: parent.id),
+    );
+    await MemRepository().receiveParent(
+      MemParent(memId: childB.id, parentMemId: parent.id),
+    );
+
+    await pumpDetail(tester, parent.id);
+
+    await tester.tap(
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'Child A'),
+        matching: find.byIcon(Icons.close),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 50),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
+
+    expect(find.text('Child A'), findsNothing);
+    expect(find.text('Child B'), findsOneWidget);
+    expect(find.byType(MemDetailPage), findsNothing);
+    expect(await MemRepository().shipParentByMemId(childA.id), isNull);
+    expect(
+      (await MemRepository().shipParentByMemId(childB.id))?.parentMemId,
+      parent.id,
+    );
+  });
+
   testWidgets('opens the child mem detail on tap', (tester) async {
     final parent = await insertMem('Parent');
     final child = await insertMem('Child');
@@ -358,7 +393,13 @@ void main() {
 
     await pumpDetail(tester, editing.id);
 
-    await tester.tap(find.byIcon(Icons.close));
+    expect(find.byIcon(Icons.close), findsNWidgets(2));
+    await tester.tap(
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'Ancestor'),
+        matching: find.byIcon(Icons.close),
+      ),
+    );
     await tester.pumpAndSettle(
       const Duration(milliseconds: 50),
       EnginePhase.sendSemanticsUpdate,
