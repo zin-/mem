@@ -1452,6 +1452,28 @@ void main() {
     group('next time after last act', () {
       const interval = Duration(hours: 2);
 
+      // 間隔が日付をまたぐと一覧はその時刻を出さない
+      bool intervalStaysOnActDay(DateTime end) {
+        final next = end.add(interval);
+        return end.year == next.year &&
+            end.month == next.month &&
+            end.day == next.day;
+      }
+
+      DateTime endWhoseIntervalStaysOnItsDay(
+        DateTime end, {
+        required bool nextIsAhead,
+      }) {
+        if (intervalStaysOnActDay(end)) return end;
+        final now = DateTime.now();
+        final startOfToday = DateTime(now.year, now.month, now.day);
+        final day = nextIsAhead
+            ? startOfToday.add(const Duration(days: 1))
+            : startOfToday.subtract(const Duration(days: 1));
+        final atNoon = DateTime(day.year, day.month, day.day, _noonHour);
+        return nextIsAhead ? atNoon.subtract(interval) : atNoon;
+      }
+
       Target intervalTarget() => Target(
             memId: memId,
             targetType: TargetType.equalTo,
@@ -1462,6 +1484,7 @@ void main() {
           );
 
       const endedHoursAgo = 3;
+      const minutesAgoWhileNextIsAhead = 30;
       const notifyMinutesAgo = 90;
       const belowTargetCount = 1;
 
@@ -1538,7 +1561,10 @@ void main() {
           (tester) async {
         await expectClock(
           tester,
-          DateTime.now().subtract(const Duration(hours: 3)),
+          endWhoseIntervalStaysOnItsDay(
+            DateTime.now().subtract(const Duration(hours: endedHoursAgo)),
+            nextIsAhead: false,
+          ),
           equals(warningColor),
         );
       });
@@ -1547,7 +1573,12 @@ void main() {
           (tester) async {
         await expectClock(
           tester,
-          DateTime.now().subtract(const Duration(minutes: 30)),
+          endWhoseIntervalStaysOnItsDay(
+            DateTime.now().subtract(
+              const Duration(minutes: minutesAgoWhileNextIsAhead),
+            ),
+            nextIsAhead: true,
+          ),
           isNot(equals(warningColor)),
         );
       });
@@ -1603,7 +1634,10 @@ void main() {
           'shows one clock with the time after the last act when a notification time is also set',
           (tester) async {
         final now = DateTime.now();
-        final endedAt = now.subtract(const Duration(hours: endedHoursAgo));
+        final endedAt = endWhoseIntervalStaysOnItsDay(
+          now.subtract(const Duration(hours: endedHoursAgo)),
+          nextIsAhead: false,
+        );
         final notify = TimeOfDay.fromDateTime(
           now.subtract(const Duration(minutes: notifyMinutesAgo)),
         );
