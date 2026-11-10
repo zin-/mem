@@ -372,6 +372,26 @@ class MemRepository extends DriftRepository {
         {'parentMemId': parentMemId},
       );
 
+  Future<Set<int>> shipParentMemIdsWithUndoneChildren() => v(
+        () async {
+          final parentMemId = driftDb.memParents.parentMemId;
+          final rows = await (driftDb.selectOnly(driftDb.memParents)
+                ..addColumns([parentMemId])
+                ..join([
+                  drift.innerJoin(
+                    driftDb.mems,
+                    driftDb.mems.id.equalsExp(driftDb.memParents.memId),
+                  ),
+                ])
+                ..where(
+                  driftDb.mems.doneAt.isNull() &
+                      driftDb.mems.archivedAt.isNull(),
+                ))
+              .get();
+          return rows.map((row) => row.read(parentMemId)!).toSet();
+        },
+      );
+
   Future<List<MemParent>> wasteParents({int? memId}) => v(
         () async {
           var query = driftDb.delete(driftDb.memParents);

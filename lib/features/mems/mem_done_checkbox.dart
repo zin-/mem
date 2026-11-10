@@ -5,7 +5,7 @@ import 'package:mem/features/logger/log_service.dart';
 
 class MemDoneCheckbox extends StatelessWidget {
   final Mem _mem;
-  final Function(bool? value) _onChanged;
+  final void Function(bool? value)? _onChanged;
 
   const MemDoneCheckbox(
     this._mem,

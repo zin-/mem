@@ -37,6 +37,7 @@ class MemEntities extends _$MemEntities
             ref,
             memIdsIn: mems.map((e) => e.id),
           );
+          await _refreshParentMemIdsWithUndoneChildren();
         },
         {
           'archived': archived,
@@ -91,7 +92,9 @@ class MemEntities extends _$MemEntities
         () async {
           await Future.wait(ids.map((id) => MemClient().remove(id)));
 
-          return remove(ids);
+          final removed = remove(ids);
+          await _refreshParentMemIdsWithUndoneChildren();
+          return removed;
         },
         {'ids': ids},
       );
@@ -131,6 +134,7 @@ class MemEntities extends _$MemEntities
           final doneMem = await MemService().doneByMemId(memId);
 
           upsert([doneMem]);
+          await _refreshParentMemIdsWithUndoneChildren();
         },
         {'memId': memId},
       );
@@ -140,6 +144,7 @@ class MemEntities extends _$MemEntities
           final undoneMem = await MemService().undoneByMemId(memId);
 
           upsert([undoneMem]);
+          await _refreshParentMemIdsWithUndoneChildren();
         },
         {'memId': memId},
       );
@@ -155,6 +160,7 @@ class MemEntities extends _$MemEntities
           final archived = await MemClient().archive(targetMem);
 
           upsert([archived]);
+          await _refreshParentMemIdsWithUndoneChildren();
         },
         {'memId': memId},
       );
@@ -170,6 +176,7 @@ class MemEntities extends _$MemEntities
           final unarchived = await MemClient().unarchive(targetMem);
 
           upsert([unarchived]);
+          await _refreshParentMemIdsWithUndoneChildren();
         },
       );
 
@@ -225,4 +232,19 @@ class MemEntities extends _$MemEntities
       childMemIds: () => existing.childMemIds,
     );
   }
+
+  Future<void> _refreshParentMemIdsWithUndoneChildren() =>
+      ref.read(parentMemIdsWithUndoneChildrenProvider.notifier).refresh();
+}
+
+@Riverpod(keepAlive: true)
+class ParentMemIdsWithUndoneChildren extends _$ParentMemIdsWithUndoneChildren {
+  @override
+  Set<int> build() => const <int>{};
+
+  Future<void> refresh() => v(
+        () async {
+          state = await MemRepository().shipParentMemIdsWithUndoneChildren();
+        },
+      );
 }

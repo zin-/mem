@@ -223,4 +223,36 @@ void main() {
     await notifier().undoneMem(saved.id);
     expect(container.read(memEntitiesProvider).single.doneAt, isNull);
   });
+
+  test('refreshes parent ids with undone children after list and mem changes',
+      () async {
+    final parent = await insertMem('parent');
+    final child = await insertMem('child');
+    await MemRepository().receiveParent(
+      MemParent(memId: child.id, parentMemId: parent.id),
+    );
+
+    Set<int> parentIds() =>
+        container.read(parentMemIdsWithUndoneChildrenProvider);
+
+    expect(parentIds(), isEmpty);
+
+    await notifier().loadMemList();
+    expect(parentIds(), {parent.id});
+
+    await notifier().doneMem(child.id);
+    expect(parentIds(), isEmpty);
+
+    await notifier().undoneMem(child.id);
+    expect(parentIds(), {parent.id});
+
+    await notifier().archive(child.id);
+    expect(parentIds(), isEmpty);
+
+    await notifier().unarchive(child.id);
+    expect(parentIds(), {parent.id});
+
+    await notifier().removeAsync([child.id]);
+    expect(parentIds(), isEmpty);
+  });
 }

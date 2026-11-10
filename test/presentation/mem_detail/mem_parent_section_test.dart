@@ -12,6 +12,7 @@ import 'package:mem/features/mems/detail/body.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
+import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/targets/target_repository.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/repository/drift_repository.dart';
@@ -52,17 +53,32 @@ void main() {
     Singleton.reset<TargetRepository>();
   });
 
-  Future<MemEntity> insertMem(String name) =>
-      MemRepository().receive(Mem(null, name, null, null));
+  Future<MemEntity> insertMem(String name, {DateTime? doneAt}) =>
+      MemRepository().receive(Mem(null, name, doneAt, null));
 
-  Future<void> pumpDetail(WidgetTester tester, int? memId) async {
+  Future<ProviderContainer> pumpDetail(
+    WidgetTester tester,
+    int? memId, {
+    Set<int>? parentIdsWithUndoneChildren,
+  }) async {
     tester.view.physicalSize = const Size(800, 2400);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
+    final container = ProviderContainer(
+      overrides: [
+        if (parentIdsWithUndoneChildren != null)
+          parentMemIdsWithUndoneChildrenProvider.overrideWithValue(
+            parentIdsWithUndoneChildren,
+          ),
+      ],
+    );
+    addTearDown(container.dispose);
+
     await tester.pumpWidget(
-      ProviderScope(
+      UncontrolledProviderScope(
+        container: container,
         child: MaterialApp(
           locale: const Locale('ja'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -80,6 +96,7 @@ void main() {
       EnginePhase.sendSemanticsUpdate,
       const Duration(seconds: 10),
     );
+    return container;
   }
 
   testWidgets('hides the parent field on an unsaved mem', (tester) async {
@@ -125,8 +142,9 @@ void main() {
     final parentA = await insertMem('Parent A');
     final parentB = await insertMem('Parent B');
 
-    await pumpDetail(tester, child.id);
+    final container = await pumpDetail(tester, child.id);
 
+    expect(container.read(parentMemIdsWithUndoneChildrenProvider), isEmpty);
     expect(find.byIcon(Icons.account_tree), findsOneWidget);
     expect(find.text(_l10n.parentNone), findsOneWidget);
     expect(find.byIcon(Icons.close), findsNothing);
@@ -169,6 +187,7 @@ void main() {
       (await MemRepository().shipParentByMemId(child.id))?.parentMemId,
       parentA.id,
     );
+    expect(container.read(parentMemIdsWithUndoneChildrenProvider), {parentA.id});
 
     await tester.tap(find.text('Parent A'));
     await tester.pumpAndSettle(
@@ -190,6 +209,7 @@ void main() {
       (await MemRepository().shipParentByMemId(child.id))?.parentMemId,
       parentB.id,
     );
+    expect(container.read(parentMemIdsWithUndoneChildrenProvider), {parentB.id});
 
     await tester.tap(find.byIcon(Icons.close));
     await tester.pumpAndSettle(
@@ -202,6 +222,7 @@ void main() {
     expect(find.text(_l10n.parentNone), findsOneWidget);
     expect(find.byIcon(Icons.close), findsNothing);
     expect(await MemRepository().shipParentByMemId(child.id), isNull);
+    expect(container.read(parentMemIdsWithUndoneChildrenProvider), isEmpty);
   });
 
   testWidgets('shows direct child names in name order', (tester) async {
@@ -375,5 +396,61 @@ void main() {
       (await MemRepository().shipParentByMemId(child.id))?.parentMemId,
       other.id,
     );
+  });
+
+  testWidgets(
+      'disables the undone checkbox when the id is in the set',
+      (tester) async {
+    final parent = await insertMem('Parent');
+    await pumpDetail(
+      tester,
+      parent.id,
+      parentIdsWithUndoneChildren: {parent.id},
+    );
+
+    final checkbox = tester.widget<Checkbox>(find.byType(Checkbox));
+    expect(checkbox.value, isFalse);
+    expect(checkbox.onChanged, isNull);
+  });
+
+  testWidgets(
+      'keeps undone available when the mem is done and the id is in the set',
+      (tester) async {
+    final parent = await insertMem('Parent', doneAt: DateTime.now());
+    await pumpDetail(
+      tester,
+      parent.id,
+      parentIdsWithUndoneChildren: {parent.id},
+    );
+
+    final checkbox = tester.widget<Checkbox>(find.byType(Checkbox));
+    expect(checkbox.value, isTrue);
+    expect(checkbox.onChanged, isNotNull);
+
+    checkbox.onChanged!(false);
+    await tester.pump();
+
+    final undone = tester.widget<Checkbox>(find.byType(Checkbox));
+    expect(undone.value, isFalse);
+    expect(undone.onChanged, isNull);
+  });
+
+  testWidgets('keeps the checkbox when the id is not in the set',
+      (tester) async {
+    final parent = await insertMem('Parent');
+    await pumpDetail(
+      tester,
+      parent.id,
+      parentIdsWithUndoneChildren: {parent.id + 1},
+    );
+
+    final checkbox = tester.widget<Checkbox>(find.byType(Checkbox));
+    expect(checkbox.value, isFalse);
+    expect(checkbox.onChanged, isNotNull);
+
+    checkbox.onChanged!(true);
+    await tester.pump();
+
+    expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isTrue);
   });
 }

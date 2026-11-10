@@ -1695,5 +1695,203 @@ void main() {
         );
       });
     });
+
+    group('undone children', () {
+      const repeatNotifyHour = 9;
+
+      Future<void> pump(
+        WidgetTester tester, {
+        required Mem mem,
+        bool withNotification = false,
+        Set<int>? parentIds,
+        _FakeMemEntities? memEntities,
+        _FakeActEntities? actEntities,
+      }) async {
+        final now = DateTime.now();
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              memNotificationsByMemIdProvider(memId).overrideWith(
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>(
+                  withNotification
+                      ? [
+                          savedMemNotification(
+                            id: 1,
+                            memId: memId,
+                            type: MemNotificationType.repeat,
+                            timeOfDaySeconds:
+                                repeatNotifyHour * Duration.secondsPerHour,
+                            message: 'Repeat',
+                            createdAt: now,
+                            updatedAt: now,
+                          ),
+                        ]
+                      : [],
+                ),
+              ),
+              memEntitiesProvider.overrideWith(
+                () =>
+                    memEntities ?? _FakeMemEntities([savedMemFromDomain(mem)]),
+              ),
+              parentMemIdsWithUndoneChildrenProvider.overrideWithValue(
+                parentIds ?? {memId},
+              ),
+              if (actEntities != null)
+                actEntitiesProvider.overrideWith(() => actEntities),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                body: MemListItemView(mem),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+      }
+
+      void expectParentIconLeading(WidgetTester tester) {
+        final leading = tester.widget<ListTile>(find.byType(ListTile)).leading;
+        expect(leading, isA<Icon>());
+        expect((leading! as Icon).icon, Icons.account_tree);
+      }
+
+      testWidgets(
+          'shows a parent icon instead of the checkbox when the id is in the set',
+          (tester) async {
+        await pump(tester, mem: baseMem);
+
+        expectParentIconLeading(tester);
+        expect(find.byType(MemDoneCheckbox), findsNothing);
+        expect(find.byType(Checkbox), findsNothing);
+        expect(find.byIcon(Icons.stop), findsNothing);
+        expect(find.byIcon(Icons.play_arrow), findsNothing);
+        expect(
+          find.ancestor(
+            of: find.byIcon(Icons.account_tree),
+            matching: find.byType(IconButton),
+          ),
+          findsNothing,
+        );
+        expect(
+          tester.widget<ListTile>(find.byType(ListTile)).onTap,
+          isNotNull,
+        );
+      });
+
+      testWidgets(
+          'keeps stop and play when the id is in the set and a notification is enabled',
+          (tester) async {
+        final actEntities = _FakeActEntities();
+        await pump(
+          tester,
+          mem: baseMem,
+          withNotification: true,
+          actEntities: actEntities,
+        );
+
+        expect(find.byIcon(Icons.stop), findsOneWidget);
+        expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+        expect(find.byIcon(Icons.account_tree), findsNothing);
+        expect(find.byType(MemDoneCheckbox), findsNothing);
+
+        await tester.tap(find.byIcon(Icons.play_arrow));
+        await tester.pump();
+
+        expect(actEntities.startActbyCallCount, 1);
+        expect(actEntities.lastStartActbyMemId, memId);
+
+        await tester.tap(find.byIcon(Icons.stop));
+        await tester.pump();
+
+        expect(actEntities.finishActbyCallCount, 1);
+        expect(actEntities.lastFinishActbyMemId, memId);
+      });
+
+      testWidgets(
+          'keeps the checkbox when the mem is done even if the id is in the set',
+          (tester) async {
+        final doneMem = Mem(memId, 'Done Mem', DateTime.now(), null);
+        final memEntities = _FakeMemEntities([savedMemFromDomain(doneMem)]);
+        await pump(tester, mem: doneMem, memEntities: memEntities);
+
+        expect(find.byIcon(Icons.account_tree), findsNothing);
+        final checkbox = tester.widget<Checkbox>(find.byType(Checkbox));
+        expect(checkbox.value, isTrue);
+
+        checkbox.onChanged!(false);
+        await tester.pump();
+
+        expect(memEntities.undoneMemCallCount, 1);
+        expect(memEntities.lastUndoneMemId, memId);
+      });
+
+      testWidgets(
+          'keeps pause and stop while an act is active and the id is in the set',
+          (tester) async {
+        final mem = Mem(
+          memId,
+          'Test Mem',
+          null,
+          null,
+          latestAct: ActiveAct(
+            memId,
+            DateAndTime.from(
+              DateTime.now().subtract(const Duration(minutes: 5)),
+            ),
+          ),
+        );
+        await pump(tester, mem: mem, withNotification: true);
+
+        expect(find.byIcon(Icons.pause), findsOneWidget);
+        expect(find.byIcon(Icons.stop), findsOneWidget);
+        expect(find.byIcon(Icons.account_tree), findsNothing);
+        expect(find.byIcon(Icons.play_arrow), findsNothing);
+      });
+
+      testWidgets(
+          'keeps close and play while an act is paused and the id is in the set',
+          (tester) async {
+        final mem = Mem(
+          memId,
+          'Test Mem',
+          null,
+          null,
+          latestAct: PausedAct(
+            memId,
+            DateTime.now().subtract(const Duration(minutes: 5)),
+          ),
+        );
+        await pump(tester, mem: mem, withNotification: true);
+
+        expect(find.byIcon(Icons.close), findsOneWidget);
+        expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+        expect(find.byIcon(Icons.account_tree), findsNothing);
+        expect(find.byIcon(Icons.stop), findsNothing);
+      });
+
+      testWidgets('keeps the checkbox when the id is not in the set',
+          (tester) async {
+        await pump(tester, mem: baseMem, parentIds: {memId + 1});
+
+        expect(find.byType(MemDoneCheckbox), findsOneWidget);
+        expect(find.byIcon(Icons.account_tree), findsNothing);
+        expect(find.byIcon(Icons.stop), findsNothing);
+      });
+
+      testWidgets('keeps stop and play when the id is not in the set',
+          (tester) async {
+        await pump(
+          tester,
+          mem: baseMem,
+          withNotification: true,
+          parentIds: {memId + 1},
+        );
+
+        expect(find.byIcon(Icons.stop), findsOneWidget);
+        expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+        expect(find.byIcon(Icons.account_tree), findsNothing);
+        expect(find.byType(MemDoneCheckbox), findsNothing);
+      });
+    });
   });
 }

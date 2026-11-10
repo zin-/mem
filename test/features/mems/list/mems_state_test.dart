@@ -34,6 +34,9 @@ void main() {
 
     MemRepository(mock: mockMemRepository);
     MemNotificationRepository(mock: mockMemNotificationRepository);
+
+    when(mockMemRepository.shipParentMemIdsWithUndoneChildren())
+        .thenAnswer((_) async => <int>{});
   });
 
   group('upsertSavedMemNotifications', () {

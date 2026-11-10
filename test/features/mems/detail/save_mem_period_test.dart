@@ -144,6 +144,8 @@ void main() {
     )).thenAnswer(
       (invocation) async => invocation.positionalArguments[0] as MemEntity,
     );
+    when(mockMemRepository.shipParentMemIdsWithUndoneChildren())
+        .thenAnswer((_) async => <int>{});
   });
 
   tearDown(() {
@@ -182,6 +184,38 @@ void main() {
       ],
     );
   }
+
+  test('refreshes parent ids with undone children after save', () async {
+    const memId = 1;
+    final mem = savedMem(id: memId, name: 'Test mem');
+    when(mockMemRepository.shipParentMemIdsWithUndoneChildren())
+        .thenAnswer((_) async => {memId});
+    when(mockMemClient.save(
+      any,
+      any,
+      any,
+      any,
+      any,
+    )).thenAnswer((_) async => (
+          (
+            <MemItemEntityV1>[],
+            null,
+            null,
+            null,
+            mem,
+          ),
+          null,
+        ));
+
+    final container = containerForMem(memId, mem);
+    addTearDown(container.dispose);
+
+    expect(container.read(parentMemIdsWithUndoneChildrenProvider), isEmpty);
+
+    await container.read(saveMem(memId));
+
+    expect(container.read(parentMemIdsWithUndoneChildrenProvider), {memId});
+  });
 
   group('saveMem period', () {
     test('passes edited period with time to MemClient.save', () async {

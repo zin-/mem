@@ -14,6 +14,7 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/list/item/completion_dialog.dart';
 import 'package:mem/features/mems/mem_done_checkbox.dart';
+import 'package:mem/features/mems/mem_done_edit.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:mem/features/mems/list/list_frame_count.dart';
@@ -62,6 +63,11 @@ class MemListItemView extends ConsumerWidget {
                     periodCount: periodCount ?? 0,
                   )
                   ?.at;
+          final hasUndoneChildren = ref.watch(
+            parentMemIdsWithUndoneChildrenProvider.select(
+              (ids) => ids.contains(_mem.id),
+            ),
+          );
           return _render(
             context,
             _mem,
@@ -102,6 +108,7 @@ class MemListItemView extends ConsumerWidget {
             target,
             amount,
             listAt,
+            hasUndoneChildren,
           );
         },
         {
@@ -126,6 +133,7 @@ ListTile _render(
   Target? target,
   DayActAmount? amount,
   DateTime? listAt,
+  bool hasUndoneChildren,
 ) =>
     v(
       () {
@@ -139,6 +147,11 @@ ListTile _render(
             )
             .isNotEmpty;
         final enableSkipMenu = hasEnableMemNotifications && !hasActiveAct;
+        final doneEdit = MemDoneEdit.of(
+          hasUndoneChildren: hasUndoneChildren,
+          isDone: mem.isDone,
+          onChanged: (value) => onMemDoneCheckboxTapped(value, mem.id as int),
+        );
 
         void showCompletionDialog(BuildContext dialogContext) {
           showMemListCompletionDialog(
@@ -176,21 +189,22 @@ ListTile _render(
                   : hasPausedAct
                       ? closeIconButton
                       : stopIconButton
-              : MemDoneCheckbox(
-                  mem,
-                  (value) => onMemDoneCheckboxTapped(value, mem.id as int),
-                ),
+              : doneEdit == null
+                  ? const Icon(Icons.account_tree)
+                  : MemDoneCheckbox(
+                      mem,
+                      doneEdit.onChanged,
+                    ),
           tileColor: mem.isArchived ? secondaryGreyColor : null,
           trailing: !mem.isDone && hasEnableMemNotifications
               ? hasActiveAct
                   ? stopIconButton
                   : startIconButton
               : null,
-          subtitle: mem.period == null &&
-                  !hasEnableMemNotifications &&
-                  listAt == null
-              ? null
-              : MemListItemSubtitle(mem.id as int, listAt),
+          subtitle:
+              mem.period == null && !hasEnableMemNotifications && listAt == null
+                  ? null
+                  : MemListItemSubtitle(mem.id as int, listAt),
           isThreeLine: mem.period != null && hasEnableMemNotifications,
         );
       },
@@ -201,6 +215,7 @@ ListTile _render(
         'target': target,
         'amount': amount,
         'listAt': listAt,
+        'hasUndoneChildren': hasUndoneChildren,
       },
     );
 

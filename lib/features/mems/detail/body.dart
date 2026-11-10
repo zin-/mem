@@ -8,6 +8,7 @@ import 'package:mem/framework/date_and_time/created_and_updated_at_texts.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/targets/target_view.dart';
 import 'package:mem/features/mems/mem_done_checkbox.dart';
+import 'package:mem/features/mems/mem_done_edit.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mems/mem_period.dart';
@@ -35,19 +36,30 @@ class MemDetailBody extends ConsumerWidget {
               ref.read(memEntitiesProvider.notifier).loadDetail(memId);
             });
           }
+          final hasUndoneChildren = memId != null &&
+              ref.watch(
+                parentMemIdsWithUndoneChildrenProvider.select(
+                  (ids) => ids.contains(memId),
+                ),
+              );
+          void onMemDoneChanged(bool? value) => ref
+              .read(editingMemByMemIdProvider(_memId).notifier)
+              .updatedBy(
+                editingMem.updatedWith(
+                  (mem) =>
+                      value == true ? mem.done(DateTime.now()) : mem.undone(),
+                ),
+              );
 
           return _MemDetailBodyComponent(
             _memId,
             editingMem,
             savedMem,
-            (value) => ref
-                .read(editingMemByMemIdProvider(_memId).notifier)
-                .updatedBy(
-                  editingMem.updatedWith(
-                    (mem) =>
-                        value == true ? mem.done(DateTime.now()) : mem.undone(),
-                  ),
-                ),
+            MemDoneEdit.of(
+              hasUndoneChildren: hasUndoneChildren,
+              isDone: editingMem.value.isDone,
+              onChanged: onMemDoneChanged,
+            )?.onChanged,
           );
         },
         _memId.toString(),
@@ -58,7 +70,7 @@ class _MemDetailBodyComponent extends StatelessWidget {
   final int? _memId;
   final MemViewData _mem;
   final MemEntity? _savedMem;
-  final Function(bool? memDone) _onMemDoneChanged;
+  final void Function(bool? memDone)? _onMemDoneChanged;
 
   const _MemDetailBodyComponent(
     this._memId,
