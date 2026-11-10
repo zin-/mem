@@ -144,7 +144,7 @@ void main() {
     )).thenAnswer(
       (invocation) async => invocation.positionalArguments[0] as MemEntity,
     );
-    when(mockMemRepository.shipParentMemIdsWithOpenChildren())
+    when(mockMemRepository.shipParentMemIdsWithUndoneChildren())
         .thenAnswer((_) async => <int>{});
   });
 
@@ -185,10 +185,10 @@ void main() {
     );
   }
 
-  test('refreshes parent ids with open children after save', () async {
+  test('refreshes parent ids with undone children after save', () async {
     const memId = 1;
     final mem = savedMem(id: memId, name: 'Test mem');
-    when(mockMemRepository.shipParentMemIdsWithOpenChildren())
+    when(mockMemRepository.shipParentMemIdsWithUndoneChildren())
         .thenAnswer((_) async => {memId});
     when(mockMemClient.save(
       any,
@@ -210,11 +210,11 @@ void main() {
     final container = containerForMem(memId, mem);
     addTearDown(container.dispose);
 
-    expect(container.read(parentMemIdsWithOpenChildrenProvider), isEmpty);
+    expect(container.read(parentMemIdsWithUndoneChildrenProvider), isEmpty);
 
     await container.read(saveMem(memId));
 
-    expect(container.read(parentMemIdsWithOpenChildrenProvider), {memId});
+    expect(container.read(parentMemIdsWithUndoneChildrenProvider), {memId});
   });
 
   group('saveMem period', () {

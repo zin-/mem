@@ -99,7 +99,7 @@ void main() {
         .thenAnswer((_) async => null);
     when(mockMemRepository.shipChildrenByParentMemId(any))
         .thenAnswer((_) async => []);
-    when(mockMemRepository.shipParentMemIdsWithOpenChildren())
+    when(mockMemRepository.shipParentMemIdsWithUndoneChildren())
         .thenAnswer((_) async => <int>{});
     when(mockMemRepository.shipById(
       any,

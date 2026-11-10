@@ -35,9 +35,9 @@ class MemDetailBody extends ConsumerWidget {
               ref.read(memEntitiesProvider.notifier).loadDetail(memId);
             });
           }
-          final hasOpenChildren = memId != null &&
+          final hasUndoneChildren = memId != null &&
               ref.watch(
-                parentMemIdsWithOpenChildrenProvider.select(
+                parentMemIdsWithUndoneChildrenProvider.select(
                   (ids) => ids.contains(memId),
                 ),
               );
@@ -54,7 +54,7 @@ class MemDetailBody extends ConsumerWidget {
             _memId,
             editingMem,
             savedMem,
-            hasOpenChildren && !editingMem.value.isDone
+            hasUndoneChildren && !editingMem.value.isDone
                 ? null
                 : onMemDoneChanged,
           );

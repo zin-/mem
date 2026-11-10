@@ -153,9 +153,9 @@ void main() {
   });
 
   test(
-    'shipParentMemIdsWithOpenChildren returns parents of open direct children',
+    'shipParentMemIdsWithUndoneChildren returns parents of undone direct children',
     () async {
-      expect(await repository.shipParentMemIdsWithOpenChildren(), isEmpty);
+      expect(await repository.shipParentMemIdsWithUndoneChildren(), isEmpty);
 
       final withOpenChild =
           await repository.receive(Mem(null, 'with open child', null, null));
@@ -207,7 +207,7 @@ void main() {
       );
 
       expect(
-        await repository.shipParentMemIdsWithOpenChildren(),
+        await repository.shipParentMemIdsWithUndoneChildren(),
         {withOpenChild.id, doneMid.id},
       );
     },

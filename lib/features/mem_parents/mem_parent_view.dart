@@ -195,7 +195,7 @@ Future<void> _reloadParentDetails(
   await Future.wait([
     for (final id in ids) notifier.loadDetail(id),
   ]);
-  await ref.read(parentMemIdsWithOpenChildrenProvider.notifier).refresh();
+  await ref.read(parentMemIdsWithUndoneChildrenProvider.notifier).refresh();
 }
 
 MemEntity? _entityById(Iterable<MemEntity> entities, int id) {

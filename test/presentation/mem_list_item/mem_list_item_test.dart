@@ -1696,7 +1696,7 @@ void main() {
       });
     });
 
-    group('open children', () {
+    group('undone children', () {
       const repeatNotifyHour = 9;
 
       Future<void> pump(
@@ -1733,7 +1733,7 @@ void main() {
                 () =>
                     memEntities ?? _FakeMemEntities([savedMemFromDomain(mem)]),
               ),
-              parentMemIdsWithOpenChildrenProvider.overrideWithValue(
+              parentMemIdsWithUndoneChildrenProvider.overrideWithValue(
                 parentIds ?? {memId},
               ),
               if (actEntities != null)

@@ -372,7 +372,7 @@ class MemRepository extends DriftRepository {
         {'parentMemId': parentMemId},
       );
 
-  Future<Set<int>> shipParentMemIdsWithOpenChildren() => v(
+  Future<Set<int>> shipParentMemIdsWithUndoneChildren() => v(
         () async {
           final parentMemId = driftDb.memParents.parentMemId;
           final rows = await (driftDb.selectOnly(driftDb.memParents)

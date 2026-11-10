@@ -224,7 +224,7 @@ void main() {
     expect(container.read(memEntitiesProvider).single.doneAt, isNull);
   });
 
-  test('refreshes parent ids with open children after list and mem changes',
+  test('refreshes parent ids with undone children after list and mem changes',
       () async {
     final parent = await insertMem('parent');
     final child = await insertMem('child');
@@ -233,7 +233,7 @@ void main() {
     );
 
     Set<int> parentIds() =>
-        container.read(parentMemIdsWithOpenChildrenProvider);
+        container.read(parentMemIdsWithUndoneChildrenProvider);
 
     expect(parentIds(), isEmpty);
 

@@ -62,8 +62,8 @@ class MemListItemView extends ConsumerWidget {
                     periodCount: periodCount ?? 0,
                   )
                   ?.at;
-          final hasOpenChildren = ref.watch(
-            parentMemIdsWithOpenChildrenProvider.select(
+          final hasUndoneChildren = ref.watch(
+            parentMemIdsWithUndoneChildrenProvider.select(
               (ids) => ids.contains(_mem.id),
             ),
           );
@@ -107,7 +107,7 @@ class MemListItemView extends ConsumerWidget {
             target,
             amount,
             listAt,
-            hasOpenChildren,
+            hasUndoneChildren,
           );
         },
         {
@@ -132,7 +132,7 @@ ListTile _render(
   Target? target,
   DayActAmount? amount,
   DateTime? listAt,
-  bool hasOpenChildren,
+  bool hasUndoneChildren,
 ) =>
     v(
       () {
@@ -146,7 +146,7 @@ ListTile _render(
             )
             .isNotEmpty;
         final enableSkipMenu = hasEnableMemNotifications && !hasActiveAct;
-        final showParentIcon = hasOpenChildren && !mem.isDone;
+        final showParentIcon = hasUndoneChildren && !mem.isDone;
 
         void showCompletionDialog(BuildContext dialogContext) {
           showMemListCompletionDialog(
@@ -210,7 +210,7 @@ ListTile _render(
         'target': target,
         'amount': amount,
         'listAt': listAt,
-        'hasOpenChildren': hasOpenChildren,
+        'hasUndoneChildren': hasUndoneChildren,
       },
     );
 

@@ -34,7 +34,7 @@ final saveMem =
 
               ref.read(memEntitiesProvider.notifier).upsert([memEntityV2]);
               await ref
-                  .read(parentMemIdsWithOpenChildrenProvider.notifier)
+                  .read(parentMemIdsWithUndoneChildrenProvider.notifier)
                   .refresh();
 
               ref

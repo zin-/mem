@@ -37,7 +37,7 @@ class MemEntities extends _$MemEntities
             ref,
             memIdsIn: mems.map((e) => e.id),
           );
-          await _refreshParentMemIdsWithOpenChildren();
+          await _refreshParentMemIdsWithUndoneChildren();
         },
         {
           'archived': archived,
@@ -93,7 +93,7 @@ class MemEntities extends _$MemEntities
           await Future.wait(ids.map((id) => MemClient().remove(id)));
 
           final removed = remove(ids);
-          await _refreshParentMemIdsWithOpenChildren();
+          await _refreshParentMemIdsWithUndoneChildren();
           return removed;
         },
         {'ids': ids},
@@ -134,7 +134,7 @@ class MemEntities extends _$MemEntities
           final doneMem = await MemService().doneByMemId(memId);
 
           upsert([doneMem]);
-          await _refreshParentMemIdsWithOpenChildren();
+          await _refreshParentMemIdsWithUndoneChildren();
         },
         {'memId': memId},
       );
@@ -144,7 +144,7 @@ class MemEntities extends _$MemEntities
           final undoneMem = await MemService().undoneByMemId(memId);
 
           upsert([undoneMem]);
-          await _refreshParentMemIdsWithOpenChildren();
+          await _refreshParentMemIdsWithUndoneChildren();
         },
         {'memId': memId},
       );
@@ -160,7 +160,7 @@ class MemEntities extends _$MemEntities
           final archived = await MemClient().archive(targetMem);
 
           upsert([archived]);
-          await _refreshParentMemIdsWithOpenChildren();
+          await _refreshParentMemIdsWithUndoneChildren();
         },
         {'memId': memId},
       );
@@ -176,7 +176,7 @@ class MemEntities extends _$MemEntities
           final unarchived = await MemClient().unarchive(targetMem);
 
           upsert([unarchived]);
-          await _refreshParentMemIdsWithOpenChildren();
+          await _refreshParentMemIdsWithUndoneChildren();
         },
       );
 
@@ -233,18 +233,18 @@ class MemEntities extends _$MemEntities
     );
   }
 
-  Future<void> _refreshParentMemIdsWithOpenChildren() =>
-      ref.read(parentMemIdsWithOpenChildrenProvider.notifier).refresh();
+  Future<void> _refreshParentMemIdsWithUndoneChildren() =>
+      ref.read(parentMemIdsWithUndoneChildrenProvider.notifier).refresh();
 }
 
 @Riverpod(keepAlive: true)
-class ParentMemIdsWithOpenChildren extends _$ParentMemIdsWithOpenChildren {
+class ParentMemIdsWithUndoneChildren extends _$ParentMemIdsWithUndoneChildren {
   @override
   Set<int> build() => const <int>{};
 
   Future<void> refresh() => v(
         () async {
-          state = await MemRepository().shipParentMemIdsWithOpenChildren();
+          state = await MemRepository().shipParentMemIdsWithUndoneChildren();
         },
       );
 }

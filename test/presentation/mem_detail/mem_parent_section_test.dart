@@ -59,7 +59,7 @@ void main() {
   Future<ProviderContainer> pumpDetail(
     WidgetTester tester,
     int? memId, {
-    Set<int>? parentIdsWithOpenChildren,
+    Set<int>? parentIdsWithUndoneChildren,
   }) async {
     tester.view.physicalSize = const Size(800, 2400);
     tester.view.devicePixelRatio = 1;
@@ -68,9 +68,9 @@ void main() {
 
     final container = ProviderContainer(
       overrides: [
-        if (parentIdsWithOpenChildren != null)
-          parentMemIdsWithOpenChildrenProvider.overrideWithValue(
-            parentIdsWithOpenChildren,
+        if (parentIdsWithUndoneChildren != null)
+          parentMemIdsWithUndoneChildrenProvider.overrideWithValue(
+            parentIdsWithUndoneChildren,
           ),
       ],
     );
@@ -144,7 +144,7 @@ void main() {
 
     final container = await pumpDetail(tester, child.id);
 
-    expect(container.read(parentMemIdsWithOpenChildrenProvider), isEmpty);
+    expect(container.read(parentMemIdsWithUndoneChildrenProvider), isEmpty);
     expect(find.byIcon(Icons.account_tree), findsOneWidget);
     expect(find.text(_l10n.parentNone), findsOneWidget);
     expect(find.byIcon(Icons.close), findsNothing);
@@ -187,7 +187,7 @@ void main() {
       (await MemRepository().shipParentByMemId(child.id))?.parentMemId,
       parentA.id,
     );
-    expect(container.read(parentMemIdsWithOpenChildrenProvider), {parentA.id});
+    expect(container.read(parentMemIdsWithUndoneChildrenProvider), {parentA.id});
 
     await tester.tap(find.text('Parent A'));
     await tester.pumpAndSettle(
@@ -209,7 +209,7 @@ void main() {
       (await MemRepository().shipParentByMemId(child.id))?.parentMemId,
       parentB.id,
     );
-    expect(container.read(parentMemIdsWithOpenChildrenProvider), {parentB.id});
+    expect(container.read(parentMemIdsWithUndoneChildrenProvider), {parentB.id});
 
     await tester.tap(find.byIcon(Icons.close));
     await tester.pumpAndSettle(
@@ -222,7 +222,7 @@ void main() {
     expect(find.text(_l10n.parentNone), findsOneWidget);
     expect(find.byIcon(Icons.close), findsNothing);
     expect(await MemRepository().shipParentByMemId(child.id), isNull);
-    expect(container.read(parentMemIdsWithOpenChildrenProvider), isEmpty);
+    expect(container.read(parentMemIdsWithUndoneChildrenProvider), isEmpty);
   });
 
   testWidgets('shows direct child names in name order', (tester) async {
@@ -405,7 +405,7 @@ void main() {
     await pumpDetail(
       tester,
       parent.id,
-      parentIdsWithOpenChildren: {parent.id},
+      parentIdsWithUndoneChildren: {parent.id},
     );
 
     final checkbox = tester.widget<Checkbox>(find.byType(Checkbox));
@@ -420,7 +420,7 @@ void main() {
     await pumpDetail(
       tester,
       parent.id,
-      parentIdsWithOpenChildren: {parent.id},
+      parentIdsWithUndoneChildren: {parent.id},
     );
 
     final checkbox = tester.widget<Checkbox>(find.byType(Checkbox));
@@ -441,7 +441,7 @@ void main() {
     await pumpDetail(
       tester,
       parent.id,
-      parentIdsWithOpenChildren: {parent.id + 1},
+      parentIdsWithUndoneChildren: {parent.id + 1},
     );
 
     final checkbox = tester.widget<Checkbox>(find.byType(Checkbox));
