@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_parents/mem_parent.dart';
+import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mems/mems_state.dart';
@@ -23,112 +24,118 @@ class MemParentView extends ConsumerWidget {
           }
 
           final entities = ref.watch(memEntitiesProvider);
-          final parentMemId = mem.parentMemId;
-          final parentName = parentMemId == null
-              ? null
-              : _entityById(entities, parentMemId)?.name;
-          final children = <_ChildMem>[];
-          for (final childId in mem.childMemIds) {
-            final name = _entityById(entities, childId)?.name;
-            if (name != null) children.add(_ChildMem(childId, name));
+
+          Mem? memById(int? id) {
+            if (id == null) return null;
+            return _entityById(entities, id)?.toDomain();
           }
-          children.sort((a, b) => a.name.compareTo(b.name));
 
-          void openDetail(int memId) => showMemDetailPage(context, ref, memId);
+          final parent = memById(mem.parentMemId);
+          final children = <Mem>[
+            for (final childId in mem.childMemIds)
+              if (memById(childId) case final child?) child,
+          ]..sort((a, b) => a.name.compareTo(b.name));
 
-          return _MemParentSection(
-            parentName: parentName,
-            children: children,
-            onParentTap: () {
-              final parentId = parentMemId;
-              if (parentId == null) {
-                _setParent(context, ref, _memId);
-              } else {
-                openDetail(parentId);
-              }
-            },
-            onDisconnect: parentMemId == null
-                ? null
-                : () => _disconnectParent(context, ref, _memId),
-            onChildTap: openDetail,
-            onChildDisconnect: (childId) => _disconnectParent(
+          void disconnect(int memId) {
+            if (memId == _memId) {
+              _disconnectParent(context, ref, memId);
+              return;
+            }
+            _disconnectParent(
               context,
               ref,
-              childId,
+              memId,
               previousParentMemId: _memId,
-            ),
+            );
+          }
+
+          return _MemParentSection(
+            memId: _memId,
+            parent: parent,
+            children: children,
+            onOpen: (memId) => showMemDetailPage(context, ref, memId),
+            onDisconnect: disconnect,
+            onSetParent: () => _setParent(context, ref, _memId),
           );
         },
         _memId,
       );
 }
 
-class _ChildMem {
-  final int id;
-  final String name;
-
-  const _ChildMem(this.id, this.name);
-}
-
 class _MemParentSection extends StatelessWidget {
-  final String? _parentName;
-  final List<_ChildMem> _children;
-  final VoidCallback _onParentTap;
-  final VoidCallback? _onDisconnect;
-  final void Function(int childId) _onChildTap;
-  final void Function(int childId) _onChildDisconnect;
+  final int _memId;
+  final Mem? _parent;
+  final List<Mem> _children;
+  final void Function(int memId) _onOpen;
+  final void Function(int memId) _onDisconnect;
+  final VoidCallback _onSetParent;
 
   const _MemParentSection({
-    required String? parentName,
-    required List<_ChildMem> children,
-    required VoidCallback onParentTap,
-    required VoidCallback? onDisconnect,
-    required void Function(int childId) onChildTap,
-    required void Function(int childId) onChildDisconnect,
-  })  : _parentName = parentName,
+    required int memId,
+    required Mem? parent,
+    required List<Mem> children,
+    required void Function(int memId) onOpen,
+    required void Function(int memId) onDisconnect,
+    required VoidCallback onSetParent,
+  })  : _memId = memId,
+        _parent = parent,
         _children = children,
-        _onParentTap = onParentTap,
+        _onOpen = onOpen,
         _onDisconnect = onDisconnect,
-        _onChildTap = onChildTap,
-        _onChildDisconnect = onChildDisconnect;
+        _onSetParent = onSetParent;
 
   @override
   Widget build(BuildContext context) => v(
         () {
           final l10n = buildL10n(context);
-          final disconnect = _onDisconnect;
+          final parent = _parent;
+          final parentId = parent?.id;
 
-          IconButton disconnectButton(VoidCallback onPressed) => IconButton(
-                onPressed: onPressed,
-                tooltip: l10n.disconnectParentAction,
-                icon: const Icon(Icons.close),
+          ListTile memRow({
+            required IconData icon,
+            required String name,
+            required VoidCallback onTap,
+            VoidCallback? onDisconnect,
+          }) =>
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(icon),
+                title: Text(name),
+                onTap: onTap,
+                trailing: onDisconnect == null
+                    ? null
+                    : IconButton(
+                        onPressed: onDisconnect,
+                        tooltip: l10n.disconnectParentAction,
+                        icon: const Icon(Icons.close),
+                      ),
               );
 
           return Column(
             children: [
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.account_tree),
-                title: Text(_parentName ?? l10n.parentNone),
-                onTap: _onParentTap,
-                trailing:
-                    disconnect == null ? null : disconnectButton(disconnect),
+              memRow(
+                icon: Icons.account_tree,
+                name: parent?.name ?? l10n.parentNone,
+                onTap: parentId == null
+                    ? _onSetParent
+                    : () => _onOpen(parentId),
+                onDisconnect:
+                    parentId == null ? null : () => _onDisconnect(_memId),
               ),
               for (final child in _children)
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: const Icon(Icons.subdirectory_arrow_right),
-                  title: Text(child.name),
-                  onTap: () => _onChildTap(child.id),
-                  trailing: disconnectButton(
-                    () => _onChildDisconnect(child.id),
+                if (child.id case final int childId)
+                  memRow(
+                    icon: Icons.subdirectory_arrow_right,
+                    name: child.name,
+                    onTap: () => _onOpen(childId),
+                    onDisconnect: () => _onDisconnect(childId),
                   ),
-                ),
             ],
           );
         },
         {
-          'parentName': _parentName,
+          'memId': _memId,
+          'parent': _parent,
           'children': _children,
         },
       );
