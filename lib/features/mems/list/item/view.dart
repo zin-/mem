@@ -146,10 +146,7 @@ ListTile _render(
             )
             .isNotEmpty;
         final enableSkipMenu = hasEnableMemNotifications && !hasActiveAct;
-        final replacesCompletion = hasOpenChildren && !mem.isDone;
-
-        Widget completionOrParentIcon(Widget completion) =>
-            replacesCompletion ? const Icon(Icons.account_tree) : completion;
+        final showParentIcon = hasOpenChildren && !mem.isDone;
 
         void showCompletionDialog(BuildContext dialogContext) {
           showMemListCompletionDialog(
@@ -186,19 +183,17 @@ ListTile _render(
                   ? pauseIconButton
                   : hasPausedAct
                       ? closeIconButton
-                      : completionOrParentIcon(stopIconButton)
-              : completionOrParentIcon(
-                  MemDoneCheckbox(
-                    mem,
-                    (value) => onMemDoneCheckboxTapped(value, mem.id as int),
-                  ),
-                ),
+                      : stopIconButton
+              : showParentIcon
+                  ? const Icon(Icons.account_tree)
+                  : MemDoneCheckbox(
+                      mem,
+                      (value) => onMemDoneCheckboxTapped(value, mem.id as int),
+                    ),
           tileColor: mem.isArchived ? secondaryGreyColor : null,
           trailing: !mem.isDone && hasEnableMemNotifications
               ? hasActiveAct
-                  ? replacesCompletion
-                      ? null
-                      : stopIconButton
+                  ? stopIconButton
                   : startIconButton
               : null,
           subtitle:

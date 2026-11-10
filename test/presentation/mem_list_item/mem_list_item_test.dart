@@ -1779,7 +1779,7 @@ void main() {
       });
 
       testWidgets(
-          'shows a parent icon instead of stop and keeps play when the id is in the set',
+          'keeps stop and play when the id is in the set and a notification is enabled',
           (tester) async {
         final actEntities = _FakeActEntities();
         await pump(
@@ -1789,18 +1789,22 @@ void main() {
           actEntities: actEntities,
         );
 
-        expectParentIconLeading(tester);
-        expect(find.byType(MemDoneCheckbox), findsNothing);
-        expect(find.byIcon(Icons.stop), findsNothing);
+        expect(find.byIcon(Icons.stop), findsOneWidget);
         expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+        expect(find.byIcon(Icons.account_tree), findsNothing);
+        expect(find.byType(MemDoneCheckbox), findsNothing);
 
         await tester.tap(find.byIcon(Icons.play_arrow));
         await tester.pump();
 
         expect(actEntities.startActbyCallCount, 1);
         expect(actEntities.lastStartActbyMemId, memId);
-        expect(actEntities.skipActByCallCount, 0);
-        expect(actEntities.finishActbyCallCount, 0);
+
+        await tester.tap(find.byIcon(Icons.stop));
+        await tester.pump();
+
+        expect(actEntities.finishActbyCallCount, 1);
+        expect(actEntities.lastFinishActbyMemId, memId);
       });
 
       testWidgets(
@@ -1822,7 +1826,7 @@ void main() {
       });
 
       testWidgets(
-          'keeps pause and hides stop while an act is active and the id is in the set',
+          'keeps pause and stop while an act is active and the id is in the set',
           (tester) async {
         final mem = Mem(
           memId,
@@ -1839,8 +1843,8 @@ void main() {
         await pump(tester, mem: mem, withNotification: true);
 
         expect(find.byIcon(Icons.pause), findsOneWidget);
+        expect(find.byIcon(Icons.stop), findsOneWidget);
         expect(find.byIcon(Icons.account_tree), findsNothing);
-        expect(find.byIcon(Icons.stop), findsNothing);
         expect(find.byIcon(Icons.play_arrow), findsNothing);
       });
 
