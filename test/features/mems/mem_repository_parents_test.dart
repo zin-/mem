@@ -151,4 +151,65 @@ void main() {
 
     expect(await db.select(db.memParents).get(), isEmpty);
   });
+
+  test(
+    'shipParentMemIdsWithOpenChildren returns parents of open direct children',
+    () async {
+      expect(await repository.shipParentMemIdsWithOpenChildren(), isEmpty);
+
+      final withOpenChild =
+          await repository.receive(Mem(null, 'with open child', null, null));
+      final openChild = await repository.receive(Mem(null, 'open', null, null));
+      final doneSibling = await repository.receive(
+        Mem(null, 'done sibling', DateTime(2024, 2, 1), null),
+      );
+      await repository.receiveParent(
+        MemParent(memId: openChild.id, parentMemId: withOpenChild.id),
+      );
+      await repository.receiveParent(
+        MemParent(memId: doneSibling.id, parentMemId: withOpenChild.id),
+      );
+
+      final withDoneChild =
+          await repository.receive(Mem(null, 'with done child', null, null));
+      final doneChild = await repository.receive(
+        Mem(null, 'done', DateTime(2024, 3, 1), null),
+      );
+      await repository.receiveParent(
+        MemParent(memId: doneChild.id, parentMemId: withDoneChild.id),
+      );
+
+      final withArchivedChild = await repository.receive(
+        Mem(null, 'with archived child', null, null),
+      );
+      final archivedChild =
+          await repository.receive(Mem(null, 'archived', null, null));
+      await repository.replace(
+        archivedChild.updatedWith(archivedAt: () => DateTime(2024, 1, 1)),
+      );
+      await repository.receiveParent(
+        MemParent(memId: archivedChild.id, parentMemId: withArchivedChild.id),
+      );
+
+      await repository.receive(Mem(null, 'childless', null, null));
+
+      final grand = await repository.receive(Mem(null, 'grand', null, null));
+      final doneMid = await repository.receive(
+        Mem(null, 'done mid', DateTime(2024, 4, 1), null),
+      );
+      final grandchild =
+          await repository.receive(Mem(null, 'grandchild', null, null));
+      await repository.receiveParent(
+        MemParent(memId: doneMid.id, parentMemId: grand.id),
+      );
+      await repository.receiveParent(
+        MemParent(memId: grandchild.id, parentMemId: doneMid.id),
+      );
+
+      expect(
+        await repository.shipParentMemIdsWithOpenChildren(),
+        {withOpenChild.id, doneMid.id},
+      );
+    },
+  );
 }
