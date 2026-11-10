@@ -112,8 +112,6 @@ void main() {
       'repeat at 23:45',
     ),
   ];
-  final todayAtQuarterToMidnight = DateTime(2026, 11, 9, 23, 45);
-
   group('daily count stays on its day', () {
     final belowTarget = countTarget();
 
@@ -188,8 +186,11 @@ void main() {
       );
     });
 
-    test('an interval on the next logical day keeps today\'s fixed time', () {
+    test('an interval on the next logical day is that time', () {
       final withInterval = countTarget(secondsAfterLastAct: intervalSeconds);
+      final next = endedAtElevenPm.period!.end!.add(
+        const Duration(seconds: intervalSeconds),
+      );
 
       expect(
         listAt(
@@ -198,7 +199,7 @@ void main() {
           todayCount: belowTargetCount,
           notifications: repeatAtQuarterToMidnight,
         ),
-        todayAtQuarterToMidnight,
+        next,
       );
       expect(
         fireAt(
@@ -208,7 +209,7 @@ void main() {
           todayCount: belowTargetCount,
           notifications: repeatAtQuarterToMidnight,
         ),
-        todayAtQuarterToMidnight,
+        next,
       );
     });
 

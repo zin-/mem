@@ -6,7 +6,9 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_list_at.dart';
 import 'package:mem/features/mems/mem_notify_at.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
+import 'package:mem/features/targets/next_at_after_last_act.dart';
 import 'package:mem/features/targets/target.dart';
+import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/framework/notifications/notification/type.dart';
 import 'package:mem/framework/notifications/schedule.dart';
 
@@ -62,6 +64,13 @@ class Mem {
       periodCount: todayCount,
     )?.at;
     if (at == null) return null;
+    final onActEndDay = _sectionOnActEndDay(
+      at,
+      latestAct,
+      target,
+      TimeOfDay.fromDateTime(startOfToday),
+    );
+    if (onActEndDay != null) return onActEndDay;
     final scheduledNotifications = memNotifications?.where(
       (e) => !e.isAfterActStarted(),
     );
@@ -175,4 +184,29 @@ class Mem {
           'startOfDay': startOfDay,
         },
       );
+}
+
+DateAndTime? _sectionOnActEndDay(
+  DateTime at,
+  Act? latestAct,
+  Target? target,
+  TimeOfDay startOfDay,
+) {
+  final end = latestAct?.period?.end;
+  if (target == null || end == null) return null;
+  final intervalAt = NextAtAfterLastAct.of(
+    target: target,
+    latestAct: latestAct,
+  )?.at;
+  if (intervalAt == null || at != intervalAt) return null;
+
+  DateAndTime timed(DateTime value) =>
+      value is DateAndTime ? value : DateAndTime.from(value, timeOfDay: value);
+
+  final ended = timed(end);
+  if (timed(intervalAt)
+      .isSameLogicalDay(ended.logicalDay(startOfDay), startOfDay)) {
+    return null;
+  }
+  return ended.logicalDay(startOfDay);
 }
