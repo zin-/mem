@@ -62,6 +62,11 @@ class MemListItemView extends ConsumerWidget {
                     periodCount: periodCount ?? 0,
                   )
                   ?.at;
+          final hasOpenChildren = ref.watch(
+            parentMemIdsWithOpenChildrenProvider.select(
+              (ids) => ids.contains(_mem.id),
+            ),
+          );
           return _render(
             context,
             _mem,
@@ -102,6 +107,7 @@ class MemListItemView extends ConsumerWidget {
             target,
             amount,
             listAt,
+            hasOpenChildren,
           );
         },
         {
@@ -126,6 +132,7 @@ ListTile _render(
   Target? target,
   DayActAmount? amount,
   DateTime? listAt,
+  bool hasOpenChildren,
 ) =>
     v(
       () {
@@ -139,6 +146,10 @@ ListTile _render(
             )
             .isNotEmpty;
         final enableSkipMenu = hasEnableMemNotifications && !hasActiveAct;
+        final replacesCompletion = hasOpenChildren && !mem.isDone;
+
+        Widget completionOrParentIcon(Widget completion) =>
+            replacesCompletion ? const Icon(Icons.account_tree) : completion;
 
         void showCompletionDialog(BuildContext dialogContext) {
           showMemListCompletionDialog(
@@ -175,22 +186,25 @@ ListTile _render(
                   ? pauseIconButton
                   : hasPausedAct
                       ? closeIconButton
-                      : stopIconButton
-              : MemDoneCheckbox(
-                  mem,
-                  (value) => onMemDoneCheckboxTapped(value, mem.id as int),
+                      : completionOrParentIcon(stopIconButton)
+              : completionOrParentIcon(
+                  MemDoneCheckbox(
+                    mem,
+                    (value) => onMemDoneCheckboxTapped(value, mem.id as int),
+                  ),
                 ),
           tileColor: mem.isArchived ? secondaryGreyColor : null,
           trailing: !mem.isDone && hasEnableMemNotifications
               ? hasActiveAct
-                  ? stopIconButton
+                  ? replacesCompletion
+                      ? null
+                      : stopIconButton
                   : startIconButton
               : null,
-          subtitle: mem.period == null &&
-                  !hasEnableMemNotifications &&
-                  listAt == null
-              ? null
-              : MemListItemSubtitle(mem.id as int, listAt),
+          subtitle:
+              mem.period == null && !hasEnableMemNotifications && listAt == null
+                  ? null
+                  : MemListItemSubtitle(mem.id as int, listAt),
           isThreeLine: mem.period != null && hasEnableMemNotifications,
         );
       },
@@ -201,6 +215,7 @@ ListTile _render(
         'target': target,
         'amount': amount,
         'listAt': listAt,
+        'hasOpenChildren': hasOpenChildren,
       },
     );
 
