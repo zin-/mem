@@ -6,6 +6,7 @@ import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/mems/states.dart';
+import 'package:mem/features/mems/transitions.dart';
 import 'package:mem/l10n/l10n.dart';
 
 class MemParentView extends ConsumerWidget {
@@ -26,41 +27,61 @@ class MemParentView extends ConsumerWidget {
           final parentName = parentMemId == null
               ? null
               : _entityById(entities, parentMemId)?.name;
-          final childrenNames = <String>[];
+          final children = <_ChildMem>[];
           for (final childId in mem.childMemIds) {
             final name = _entityById(entities, childId)?.name;
-            if (name != null) childrenNames.add(name);
+            if (name != null) children.add(_ChildMem(childId, name));
           }
-          childrenNames.sort();
+          children.sort((a, b) => a.name.compareTo(b.name));
+
+          void openDetail(int memId) => showMemDetailPage(context, ref, memId);
 
           return _MemParentSection(
             parentName: parentName,
-            childrenNames: childrenNames,
-            onSet: () => _setParent(context, ref, _memId),
+            children: children,
+            onParentTap: () {
+              final parentId = parentMemId;
+              if (parentId == null) {
+                _setParent(context, ref, _memId);
+              } else {
+                openDetail(parentId);
+              }
+            },
             onDisconnect: parentMemId == null
                 ? null
                 : () => _disconnectParent(context, ref, _memId),
+            onChildTap: openDetail,
           );
         },
         _memId,
       );
 }
 
+class _ChildMem {
+  final int id;
+  final String name;
+
+  const _ChildMem(this.id, this.name);
+}
+
 class _MemParentSection extends StatelessWidget {
   final String? _parentName;
-  final List<String> _childrenNames;
-  final VoidCallback _onSet;
+  final List<_ChildMem> _children;
+  final VoidCallback _onParentTap;
   final VoidCallback? _onDisconnect;
+  final void Function(int childId) _onChildTap;
 
   const _MemParentSection({
     required String? parentName,
-    required List<String> childrenNames,
-    required VoidCallback onSet,
+    required List<_ChildMem> children,
+    required VoidCallback onParentTap,
     required VoidCallback? onDisconnect,
+    required void Function(int childId) onChildTap,
   })  : _parentName = parentName,
-        _childrenNames = childrenNames,
-        _onSet = onSet,
-        _onDisconnect = onDisconnect;
+        _children = children,
+        _onParentTap = onParentTap,
+        _onDisconnect = onDisconnect,
+        _onChildTap = onChildTap;
 
   @override
   Widget build(BuildContext context) => v(
@@ -73,7 +94,7 @@ class _MemParentSection extends StatelessWidget {
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.account_tree),
                 title: Text(_parentName ?? l10n.parentNone),
-                onTap: _onSet,
+                onTap: _onParentTap,
                 trailing: _onDisconnect == null
                     ? null
                     : IconButton(
@@ -82,18 +103,19 @@ class _MemParentSection extends StatelessWidget {
                         icon: const Icon(Icons.close),
                       ),
               ),
-              for (final name in _childrenNames)
+              for (final child in _children)
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.subdirectory_arrow_right),
-                  title: Text(name),
+                  title: Text(child.name),
+                  onTap: () => _onChildTap(child.id),
                 ),
             ],
           );
         },
         {
           'parentName': _parentName,
-          'childrenNames': _childrenNames,
+          'children': _children,
         },
       );
 }
@@ -111,10 +133,7 @@ Future<void> _setParent(BuildContext context, WidgetRef ref, int memId) => v(
           ..sort((a, b) => a.name.compareTo(b.name));
         final selectedId = await showDialog<int>(
           context: context,
-          builder: (context) => _SelectParentDialog(
-            candidates: candidates,
-            currentParentMemId: currentParent?.parentMemId,
-          ),
+          builder: (context) => _SelectParentDialog(candidates: candidates),
         );
         if (selectedId == null || !context.mounted) return;
 
@@ -207,13 +226,10 @@ MemEntity? _entityById(Iterable<MemEntity> entities, int id) {
 
 class _SelectParentDialog extends StatelessWidget {
   final List<MemEntity> _candidates;
-  final int? _currentParentMemId;
 
   const _SelectParentDialog({
     required List<MemEntity> candidates,
-    required int? currentParentMemId,
-  })  : _candidates = candidates,
-        _currentParentMemId = currentParentMemId;
+  }) : _candidates = candidates;
 
   @override
   Widget build(BuildContext context) => v(
@@ -229,13 +245,9 @@ class _SelectParentDialog extends StatelessWidget {
                 itemCount: _candidates.length,
                 itemBuilder: (context, index) {
                   final mem = _candidates[index];
-                  final isCurrentParent = mem.id == _currentParentMemId;
                   return ListTile(
                     title: Text(mem.name),
-                    enabled: !isCurrentParent,
-                    onTap: isCurrentParent
-                        ? null
-                        : () => Navigator.of(context).pop(mem.id),
+                    onTap: () => Navigator.of(context).pop(mem.id),
                   );
                 },
               ),
@@ -250,7 +262,6 @@ class _SelectParentDialog extends StatelessWidget {
         },
         {
           'candidates': _candidates,
-          'currentParentMemId': _currentParentMemId,
         },
       );
 }

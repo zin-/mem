@@ -9,6 +9,7 @@ import 'package:mem/features/mem_notifications/mem_notification_repository.dart'
 import 'package:mem/features/mem_parents/mem_parent.dart';
 import 'package:mem/features/mem_relations/mem_relation_repository.dart';
 import 'package:mem/features/mems/detail/body.dart';
+import 'package:mem/features/mems/detail/page.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
@@ -196,6 +197,36 @@ void main() {
       const Duration(seconds: 10),
     );
 
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.byType(MemDetailPage), findsOneWidget);
+
+    tester.state<NavigatorState>(find.byType(Navigator)).pop();
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 50),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
+
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 50),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
+
+    expect(find.text('Parent A'), findsNothing);
+    expect(find.text(_l10n.parentNone), findsOneWidget);
+    expect(find.byIcon(Icons.close), findsNothing);
+    expect(await MemRepository().shipParentByMemId(child.id), isNull);
+    expect(container.read(parentMemIdsWithUndoneChildrenProvider), isEmpty);
+
+    await tester.tap(find.text(_l10n.parentNone));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 50),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
+
     await tester.tap(find.widgetWithText(ListTile, 'Parent B'));
     await tester.pumpAndSettle(
       const Duration(milliseconds: 50),
@@ -276,6 +307,25 @@ void main() {
     );
   });
 
+  testWidgets('opens the child mem detail on tap', (tester) async {
+    final parent = await insertMem('Parent');
+    final child = await insertMem('Child');
+    await MemRepository().receiveParent(
+      MemParent(memId: child.id, parentMemId: parent.id),
+    );
+
+    await pumpDetail(tester, parent.id);
+
+    await tester.tap(find.text('Child'));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 50),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
+
+    expect(find.byType(MemDetailPage), findsOneWidget);
+  });
+
   testWidgets('hides the children field when a mem has no children',
       (tester) async {
     final mem = await insertMem('Alone');
@@ -308,7 +358,14 @@ void main() {
 
     await pumpDetail(tester, editing.id);
 
-    await tester.tap(find.text('Ancestor'));
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 50),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
+
+    await tester.tap(find.text(_l10n.parentNone));
     await tester.pumpAndSettle(
       const Duration(milliseconds: 50),
       EnginePhase.sendSemanticsUpdate,
@@ -336,65 +393,6 @@ void main() {
     expect(
       find.descendant(of: dialog, matching: find.text('Unrelated')),
       findsOneWidget,
-    );
-  });
-
-  testWidgets('disables the current parent in the picker', (tester) async {
-    final child = await insertMem('Child');
-    final parent = await insertMem('Parent');
-    final other = await insertMem('Other');
-    await MemRepository().receiveParent(
-      MemParent(memId: child.id, parentMemId: parent.id),
-    );
-
-    await pumpDetail(tester, child.id);
-
-    await tester.tap(find.text('Parent'));
-    await tester.pumpAndSettle(
-      const Duration(milliseconds: 50),
-      EnginePhase.sendSemanticsUpdate,
-      const Duration(seconds: 10),
-    );
-
-    final dialog = find.byType(AlertDialog);
-    final currentParentTile = find.descendant(
-      of: dialog,
-      matching: find.widgetWithText(ListTile, 'Parent'),
-    );
-    final otherTile = find.descendant(
-      of: dialog,
-      matching: find.widgetWithText(ListTile, 'Other'),
-    );
-    expect(currentParentTile, findsOneWidget);
-    expect(tester.widget<ListTile>(currentParentTile).enabled, isFalse);
-    expect(tester.widget<ListTile>(otherTile).enabled, isTrue);
-
-    await tester.tap(currentParentTile);
-    await tester.pumpAndSettle(
-      const Duration(milliseconds: 50),
-      EnginePhase.sendSemanticsUpdate,
-      const Duration(seconds: 10),
-    );
-
-    expect(find.byType(AlertDialog), findsOneWidget);
-    expect(
-      (await MemRepository().shipParentByMemId(child.id))?.parentMemId,
-      parent.id,
-    );
-
-    await tester.tap(otherTile);
-    await tester.pumpAndSettle(
-      const Duration(milliseconds: 50),
-      EnginePhase.sendSemanticsUpdate,
-      const Duration(seconds: 10),
-    );
-
-    expect(find.byType(AlertDialog), findsNothing);
-    expect(find.text('Other'), findsOneWidget);
-    expect(find.text('Parent'), findsNothing);
-    expect(
-      (await MemRepository().shipParentByMemId(child.id))?.parentMemId,
-      other.id,
     );
   });
 
