@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n/l10n.dart';
+import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/values/constants.dart';
 
+import 'act_list_group.dart';
 import 'states.dart';
 
 class ActListAppBar extends ConsumerWidget {
@@ -22,8 +24,7 @@ class ActListAppBar extends ConsumerWidget {
               ? buildL10n(context).defaultActListPageTitle
               : ref.read(memByMemIdProvider(_memId))?.name ?? somethingWrong,
           ref.watch(dateViewProvider),
-          (bool changed) =>
-              ref.read(dateViewProvider.notifier).updatedBy(changed),
+          (Period unit) => ref.read(dateViewProvider.notifier).updatedBy(unit),
           ref.watch(timeViewProvider),
           (bool changed) =>
               ref.read(timeViewProvider.notifier).updatedBy(changed),
@@ -36,15 +37,15 @@ class ActListAppBar extends ConsumerWidget {
 
 class _ActListAppBar extends StatelessWidget {
   final String _title;
-  final bool _isDateView;
-  final void Function(bool changed) _changeDateViewMode;
+  final Period _group;
+  final void Function(Period unit) _changeGroup;
   final bool _isTimeView;
   final void Function(bool changed) _changeTimeViewMode;
 
   const _ActListAppBar(
     this._title,
-    this._isDateView,
-    this._changeDateViewMode,
+    this._group,
+    this._changeGroup,
     this._isTimeView,
     this._changeTimeViewMode,
   );
@@ -54,16 +55,25 @@ class _ActListAppBar extends StatelessWidget {
         () => SliverAppBar(
           title: Text(_title),
           actions: [
-            IconButton(
-                onPressed: () => v(
-                      () => _changeDateViewMode(!_isDateView),
-                      {"_isDateView": _isDateView},
-                    ),
-                icon: Icon(
-                  _isDateView
-                      ? Icons.calendar_view_month
-                      : Icons.calendar_view_day,
-                )),
+            PopupMenuButton<Period>(
+              tooltip: buildL10n(context).timePeriod,
+              onSelected: (unit) => v(
+                () => _changeGroup(unit),
+                {
+                  '_group': _group,
+                  'unit': unit,
+                },
+              ),
+              icon: Icon(_groupIcon(_group)),
+              itemBuilder: (context) => [
+                for (final unit in ActListGroup.units)
+                  PopupMenuItem(
+                    value: unit,
+                    enabled: unit != _group,
+                    child: Text(unit.name),
+                  ),
+              ],
+            ),
             IconButton(
               onPressed: () => v(
                 () => _changeTimeViewMode(!_isTimeView),
@@ -77,8 +87,17 @@ class _ActListAppBar extends StatelessWidget {
         ),
         {
           "_title": _title,
-          "_isDateView": _isDateView,
+          "_group": _group,
           "_isTimeView": _isTimeView,
         },
       );
 }
+
+IconData _groupIcon(Period unit) => switch (unit) {
+      Period.aDay => Icons.calendar_view_day,
+      Period.aWeek => Icons.calendar_view_week,
+      Period.aMonth => Icons.calendar_view_month,
+      Period.threeMonth => Icons.date_range,
+      Period.aYear => Icons.calendar_today,
+      Period.all => Icons.all_inclusive,
+    };

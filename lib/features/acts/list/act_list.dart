@@ -1,9 +1,8 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
-import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/features/acts/act_entity.dart';
+import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -14,6 +13,7 @@ import 'package:mem/features/settings/states.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/widgets/infinite_scroll.dart';
 
+import 'act_list_group.dart';
 import 'app_bar.dart';
 import 'item/builder.dart';
 import 'states.dart';
@@ -87,7 +87,7 @@ class _ActListState extends ConsumerState<ActList> {
 
 class _ActList extends StatelessWidget {
   final int? _memId;
-  final bool _isDateView;
+  final Period _groupUnit;
   final bool _isTimeView;
   final TimeOfDay _startOfDay;
   final List<SavedActEntityV1> _actList;
@@ -97,7 +97,7 @@ class _ActList extends StatelessWidget {
 
   const _ActList(
     this._memId,
-    this._isDateView,
+    this._groupUnit,
     this._isTimeView,
     this._startOfDay,
     this._actList,
@@ -114,31 +114,12 @@ class _ActList extends StatelessWidget {
             ActListAppBar(
               _memId,
             ),
-            ..._actList
-                .where(
-                  (e) => e.value.period != null,
-                )
-                .groupListsBy(
-                  (element) {
-                    final day = element.value.period!.start!.logicalDay(
-                      _startOfDay,
-                    );
-                    return DateTime(
-                      day.year,
-                      day.month,
-                      _isDateView ? day.day : 1,
-                    );
-                  },
-                )
-                .entries
-                .map(
+            ..._groupedActs().entries.map(
                   (e) => SliverStickyHeader(
                     header: ActListSubHeader(
-                        MapEntry(
-                          e.key,
-                          e.value.map((e) => e.value).toList(),
-                        ),
-                        _isDateView),
+                      e.key,
+                      e.value.map((act) => act.value).toList(),
+                    ),
                     sliver: SliverList(
                       delegate: () {
                         final builder = ActListItemBuilder(
@@ -146,7 +127,6 @@ class _ActList extends StatelessWidget {
                           _memList,
                           _isTimeView,
                           _targetList,
-                          _isDateView,
                         );
 
                         return SliverChildBuilderDelegate(
@@ -161,7 +141,7 @@ class _ActList extends StatelessWidget {
         ),
         {
           '_memId': _memId,
-          '_isDateView': _isDateView,
+          '_groupUnit': _groupUnit,
           '_isTimeView': _isTimeView,
           '_startOfDay': _startOfDay,
           '_actList': _actList,
@@ -169,4 +149,20 @@ class _ActList extends StatelessWidget {
           '_targetList': _targetList,
         },
       );
+
+  Map<ActListGroup, List<SavedActEntityV1>> _groupedActs() {
+    final groups = <ActListGroup, List<SavedActEntityV1>>{};
+    for (final entity in _actList) {
+      final period = entity.value.period;
+      if (period == null) continue;
+      final group = ActListGroup.of(
+        unit: _groupUnit,
+        at: period.start!,
+        startOfDay: _startOfDay,
+      );
+      if (group == null) continue;
+      (groups[group] ??= []).add(entity);
+    }
+    return groups;
+  }
 }

@@ -5,28 +5,27 @@ import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/targets/target.dart';
 
+import '../act_list_group.dart';
 import 'total_act_time_item.dart';
 import 'view.dart';
 
 class ActListItemBuilder {
-  final MapEntry<DateTime, List<SavedActEntityV1>> _actListWithDatetime;
+  final MapEntry<ActListGroup, List<SavedActEntityV1>> _groupedActs;
   final List<Mem> _memList;
   final bool _isTimeView;
   final List<Target> _targetList;
-  final bool _isDateView;
 
   late final Map<int, List<SavedActEntityV1>> _actListGroupedByMemId;
 
   ActListItemBuilder(
-    this._actListWithDatetime,
+    this._groupedActs,
     this._memList,
     this._isTimeView,
     this._targetList,
-    this._isDateView,
   ) {
     if (_isTimeView) {
-      _actListGroupedByMemId = _actListWithDatetime.value
-          .groupListsBy((element) => element.value.memId);
+      _actListGroupedByMemId =
+          _groupedActs.value.groupListsBy((element) => element.value.memId);
     }
   }
 
@@ -39,11 +38,10 @@ class ActListItemBuilder {
               entry.value,
               _memList.singleWhereOrNull((mem) => mem.id! == entry.key),
               _targetList.singleWhereOrNull((e) => e.memId == entry.key),
-              _actListWithDatetime.key,
-              _isDateView,
+              _groupedActs.key,
             );
           } else {
-            final act = _actListWithDatetime.value[index];
+            final act = _groupedActs.value[index];
             return ActListItemView(
               act,
               _memList
@@ -58,7 +56,6 @@ class ActListItemBuilder {
         },
       );
 
-  int get childCount => _isTimeView
-      ? _actListGroupedByMemId.length
-      : _actListWithDatetime.value.length;
+  int get childCount =>
+      _isTimeView ? _actListGroupedByMemId.length : _groupedActs.value.length;
 }

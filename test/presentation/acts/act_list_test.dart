@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/acts/list/act_list.dart';
+import 'package:mem/features/acts/list/act_list_group.dart';
 import 'package:mem/features/acts/list/item/total_act_time_item.dart';
 import 'package:mem/features/acts/list/states.dart';
 import 'package:mem/features/acts/states.dart';
@@ -67,9 +68,8 @@ Future<void> _pumpActList(
         preferenceProvider(startOfDayKey).overrideWith(
           () => _FakePreference(startOfDay),
         ),
-        // dateViewProvider はまだ bool。日以外は月表示になり、週・四半期・年は出ない
         dateViewProvider.overrideWith(
-          (ref) => ValueStateNotifier(group == Period.aDay),
+          (ref) => ValueStateNotifier(group),
         ),
         memEntitiesProvider.overrideWith(
           () => _FakeMemEntities([
@@ -161,7 +161,7 @@ void main() {
         group: Period.aWeek,
       );
 
-      expect(find.text('10/5/2026 – 10/11/2026'), findsOneWidget);
+      expect(find.text('10/05/2026 – 10/11/2026'), findsOneWidget);
       expect(find.text('2'), findsOneWidget);
       expect(find.text('10/12/2026 – 10/18/2026'), findsNothing);
     },
@@ -180,9 +180,9 @@ void main() {
         group: Period.threeMonth,
       );
 
-      expect(find.text('7/1/2026 – 9/30/2026'), findsOneWidget);
+      expect(find.text('07/01/2026 – 09/30/2026'), findsOneWidget);
       expect(find.text('2'), findsOneWidget);
-      expect(find.text('10/1/2026 – 12/31/2026'), findsNothing);
+      expect(find.text('10/01/2026 – 12/31/2026'), findsNothing);
     },
   );
 
@@ -202,6 +202,35 @@ void main() {
       expect(find.text('2025'), findsOneWidget);
       expect(find.text('2'), findsOneWidget);
       expect(find.text('2026'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'selects a grouping unit from the menu',
+    (tester) async {
+      await _pumpActList(
+        tester,
+        acts: [_act(1, DateTime(2026, 10, 13, 10))],
+        startOfDay: _midnight,
+      );
+
+      expect(find.byIcon(Icons.calendar_view_day), findsOneWidget);
+      expect(find.text('2026'), findsNothing);
+
+      await tester.tap(find.byIcon(Icons.calendar_view_day));
+      await tester.pumpAndSettle();
+
+      for (final unit in ActListGroup.units) {
+        expect(find.text(unit.name), findsOneWidget);
+      }
+      expect(find.text(Period.all.name), findsNothing);
+
+      await tester.tap(find.text(Period.aYear.name));
+      await tester.pumpAndSettle();
+
+      expect(find.text('2026'), findsOneWidget);
+      expect(find.byIcon(Icons.calendar_today), findsOneWidget);
+      expect(find.byIcon(Icons.calendar_view_day), findsNothing);
     },
   );
 }

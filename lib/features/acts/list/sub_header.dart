@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:mem/framework/date_and_time/date_and_time_view.dart';
 import 'package:mem/features/acts/act.dart';
-import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/features/acts/list/duration.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/values/colors.dart';
 import 'package:mem/values/dimens.dart';
 
+import 'act_list_group.dart';
+
 class ActListSubHeader extends StatelessWidget {
   final _subHeaderTextStyle = const TextStyle(color: secondaryGreyColor);
 
-  final MapEntry<DateTime, List<Act>> _groupedAct;
-  final bool _showDate;
+  final ActListGroup _group;
+  final List<Act> _acts;
 
   const ActListSubHeader(
-    this._groupedAct,
-    this._showDate, {
+    this._group,
+    this._acts, {
     super.key,
   });
 
@@ -26,28 +26,30 @@ class ActListSubHeader extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              DateAndTimeText(
-                DateAndTime.from(_groupedAct.key),
-                style: _subHeaderTextStyle,
-                showDate: _showDate,
+              Flexible(
+                child: Text(
+                  _group.label(MaterialLocalizations.of(context)),
+                  style: _subHeaderTextStyle,
+                ),
               ),
               Text(
-                _groupedAct.value.length.toString(),
+                _acts.length.toString(),
                 style: _subHeaderTextStyle,
               ),
               Text(
-                _groupedAct.value
+                _acts
                     .fold<Duration>(
-                        Duration.zero,
-                        (previousValue, element) =>
-                            previousValue +
-                            (element.period?.duration ?? Duration.zero))
+                      Duration.zero,
+                      (previousValue, element) =>
+                          previousValue +
+                          (element.period?.duration ?? Duration.zero),
+                    )
                     .format(),
                 style: _subHeaderTextStyle,
               ),
             ],
           ),
         ),
-        {"_groupedAct": _groupedAct},
+        {"_group": _group},
       );
 }

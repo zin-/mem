@@ -6,6 +6,7 @@ import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/day_act_amount.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
+import 'package:mem/features/acts/list/act_list_group.dart';
 import 'package:mem/features/acts/list/item/total_act_time_item.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
@@ -171,7 +172,7 @@ void main() {
     WidgetTester tester,
     Mem? mem, {
     DateTime? groupDate,
-    bool isDateView = true,
+    Period group = Period.aDay,
     Act? latestAct,
     _FakeActEntities? actEntities,
     List<SavedActEntityV1>? acts,
@@ -182,6 +183,11 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
     final resolvedGroupDate = groupDate ?? DateTime(2024, 6, 1);
+    final actListGroup = ActListGroup.of(
+      unit: group,
+      at: resolvedGroupDate,
+      startOfDay: const TimeOfDay(hour: 0, minute: 0),
+    )!;
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -213,8 +219,7 @@ void main() {
                   ],
               mem,
               target,
-              resolvedGroupDate,
-              isDateView,
+              actListGroup,
             ),
           ),
         ),
@@ -419,7 +424,7 @@ void main() {
         tester,
         mem,
         groupDate: DateTime(now.year, now.month, 1),
-        isDateView: false,
+        group: Period.aMonth,
         latestAct: ActiveAct(_memId, DateAndTime(2026, 10, 20, 9)),
       );
 
@@ -434,7 +439,7 @@ void main() {
         tester,
         mem,
         groupDate: DateTime(2024, 6, 1),
-        isDateView: false,
+        group: Period.aMonth,
         latestAct: ActiveAct(_memId, DateAndTime(2026, 10, 20, 9)),
       );
 
@@ -540,7 +545,7 @@ void main() {
       await pumpItem(
         tester,
         mem,
-        isDateView: false,
+        group: Period.aMonth,
         groupDate: DateTime(2024, 6, 1),
         acts: [
           savedAct(
@@ -592,7 +597,7 @@ void main() {
         tester,
         mem,
         groupDate: DateTime(DateTime.now().year, DateTime.now().month, 1),
-        isDateView: false,
+        group: Period.aMonth,
         latestAct: running,
       );
       expect(find.byType(LiveElapsedTimeText), findsNothing);
@@ -660,7 +665,7 @@ void main() {
         tester,
         mem,
         groupDate: DateTime(2024, 6, 1),
-        isDateView: false,
+        group: Period.aMonth,
         target: _target(TargetUnit.time, 3 * 60 * 60),
         latestAct: ActiveAct(_memId, DateAndTime(2026, 10, 20, 9)),
       );
