@@ -40,8 +40,15 @@ class DayTargetLabel extends StatelessWidget {
   final Target _target;
   final DayActAmount _amount;
   final Act? _act;
+  final String? _unit;
 
-  const DayTargetLabel(this._target, this._amount, this._act, {super.key});
+  const DayTargetLabel(
+    this._target,
+    this._amount,
+    this._act, {
+    String? unit,
+    super.key,
+  }) : _unit = unit;
 
   static bool shows(Target? target) => target != null && target.value > 0;
 
@@ -50,12 +57,17 @@ class DayTargetLabel extends StatelessWidget {
         () {
           final act = _act;
           return switch (_target.targetUnit) {
-            TargetUnit.count => ActCountLabel(_amount.count, _target.value),
+            TargetUnit.count => ActCountLabel(
+                _amount.count,
+                _target.value,
+                unit: _unit,
+              ),
             TargetUnit.time => _TimeTargetLabel(
                 _amount.recorded,
                 // 一時停止してからの時間は作業時間ではない
                 act is ActiveAct ? act.period?.start : null,
                 _target.value,
+                _unit,
               ),
           };
         },
@@ -63,6 +75,7 @@ class DayTargetLabel extends StatelessWidget {
           '_target': _target,
           '_amount': _amount,
           '_act': _act,
+          '_unit': _unit,
         },
       );
 }
@@ -74,6 +87,7 @@ class ActStatusLabels extends StatelessWidget {
   final Widget? _leading;
   final Widget? _time;
   final bool _centerTime;
+  final String? _unit;
 
   const ActStatusLabels(
     this._act,
@@ -82,10 +96,12 @@ class ActStatusLabels extends StatelessWidget {
     Widget? leading,
     Widget? time,
     bool centerTime = true,
+    String? unit,
     super.key,
   })  : _leading = leading,
         _time = time,
-        _centerTime = centerTime;
+        _centerTime = centerTime,
+        _unit = unit;
 
   @override
   Widget build(BuildContext context) => v(
@@ -141,6 +157,7 @@ class ActStatusLabels extends StatelessWidget {
           '_act': _act,
           '_target': _target,
           '_amount': _amount,
+          '_unit': _unit,
         },
       );
 
@@ -153,7 +170,7 @@ class ActStatusLabels extends StatelessWidget {
           amount != null &&
           DayTargetLabel.shows(target) &&
           target.targetUnit == TargetUnit.time)
-        DayTargetLabel(target, amount, _act),
+        DayTargetLabel(target, amount, _act, unit: _unit),
       if (StateElapsedTime.shows(_act)) StateElapsedTime(_act),
     ];
     if (children.isEmpty) {
@@ -175,7 +192,7 @@ class ActStatusLabels extends StatelessWidget {
         target.targetUnit != TargetUnit.count) {
       return null;
     }
-    return DayTargetLabel(target, amount, _act);
+    return DayTargetLabel(target, amount, _act, unit: _unit);
   }
 }
 
@@ -183,9 +200,14 @@ class _TimeTargetLabel extends StatefulWidget {
   final Duration _recorded;
   final DateTime? _runningSince;
   final int _targetSeconds;
+  final String? _unit;
 
   const _TimeTargetLabel(
-      this._recorded, this._runningSince, this._targetSeconds);
+    this._recorded,
+    this._runningSince,
+    this._targetSeconds,
+    this._unit,
+  );
 
   @override
   State<_TimeTargetLabel> createState() => _TimeTargetLabelState();
@@ -227,11 +249,16 @@ class _TimeTargetLabelState extends State<_TimeTargetLabel> {
               (since == null
                   ? Duration.zero
                   : DateTime.now().difference(since));
+          final unit = widget._unit;
           return Wrap(
             children: [
               Text(current.formatHHmm()),
               const Text(' / '),
               Text(Duration(seconds: widget._targetSeconds).formatHHmm()),
+              if (unit != null) ...[
+                const Text(' / '),
+                Text(unit),
+              ],
             ],
           );
         },
@@ -239,6 +266,7 @@ class _TimeTargetLabelState extends State<_TimeTargetLabel> {
           '_recorded': widget._recorded,
           '_runningSince': widget._runningSince,
           '_targetSeconds': widget._targetSeconds,
+          '_unit': widget._unit,
         },
       );
 

@@ -9,6 +9,7 @@ import 'package:mem/features/acts/act_status_labels.dart';
 import 'package:mem/features/acts/day_act_amount.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/acts/list/act_list_group.dart';
+import 'package:mem/features/acts/list/target_period_mark.dart';
 import 'package:mem/features/acts/list/duration.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -50,13 +51,22 @@ class TotalActTimeListItem extends ConsumerWidget {
           // 経過は今日の日グループだけ。週や月の途中でも今の状態は出さない
           final showsElapsed = _group.unit == Period.aDay && showsActions;
           final target = _target;
-          final amount = _dayAmount(ref, memId, target);
+          final recorded = _recorded();
+          final mark = DayTargetLabel.shows(target)
+              ? TargetPeriodMark.of(
+                  group: _group.unit,
+                  target: target!.period,
+                )
+              : null;
+          final amount = _amount(ref, memId, target, mark, recorded);
 
           return ListTile(
             leading: actions.leading,
             title: _title(
               showsElapsed ? latestAct : null,
               amount,
+              mark?.text,
+              recorded,
             ),
             subtitle: _mem == null ? null : Text(_mem.name),
             trailing: actions.trailing,
@@ -70,20 +80,45 @@ class TotalActTimeListItem extends ConsumerWidget {
         },
       );
 
-  DayActAmount? _dayAmount(WidgetRef ref, int memId, Target? target) {
-    if (_group.unit != Period.aDay || !DayTargetLabel.shows(target)) {
+  Duration _recorded() => _actList.fold<Duration>(
+        Duration.zero,
+        (sum, act) => sum + (act.value.period?.duration ?? Duration.zero),
+      );
+
+  DayActAmount? _amount(
+    WidgetRef ref,
+    int memId,
+    Target? target,
+    TargetPeriodMark? mark,
+    Duration recorded,
+  ) {
+    if (!DayTargetLabel.shows(target)) {
       return null;
     }
-    return ref.watch(viewedDayActAmountProvider(memId, _group.start)).value;
+    if (mark?.queries == true) {
+      return ref
+          .watch(
+            viewedPeriodActAmountProvider(
+              memId,
+              target!.period,
+              // 0時の日付だと開始時刻より前になり、前日の期間になる
+              _group.period.start,
+            ),
+          )
+          .value;
+    }
+    if (_group.unit == Period.aDay) {
+      return ref.watch(viewedDayActAmountProvider(memId, _group.start)).value;
+    }
+    return DayActAmount(_actList.length, recorded);
   }
 
-  Widget _title(Act? statusAct, DayActAmount? amount) {
-    final recorded = _actList.fold<Duration>(
-      Duration.zero,
-      (sum, act) => sum + (act.value.period?.duration ?? Duration.zero),
-    );
-    final target = _target;
-    final progress = _progress(amount, recorded, target);
+  Widget _title(
+    Act? statusAct,
+    DayActAmount? amount,
+    String? periodUnit,
+    Duration recorded,
+  ) {
     final range = _actListRange(_actList.map((act) => act.value));
 
     return Column(
@@ -92,9 +127,10 @@ class TotalActTimeListItem extends ConsumerWidget {
       children: [
         ActStatusLabels(
           statusAct,
-          target,
-          progress,
-          time: _groupDuration(recorded, progress, target),
+          _target,
+          amount,
+          unit: periodUnit,
+          time: _groupDuration(recorded, amount, _target),
           centerTime: false,
         ),
         if (range != null)
@@ -106,22 +142,7 @@ class TotalActTimeListItem extends ConsumerWidget {
     );
   }
 
-  // 日の進捗は Mem 一覧と同じ今日の集計。それ以外は、そのグループの Act から作る
-  DayActAmount? _progress(
-    DayActAmount? dayAmount,
-    Duration recorded,
-    Target? target,
-  ) {
-    if (_group.unit == Period.aDay) {
-      return dayAmount;
-    }
-    if (!DayTargetLabel.shows(target)) {
-      return null;
-    }
-    return DayActAmount(_actList.length, recorded);
-  }
-
-  // 時間目標がグループ合計を進捗に出すときは、合計時間を重ねて出さない
+  // 進捗がグループ合計そのもののときは、合計時間を重ねて出さない
   Widget? _groupDuration(
     Duration recorded,
     DayActAmount? progress,
@@ -129,6 +150,7 @@ class TotalActTimeListItem extends ConsumerWidget {
   ) {
     if (_group.unit != Period.aDay &&
         progress != null &&
+        progress.recorded == recorded &&
         target != null &&
         target.targetUnit == TargetUnit.time) {
       return null;

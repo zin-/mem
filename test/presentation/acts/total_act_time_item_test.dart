@@ -711,7 +711,11 @@ void main() {
         tester,
         mem,
         groupDate: DateTime(2024, 6, 1),
-        target: _target(TargetUnit.time, 3 * 60 * 60),
+        target: _target(
+          TargetUnit.time,
+          3 * 60 * 60,
+          period: Period.aDay,
+        ),
         dayAmount: const DayActAmount(1, Duration(minutes: 30)),
       );
 
