@@ -9,8 +9,8 @@ import 'package:mem/features/acts/act_status_labels.dart';
 import 'package:mem/features/acts/day_act_amount.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/acts/list/act_list_group.dart';
-import 'package:mem/features/acts/list/target_period_mark.dart';
 import 'package:mem/features/acts/list/duration.dart';
+import 'package:mem/features/acts/period_view.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
@@ -52,20 +52,21 @@ class TotalActTimeListItem extends ConsumerWidget {
           final showsElapsed = _group.unit == Period.aDay && showsActions;
           final target = _target;
           final recorded = _recorded();
-          final mark = DayTargetLabel.shows(target)
-              ? TargetPeriodMark.of(
-                  group: _group.unit,
-                  target: target!.period,
-                )
-              : null;
-          final amount = _amount(ref, memId, target, mark, recorded);
+          String? periodLabel;
+          if (DayTargetLabel.shows(target)) {
+            final period = target!.period;
+            if (period != _group.unit) {
+              periodLabel = period.shortLabel;
+            }
+          }
+          final amount = _amount(ref, memId, target, recorded);
 
           return ListTile(
             leading: actions.leading,
             title: _title(
               showsElapsed ? latestAct : null,
               amount,
-              mark,
+              periodLabel,
               recorded,
             ),
             subtitle: _mem == null ? null : Text(_mem.name),
@@ -89,18 +90,19 @@ class TotalActTimeListItem extends ConsumerWidget {
     WidgetRef ref,
     int memId,
     Target? target,
-    TargetPeriodMark? mark,
     Duration recorded,
   ) {
     if (!DayTargetLabel.shows(target)) {
       return null;
     }
-    if (mark?.queries == true) {
+    final period = target!.period;
+    // まとめ単位より長い目標は、行に載っていない期間を問い合わせる
+    if (period.isLongerThan(_group.unit)) {
       return ref
           .watch(
             viewedPeriodActAmountProvider(
               memId,
-              target!.period,
+              period,
               // 0時の日付だと開始時刻より前になり、前日の期間になる
               _group.period.start,
             ),
@@ -116,7 +118,7 @@ class TotalActTimeListItem extends ConsumerWidget {
   Widget _title(
     Act? statusAct,
     DayActAmount? amount,
-    TargetPeriodMark? mark,
+    String? periodLabel,
     Duration recorded,
   ) {
     final range = _actListRange(_actList.map((act) => act.value));
@@ -129,7 +131,7 @@ class TotalActTimeListItem extends ConsumerWidget {
           statusAct,
           _target,
           amount,
-          mark: mark,
+          periodLabel: periodLabel,
           time: _groupDuration(recorded, amount, _target),
           centerTime: false,
         ),

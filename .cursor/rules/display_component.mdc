@@ -6,9 +6,9 @@ alwaysApply: true
 
 `0 / 5 / w` のような一塊の表示は、親が `Text` や単位文字列を並べて作らない。
 
-その表示の Widget を一つ定義し、出す場所はすべてそれを使う。回数も時間も、` / ` と印を出すのはその Widget だけ。
+その表示の Widget を一つ定義し、出す場所はすべてそれを使う。回数も時間も、` / ` と期間の短い表示を出すのはその Widget だけ。
 
-印の有無は型（`TargetPeriodMark`）が持つ。Widget はその型を描く。`mark == null` なら `0 / 5`、あるなら `0 / 5 / w`。
+期間の短い表示は `PeriodView.shortLabel` を渡す。Widget はその文字列を描く。`periodLabel == null` なら `0 / 5`、あるなら `0 / 5 / w`。
 
 ## Example(具体例)
 
@@ -20,9 +20,9 @@ Wrap(
     Text(count.toString()),
     const Text(' / '),
     Text(target.toString()),
-    if (unit != null) ...[
+    if (periodLabel != null) ...[
       const Text(' / '),
-      Text(unit),
+      Text(periodLabel),
     ],
   ],
 )
@@ -32,9 +32,9 @@ Wrap(
     Text(current.formatHHmm()),
     const Text(' / '),
     Text(Duration(seconds: targetSeconds).formatHHmm()),
-    if (unit != null) ...[
+    if (periodLabel != null) ...[
       const Text(' / '),
-      Text(unit),
+      Text(periodLabel),
     ],
   ],
 )
@@ -46,19 +46,18 @@ Wrap(
 TargetRatioLabel(
   current: count.toString(),
   target: target.toString(),
-  mark: mark,
+  periodLabel: periodLabel,
 )
 
 TargetRatioLabel(
   current: current.formatHHmm(),
   target: Duration(seconds: targetSeconds).formatHHmm(),
-  mark: mark,
+  periodLabel: periodLabel,
 )
 ```
 
 ## Relations(関連)
 
 - Dry（同じ表示を一箇所にまとめる）
-- ドメインは型にする（印の有無は `TargetPeriodMark` が持つ）
+- `PeriodView.shortLabel`
 - `TargetRatioLabel`
-- `TargetPeriodMark`

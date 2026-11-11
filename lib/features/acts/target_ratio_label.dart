@@ -1,34 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:mem/features/acts/list/target_period_mark.dart';
 import 'package:mem/features/logger/log_service.dart';
 
 class TargetRatioLabel extends StatelessWidget {
   final String _current;
   final String _target;
-  final TargetPeriodMark? _mark;
+  final String? _periodLabel;
 
   const TargetRatioLabel({
     required String current,
     required String target,
-    TargetPeriodMark? mark,
+    String? periodLabel,
     super.key,
   })  : _current = current,
         _target = target,
-        _mark = mark;
+        _periodLabel = periodLabel;
 
   @override
   Widget build(BuildContext context) => v(
         () {
           const separator = Text(' / ');
-          final mark = _mark;
+          final periodLabel = _periodLabel;
           return Wrap(
             children: [
               Text(_current),
               separator,
               Text(_target),
-              if (mark != null) ...[
+              if (periodLabel != null) ...[
                 separator,
-                Text(mark.text),
+                Text(periodLabel),
               ],
             ],
           );
@@ -36,7 +35,7 @@ class TargetRatioLabel extends StatelessWidget {
         {
           '_current': _current,
           '_target': _target,
-          '_mark': _mark,
+          '_periodLabel': _periodLabel,
         },
       );
 }

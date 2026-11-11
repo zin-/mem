@@ -6,7 +6,7 @@ import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_status_labels.dart';
 import 'package:mem/features/acts/day_act_amount.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
-import 'package:mem/features/acts/list/target_period_mark.dart';
+import 'package:mem/features/acts/period_view.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/count_target.dart';
 import 'package:mem/features/mems/mem.dart';
@@ -48,19 +48,19 @@ class MemListItemView extends ConsumerWidget {
               ref.watch(memNotificationsByMemIdProvider(_mem.id as int));
           final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
           final periodCount = _periodCount(ref, _mem.id as int);
-          final mark = DayTargetLabel.shows(target)
-              ? TargetPeriodMark.of(
-                  group: Period.aDay,
-                  target: target!.period,
-                )
-              : null;
+          String? periodLabel;
+          if (DayTargetLabel.shows(target)) {
+            final period = target!.period;
+            if (period != Period.aDay) {
+              periodLabel = period.shortLabel;
+            }
+          }
           final amount = _labelAmount(
             ref,
             _mem,
             target,
             periodCount,
             startOfDay,
-            mark,
           );
           final listAt = _needsPeriodCount(target) && periodCount == null
               ? null
@@ -116,7 +116,7 @@ class MemListItemView extends ConsumerWidget {
             notifications,
             target,
             amount,
-            mark,
+            periodLabel,
             listAt,
             hasUndoneChildren,
           );
@@ -142,7 +142,7 @@ ListTile _render(
   Iterable<MemNotificationEntityV1> memNotificationEntities,
   Target? target,
   DayActAmount? amount,
-  TargetPeriodMark? mark,
+  String? periodLabel,
   DateTime? listAt,
   bool hasUndoneChildren,
 ) =>
@@ -192,7 +192,7 @@ ListTile _render(
         );
 
         return ListTile(
-          title: _title(mem, latestActByMem, target, amount, mark),
+          title: _title(mem, latestActByMem, target, amount, periodLabel),
           onTap: onTap,
           leading: hasEnableMemNotifications
               ? hasActiveAct
@@ -225,7 +225,7 @@ ListTile _render(
         'memNotificationEntities': memNotificationEntities,
         'target': target,
         'amount': amount,
-        'mark': mark,
+        'periodLabel': periodLabel,
         'listAt': listAt,
         'hasUndoneChildren': hasUndoneChildren,
       },
@@ -244,9 +244,9 @@ DayActAmount? _timeAmount(
   int memId,
   Target target,
   TimeOfDay startOfDay,
-  TargetPeriodMark? mark,
 ) {
-  if (mark?.queries == true) {
+  // まとめ単位より長い目標は、行に載っていない期間を問い合わせる
+  if (target.period.isLongerThan(Period.aDay)) {
     return ref
         .watch(
           viewedPeriodActAmountProvider(
@@ -268,13 +268,12 @@ DayActAmount? _labelAmount(
   Target? target,
   int? periodCount,
   TimeOfDay startOfDay,
-  TargetPeriodMark? mark,
 ) {
   if (!DayTargetLabel.shows(target)) {
     return null;
   }
   if (target!.targetUnit == TargetUnit.time) {
-    return _timeAmount(ref, mem.id as int, target, startOfDay, mark);
+    return _timeAmount(ref, mem.id as int, target, startOfDay);
   }
   if (target.targetUnit != TargetUnit.count || periodCount == null) {
     return null;
@@ -299,12 +298,12 @@ Widget _title(
   Act? latestAct,
   Target? target,
   DayActAmount? amount,
-  TargetPeriodMark? mark,
+  String? periodLabel,
 ) =>
     ActStatusLabels(
       latestAct,
       target,
       amount,
       leading: MemNameText(mem.id),
-      mark: mark,
+      periodLabel: periodLabel,
     );

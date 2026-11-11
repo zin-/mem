@@ -7,6 +7,9 @@ import 'package:mem/features/logger/log_service.dart';
 enum Period { aDay, aWeek, aMonth, threeMonth, aYear, all }
 
 extension PeriodExt on Period {
+  // 宣言順が後の期間の方が長い
+  bool isLongerThan(Period other) => index > other.index;
+
   WithStartAndEnd? toPeriod(
     DateAndTime now,
     TimeOfDay startOfDay, {

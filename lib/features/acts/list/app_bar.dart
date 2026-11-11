@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
+import 'package:mem/features/acts/period_view.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/values/constants.dart';
@@ -64,7 +65,7 @@ class _ActListAppBar extends StatelessWidget {
                   'unit': unit,
                 },
               ),
-              icon: Icon(_groupIcon(_group)),
+              icon: Icon(_group.icon),
               itemBuilder: (context) => [
                 for (final unit in ActListGroup.units)
                   PopupMenuItem(
@@ -92,12 +93,3 @@ class _ActListAppBar extends StatelessWidget {
         },
       );
 }
-
-IconData _groupIcon(Period unit) => switch (unit) {
-      Period.aDay => Icons.calendar_view_day,
-      Period.aWeek => Icons.calendar_view_week,
-      Period.aMonth => Icons.calendar_view_month,
-      Period.threeMonth => Icons.date_range,
-      Period.aYear => Icons.calendar_today,
-      Period.all => Icons.all_inclusive,
-    };

@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/features/acts/line_chart/states.dart';
-import 'package:mem/features/acts/list/target_period_mark.dart';
 import 'package:mem/features/acts/target_ratio_label.dart';
 
 void main() {
   Future<void> pump(
     WidgetTester tester, {
-    TargetPeriodMark? mark,
+    String? periodLabel,
   }) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -15,21 +13,15 @@ void main() {
           body: TargetRatioLabel(
             current: '0',
             target: '5',
-            mark: mark,
+            periodLabel: periodLabel,
           ),
         ),
       ),
     );
   }
 
-  testWidgets('shows the mark after the ratio', (tester) async {
-    await pump(
-      tester,
-      mark: TargetPeriodMark.of(
-        group: Period.aDay,
-        target: Period.aWeek,
-      ),
-    );
+  testWidgets('shows the period label after the ratio', (tester) async {
+    await pump(tester, periodLabel: 'w');
 
     expect(find.text('0'), findsOneWidget);
     expect(find.text(' / '), findsNWidgets(2));
@@ -37,7 +29,7 @@ void main() {
     expect(find.text('w'), findsOneWidget);
   });
 
-  testWidgets('omits the mark and its separator', (tester) async {
+  testWidgets('omits the period label and its separator', (tester) async {
     await pump(tester);
 
     expect(find.text('0'), findsOneWidget);

@@ -66,8 +66,7 @@ void main() {
       expect(current.start, DateAndTime(2026, 7, 14, 5, 0));
       expect(current.end, DateAndTime(2026, 10, 14, 5, 0));
 
-      final previous =
-          Period.threeMonth.toPeriod(now, startOfDay, offset: -1)!;
+      final previous = Period.threeMonth.toPeriod(now, startOfDay, offset: -1)!;
       expect(previous.start, DateAndTime(2026, 4, 14, 5, 0));
       expect(previous.end, DateAndTime(2026, 7, 14, 5, 0));
     });
@@ -87,6 +86,27 @@ void main() {
     test('all returns null', () {
       final now = DateAndTime(2026, 10, 13, 12, 0);
       expect(Period.all.toPeriod(now, startOfDay), isNull);
+    });
+  });
+
+  group('Period.isLongerThan', () {
+    test('a later declared period is longer', () {
+      const order = [
+        Period.aDay,
+        Period.aWeek,
+        Period.aMonth,
+        Period.threeMonth,
+        Period.aYear,
+        Period.all,
+      ];
+
+      for (var i = 0; i < order.length; i++) {
+        expect(order[i].isLongerThan(order[i]), isFalse);
+        for (var j = 0; j < i; j++) {
+          expect(order[i].isLongerThan(order[j]), isTrue);
+          expect(order[j].isLongerThan(order[i]), isFalse);
+        }
+      }
     });
   });
 

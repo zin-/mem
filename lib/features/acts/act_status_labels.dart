@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/day_act_amount.dart';
 import 'package:mem/features/acts/list/duration.dart';
-import 'package:mem/features/acts/list/target_period_mark.dart';
 import 'package:mem/features/acts/target_ratio_label.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/targets/target.dart';
@@ -41,15 +40,15 @@ class DayTargetLabel extends StatelessWidget {
   final Target _target;
   final DayActAmount _amount;
   final Act? _act;
-  final TargetPeriodMark? _mark;
+  final String? _periodLabel;
 
   const DayTargetLabel(
     this._target,
     this._amount,
     this._act, {
-    TargetPeriodMark? mark,
+    String? periodLabel,
     super.key,
-  }) : _mark = mark;
+  }) : _periodLabel = periodLabel;
 
   static bool shows(Target? target) => target != null && target.value > 0;
 
@@ -61,14 +60,14 @@ class DayTargetLabel extends StatelessWidget {
             TargetUnit.count => TargetRatioLabel(
                 current: _amount.count.toString(),
                 target: _target.value.toString(),
-                mark: _mark,
+                periodLabel: _periodLabel,
               ),
             TargetUnit.time => _TimeTargetLabel(
                 _amount.recorded,
                 // 一時停止してからの時間は作業時間ではない
                 act is ActiveAct ? act.period?.start : null,
                 _target.value,
-                _mark,
+                _periodLabel,
               ),
           };
         },
@@ -76,7 +75,7 @@ class DayTargetLabel extends StatelessWidget {
           '_target': _target,
           '_amount': _amount,
           '_act': _act,
-          '_mark': _mark,
+          '_periodLabel': _periodLabel,
         },
       );
 }
@@ -88,7 +87,7 @@ class ActStatusLabels extends StatelessWidget {
   final Widget? _leading;
   final Widget? _time;
   final bool _centerTime;
-  final TargetPeriodMark? _mark;
+  final String? _periodLabel;
 
   const ActStatusLabels(
     this._act,
@@ -97,12 +96,12 @@ class ActStatusLabels extends StatelessWidget {
     Widget? leading,
     Widget? time,
     bool centerTime = true,
-    TargetPeriodMark? mark,
+    String? periodLabel,
     super.key,
   })  : _leading = leading,
         _time = time,
         _centerTime = centerTime,
-        _mark = mark;
+        _periodLabel = periodLabel;
 
   @override
   Widget build(BuildContext context) => v(
@@ -158,7 +157,7 @@ class ActStatusLabels extends StatelessWidget {
           '_act': _act,
           '_target': _target,
           '_amount': _amount,
-          '_mark': _mark,
+          '_periodLabel': _periodLabel,
         },
       );
 
@@ -171,7 +170,7 @@ class ActStatusLabels extends StatelessWidget {
           amount != null &&
           DayTargetLabel.shows(target) &&
           target.targetUnit == TargetUnit.time)
-        DayTargetLabel(target, amount, _act, mark: _mark),
+        DayTargetLabel(target, amount, _act, periodLabel: _periodLabel),
       if (StateElapsedTime.shows(_act)) StateElapsedTime(_act),
     ];
     if (children.isEmpty) {
@@ -193,7 +192,7 @@ class ActStatusLabels extends StatelessWidget {
         target.targetUnit != TargetUnit.count) {
       return null;
     }
-    return DayTargetLabel(target, amount, _act, mark: _mark);
+    return DayTargetLabel(target, amount, _act, periodLabel: _periodLabel);
   }
 }
 
@@ -201,13 +200,13 @@ class _TimeTargetLabel extends StatefulWidget {
   final Duration _recorded;
   final DateTime? _runningSince;
   final int _targetSeconds;
-  final TargetPeriodMark? _mark;
+  final String? _periodLabel;
 
   const _TimeTargetLabel(
     this._recorded,
     this._runningSince,
     this._targetSeconds,
-    this._mark,
+    this._periodLabel,
   );
 
   @override
@@ -253,14 +252,14 @@ class _TimeTargetLabelState extends State<_TimeTargetLabel> {
           return TargetRatioLabel(
             current: current.formatHHmm(),
             target: Duration(seconds: widget._targetSeconds).formatHHmm(),
-            mark: widget._mark,
+            periodLabel: widget._periodLabel,
           );
         },
         {
           '_recorded': widget._recorded,
           '_runningSince': widget._runningSince,
           '_targetSeconds': widget._targetSeconds,
-          '_mark': widget._mark,
+          '_periodLabel': widget._periodLabel,
         },
       );
 
