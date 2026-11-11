@@ -35,6 +35,8 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  cupertino_ui: any
+  material_ui: any
   intl: any
   flutter_picker_plus: any
   flutter_sticky_header: any

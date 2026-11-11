@@ -2,7 +2,7 @@ import 'dart:async';
 import '../../entity_factories.dart';
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart' hide isNull, isNotNull;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
@@ -64,7 +64,13 @@ class _FakeActEntities extends ActEntities {
   Future<void> startActby(int memId) async {
     _startActbyCallCount++;
     final now = DateTime.now();
-    final act = savedAct(id: 1, memId: memId, start: now, startIsAllDay: false, createdAt: now, updatedAt: now);
+    final act = savedAct(
+        id: 1,
+        memId: memId,
+        start: now,
+        startIsAllDay: false,
+        createdAt: now,
+        updatedAt: now);
     upsert([act]);
   }
 
@@ -72,7 +78,13 @@ class _FakeActEntities extends ActEntities {
   Future<void> resumeActBy(int memId) async {
     _resumeActByCallCount++;
     final now = DateTime.now();
-    final act = savedAct(id: 2, memId: memId, start: now, startIsAllDay: false, createdAt: now, updatedAt: now);
+    final act = savedAct(
+        id: 2,
+        memId: memId,
+        start: now,
+        startIsAllDay: false,
+        createdAt: now,
+        updatedAt: now);
     upsert([act]);
   }
 
@@ -94,7 +106,15 @@ class _FakeActEntities extends ActEntities {
   Future<void> finishActby(int memId) async {
     _finishActbyCallCount++;
     final now = DateTime.now();
-    final act = savedAct(id: 1, memId: memId, start: now, startIsAllDay: false, end: now, endIsAllDay: false, createdAt: now, updatedAt: now);
+    final act = savedAct(
+        id: 1,
+        memId: memId,
+        start: now,
+        startIsAllDay: false,
+        end: now,
+        endIsAllDay: false,
+        createdAt: now,
+        updatedAt: now);
     upsert([act]);
   }
 
@@ -102,7 +122,16 @@ class _FakeActEntities extends ActEntities {
   Future<void> skipActBy(int memId) async {
     _skipActByCallCount++;
     final now = DateTime.now();
-    final act = savedAct(id: 3, memId: memId, start: now, startIsAllDay: false, end: now, endIsAllDay: false, createdAt: now, updatedAt: now, actKind: ActKind.skipped);
+    final act = savedAct(
+        id: 3,
+        memId: memId,
+        start: now,
+        startIsAllDay: false,
+        end: now,
+        endIsAllDay: false,
+        createdAt: now,
+        updatedAt: now,
+        actKind: ActKind.skipped);
     upsert([act]);
   }
 
@@ -289,7 +318,13 @@ void main() {
 
     test('closeByMemId calls client and removes result if closed', () async {
       final now = DateTime.now();
-      final act = savedAct(id: 1, memId: 1, start: now, startIsAllDay: false, createdAt: now, updatedAt: now);
+      final act = savedAct(
+          id: 1,
+          memId: 1,
+          start: now,
+          startIsAllDay: false,
+          createdAt: now,
+          updatedAt: now);
 
       final container = ProviderContainer(
         overrides: [
@@ -359,7 +394,13 @@ void main() {
 
     test('edit calls client and upserts result', () async {
       final now = DateTime.now();
-      final act = savedAct(id: 1, memId: 1, start: now, startIsAllDay: false, createdAt: now, updatedAt: now);
+      final act = savedAct(
+          id: 1,
+          memId: 1,
+          start: now,
+          startIsAllDay: false,
+          createdAt: now,
+          updatedAt: now);
 
       final container = ProviderContainer(
         overrides: [
@@ -377,8 +418,20 @@ void main() {
 
     test('removeAsync calls client and removes results', () async {
       final now = DateTime.now();
-      final act1 = savedAct(id: 1, memId: 1, start: now, startIsAllDay: false, createdAt: now, updatedAt: now);
-      final act2 = savedAct(id: 2, memId: 1, start: now, startIsAllDay: false, createdAt: now, updatedAt: now);
+      final act1 = savedAct(
+          id: 1,
+          memId: 1,
+          start: now,
+          startIsAllDay: false,
+          createdAt: now,
+          updatedAt: now);
+      final act2 = savedAct(
+          id: 2,
+          memId: 1,
+          start: now,
+          startIsAllDay: false,
+          createdAt: now,
+          updatedAt: now);
 
       final container = ProviderContainer(
         overrides: [
@@ -450,8 +503,24 @@ void main() {
 
     test('returns filtered and sorted acts for memId', () async {
       final now = DateTime.now();
-      final act1 = savedAct(id: 1, memId: 1, start: now, startIsAllDay: false, end: now.add(const Duration(hours: 1)), endIsAllDay: false, createdAt: now, updatedAt: now);
-      final act2 = savedAct(id: 2, memId: 2, start: now, startIsAllDay: false, end: now.add(const Duration(hours: 1)), endIsAllDay: false, createdAt: now, updatedAt: now);
+      final act1 = savedAct(
+          id: 1,
+          memId: 1,
+          start: now,
+          startIsAllDay: false,
+          end: now.add(const Duration(hours: 1)),
+          endIsAllDay: false,
+          createdAt: now,
+          updatedAt: now);
+      final act2 = savedAct(
+          id: 2,
+          memId: 2,
+          start: now,
+          startIsAllDay: false,
+          end: now.add(const Duration(hours: 1)),
+          endIsAllDay: false,
+          createdAt: now,
+          updatedAt: now);
 
       final container = ProviderContainer(
         overrides: [
@@ -471,8 +540,17 @@ void main() {
 
     test('filters out acts without period', () {
       final now = DateTime.now();
-      final act1 = savedAct(id: 1, memId: 1, start: now, startIsAllDay: false, end: now.add(const Duration(hours: 1)), endIsAllDay: false, createdAt: now, updatedAt: now);
-      final act2 = savedAct(id: 2, memId: 1, pausedAt: now, createdAt: now, updatedAt: now);
+      final act1 = savedAct(
+          id: 1,
+          memId: 1,
+          start: now,
+          startIsAllDay: false,
+          end: now.add(const Duration(hours: 1)),
+          endIsAllDay: false,
+          createdAt: now,
+          updatedAt: now);
+      final act2 = savedAct(
+          id: 2, memId: 1, pausedAt: now, createdAt: now, updatedAt: now);
 
       final container = ProviderContainer(
         overrides: [
@@ -492,8 +570,24 @@ void main() {
 
     test('sorts acts by period descending', () {
       final now = DateTime.now();
-      final act1 = savedAct(id: 1, memId: 1, start: now, startIsAllDay: false, end: now.add(const Duration(hours: 1)), endIsAllDay: false, createdAt: now, updatedAt: now);
-      final act2 = savedAct(id: 2, memId: 1, start: now.add(const Duration(hours: 2)), startIsAllDay: false, end: now.add(const Duration(hours: 3)), endIsAllDay: false, createdAt: now, updatedAt: now);
+      final act1 = savedAct(
+          id: 1,
+          memId: 1,
+          start: now,
+          startIsAllDay: false,
+          end: now.add(const Duration(hours: 1)),
+          endIsAllDay: false,
+          createdAt: now,
+          updatedAt: now);
+      final act2 = savedAct(
+          id: 2,
+          memId: 1,
+          start: now.add(const Duration(hours: 2)),
+          startIsAllDay: false,
+          end: now.add(const Duration(hours: 3)),
+          endIsAllDay: false,
+          createdAt: now,
+          updatedAt: now);
 
       final container = ProviderContainer(
         overrides: [
@@ -556,8 +650,20 @@ void main() {
   group('latestActsByMem', () {
     test('returns map of memId to latest act', () {
       final now = DateTime.now();
-      final act1 = savedAct(id: 1, memId: 1, start: now, startIsAllDay: false, createdAt: now, updatedAt: now);
-      final act2 = savedAct(id: 2, memId: 2, start: now, startIsAllDay: false, createdAt: now, updatedAt: now);
+      final act1 = savedAct(
+          id: 1,
+          memId: 1,
+          start: now,
+          startIsAllDay: false,
+          createdAt: now,
+          updatedAt: now);
+      final act2 = savedAct(
+          id: 2,
+          memId: 2,
+          start: now,
+          startIsAllDay: false,
+          createdAt: now,
+          updatedAt: now);
 
       final container = ProviderContainer(
         overrides: [
@@ -589,8 +695,20 @@ void main() {
 
     test('returns latest act when multiple acts for same memId', () {
       final now = DateTime.now();
-      final act1 = savedAct(id: 1, memId: 1, start: now, startIsAllDay: false, createdAt: now, updatedAt: now);
-      final act2 = savedAct(id: 2, memId: 1, start: now.add(const Duration(hours: 1)), startIsAllDay: false, createdAt: now, updatedAt: now);
+      final act1 = savedAct(
+          id: 1,
+          memId: 1,
+          start: now,
+          startIsAllDay: false,
+          createdAt: now,
+          updatedAt: now);
+      final act2 = savedAct(
+          id: 2,
+          memId: 1,
+          start: now.add(const Duration(hours: 1)),
+          startIsAllDay: false,
+          createdAt: now,
+          updatedAt: now);
 
       final container = ProviderContainer(
         overrides: [
@@ -608,7 +726,13 @@ void main() {
 
     test('returns null for memId when no acts exist', () {
       final now = DateTime.now();
-      final act1 = savedAct(id: 1, memId: 1, start: now, startIsAllDay: false, createdAt: now, updatedAt: now);
+      final act1 = savedAct(
+          id: 1,
+          memId: 1,
+          start: now,
+          startIsAllDay: false,
+          createdAt: now,
+          updatedAt: now);
 
       final container = ProviderContainer(
         overrides: [

@@ -1,5 +1,5 @@
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:mem/features/acts/act.dart';
@@ -102,8 +102,7 @@ class _MemListWidget extends StatelessWidget {
                               startOfToday,
                               memNotifications,
                               target: element.target,
-                              todayCount:
-                                  _periodCountByMemId[element.id] ?? 0,
+                              todayCount: _periodCountByMemId[element.id] ?? 0,
                             );
                       },
                     )

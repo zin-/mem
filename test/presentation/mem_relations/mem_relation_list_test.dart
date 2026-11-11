@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../../entity_factories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
@@ -11,6 +11,7 @@ import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/framework/date_and_time/time_text_form_field.dart';
 import 'package:mem/generated/l10n/app_localizations.dart';
+import 'package:mem/l10n/l10n.dart';
 
 final _l10n = lookupAppLocalizations(const Locale('en'));
 
@@ -55,7 +56,7 @@ Widget _buildTestApp(Widget child, {List<Override>? overrides}) {
     overrides: overrides ?? [],
     child: MaterialApp(
       locale: const Locale('en'),
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      localizationsDelegates: appLocalizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(
         body: child,
@@ -70,8 +71,10 @@ void main() {
         (tester) async {
       const sourceMemId = 1;
       final now = DateTime.now();
-      final mem1 = savedMem(id: 1, name: 'Mem 1', createdAt: now, updatedAt: now);
-      final mem2 = savedMem(id: 2, name: 'Mem 2', createdAt: now, updatedAt: now);
+      final mem1 =
+          savedMem(id: 1, name: 'Mem 1', createdAt: now, updatedAt: now);
+      final mem2 =
+          savedMem(id: 2, name: 'Mem 2', createdAt: now, updatedAt: now);
 
       final relation1 = MemRelationEntityV1.by(
         sourceMemId,
@@ -210,7 +213,8 @@ void main() {
         (tester) async {
       const sourceMemId = 1;
       final now = DateTime.now();
-      final mem1 = savedMem(id: 1, name: 'Mem 1', createdAt: now, updatedAt: now);
+      final mem1 =
+          savedMem(id: 1, name: 'Mem 1', createdAt: now, updatedAt: now);
 
       final relation1 = MemRelationEntityV1.by(
         sourceMemId,
@@ -299,7 +303,8 @@ void main() {
     testWidgets('calls onChanged when value is changed', (tester) async {
       const sourceMemId = 1;
       final now = DateTime.now();
-      final mem1 = savedMem(id: 1, name: 'Mem 1', createdAt: now, updatedAt: now);
+      final mem1 =
+          savedMem(id: 1, name: 'Mem 1', createdAt: now, updatedAt: now);
 
       final relation1 = MemRelationEntityV1.by(
         sourceMemId,
@@ -339,7 +344,11 @@ void main() {
       final now = DateTime.now();
       final mems = List.generate(
           4,
-          (index) => savedMem(id: index + 1, name: 'Mem ${index + 1}', createdAt: now, updatedAt: now));
+          (index) => savedMem(
+              id: index + 1,
+              name: 'Mem ${index + 1}',
+              createdAt: now,
+              updatedAt: now));
 
       final relations = mems
           .map((mem) => MemRelationEntityV1.by(
@@ -382,7 +391,11 @@ void main() {
       final now = DateTime.now();
       final mems = List.generate(
           2,
-          (index) => savedMem(id: index + 1, name: 'Mem ${index + 1}', createdAt: now, updatedAt: now));
+          (index) => savedMem(
+              id: index + 1,
+              name: 'Mem ${index + 1}',
+              createdAt: now,
+              updatedAt: now));
 
       final relations = mems
           .map((mem) => MemRelationEntityV1.by(
@@ -422,7 +435,8 @@ void main() {
     testWidgets('calls onChanged with 0 when value is null', (tester) async {
       const sourceMemId = 1;
       final now = DateTime.now();
-      final mem1 = savedMem(id: 1, name: 'Mem 1', createdAt: now, updatedAt: now);
+      final mem1 =
+          savedMem(id: 1, name: 'Mem 1', createdAt: now, updatedAt: now);
 
       final relation1 = MemRelationEntityV1.by(
         sourceMemId,

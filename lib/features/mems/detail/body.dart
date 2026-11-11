@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/mem_items/mem_items_view.dart';
 import 'package:mem/features/mem_notifications/mem_notifications_view.dart';
@@ -42,14 +42,14 @@ class MemDetailBody extends ConsumerWidget {
                   (ids) => ids.contains(memId),
                 ),
               );
-          void onMemDoneChanged(bool? value) => ref
-              .read(editingMemByMemIdProvider(_memId).notifier)
-              .updatedBy(
-                editingMem.updatedWith(
-                  (mem) =>
-                      value == true ? mem.done(DateTime.now()) : mem.undone(),
-                ),
-              );
+          void onMemDoneChanged(bool? value) =>
+              ref.read(editingMemByMemIdProvider(_memId).notifier).updatedBy(
+                    editingMem.updatedWith(
+                      (mem) => value == true
+                          ? mem.done(DateTime.now())
+                          : mem.undone(),
+                    ),
+                  );
 
           return _MemDetailBodyComponent(
             _memId,
