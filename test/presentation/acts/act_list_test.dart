@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act_entity.dart';
+import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/acts/list/act_list.dart';
 import 'package:mem/features/acts/list/item/total_act_time_item.dart';
 import 'package:mem/features/acts/list/states.dart';
@@ -55,7 +56,7 @@ Future<void> _pumpActList(
   WidgetTester tester, {
   required List<SavedActEntityV1> acts,
   required TimeOfDay startOfDay,
-  bool isDateView = true,
+  Period group = Period.aDay,
 }) async {
   await tester.binding.setSurfaceSize(const Size(390, 844));
   addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -66,10 +67,10 @@ Future<void> _pumpActList(
         preferenceProvider(startOfDayKey).overrideWith(
           () => _FakePreference(startOfDay),
         ),
-        if (!isDateView)
-          dateViewProvider.overrideWith(
-            (ref) => ValueStateNotifier(false),
-          ),
+        // dateViewProvider はまだ bool。日以外は月表示になり、週・四半期・年は出ない
+        dateViewProvider.overrideWith(
+          (ref) => ValueStateNotifier(group == Period.aDay),
+        ),
         memEntitiesProvider.overrideWith(
           () => _FakeMemEntities([
             savedMem(id: _memId, name: _memName),
@@ -138,12 +139,69 @@ void main() {
           _act(2, DateTime(2026, 10, 31, 10)),
         ],
         startOfDay: _fiveAm,
-        isDateView: false,
+        group: Period.aMonth,
       );
 
       expect(find.text('October 2026'), findsOneWidget);
       expect(find.text('2'), findsOneWidget);
       expect(find.text('November 2026'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'groups an act before start of day with the previous week',
+    (tester) async {
+      await _pumpActList(
+        tester,
+        acts: [
+          _act(1, DateTime(2026, 10, 12, 3)),
+          _act(2, DateTime(2026, 10, 6, 10)),
+        ],
+        startOfDay: _fiveAm,
+        group: Period.aWeek,
+      );
+
+      expect(find.text('10/5/2026 – 10/11/2026'), findsOneWidget);
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('10/12/2026 – 10/18/2026'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'groups an act before start of day with the previous quarter',
+    (tester) async {
+      await _pumpActList(
+        tester,
+        acts: [
+          _act(1, DateTime(2026, 10, 1, 3)),
+          _act(2, DateTime(2026, 8, 15, 10)),
+        ],
+        startOfDay: _fiveAm,
+        group: Period.threeMonth,
+      );
+
+      expect(find.text('7/1/2026 – 9/30/2026'), findsOneWidget);
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('10/1/2026 – 12/31/2026'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'groups an act before start of day with the previous year',
+    (tester) async {
+      await _pumpActList(
+        tester,
+        acts: [
+          _act(1, DateTime(2026, 1, 1, 3)),
+          _act(2, DateTime(2025, 6, 15, 10)),
+        ],
+        startOfDay: _fiveAm,
+        group: Period.aYear,
+      );
+
+      expect(find.text('2025'), findsOneWidget);
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('2026'), findsNothing);
     },
   );
 }
