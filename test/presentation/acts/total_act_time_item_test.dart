@@ -1,7 +1,9 @@
+import 'package:drift/drift.dart' hide isNull;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/databases/database.dart' hide Act, Mem, Target;
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/day_act_amount.dart';
@@ -9,8 +11,10 @@ import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/acts/list/act_list_group.dart';
 import 'package:mem/features/acts/list/item/total_act_time_item.dart';
 import 'package:mem/features/acts/states.dart';
+import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_view.dart';
+import 'package:mem/framework/singleton.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
@@ -614,20 +618,38 @@ void main() {
       expect(find.byType(LiveElapsedTimeText), findsOneWidget);
     });
 
-    testWidgets('shows that day count to the right of the total',
+    testWidgets('shows the month count and unit to the right of the total',
         (tester) async {
+      const monthCount = 2;
+      final onTheDay = DateTime(2024, 6, 1, 10);
+      // 6/1 で終わる直近1ヶ月の外で、暦月の中
+      final laterInCalendarMonth = DateTime(2024, 6, 20, 10);
+      final db = await _openMemoryDatabase();
+      await _insertAct(db, memId: _memId, start: onTheDay);
+      await _insertAct(db, memId: _memId, start: laterInCalendarMonth);
+      await _insertAct(
+        db,
+        memId: _memId,
+        start: DateTime(2024, 6, 15, 10),
+        actKind: ActKind.skipped.name,
+      );
+      await _insertAct(db, memId: _memId, start: DateTime(2024, 7, 1, 10));
+      await _insertAct(db,
+          memId: _otherMemId, start: DateTime(2024, 6, 10, 10));
+
       await pumpItem(
         tester,
         mem,
         groupDate: DateTime(2024, 6, 1),
         target: _target(TargetUnit.count, 5),
-        dayAmount: const DayActAmount(2, Duration.zero),
+        acts: [_finishedAct(onTheDay)],
       );
 
-      expect(find.text('2'), findsOneWidget);
-      expect(find.text(' / '), findsOneWidget);
-      expect(find.text('5'), findsOneWidget);
+      expect(find.text('$monthCount'), findsOneWidget);
       expect(find.text('1'), findsNothing);
+      expect(find.text(' / '), findsNWidgets(2));
+      expect(find.text('5'), findsOneWidget);
+      expect(find.text('m'), findsOneWidget);
       expect(find.text('1:00'), findsOneWidget);
       expect(find.byType(LiveElapsedTimeText), findsNothing);
       final row = tester.getRect(
@@ -640,9 +662,47 @@ void main() {
       );
       expect(tester.getTopLeft(find.text('1:00')).dx, closeTo(row.left, 1));
       expect(
-        tester.getTopRight(find.text('5')).dx,
+        tester.getTopRight(find.text('m')).dx,
         closeTo(row.right, 1),
       );
+    });
+
+    testWidgets('shows the week count and unit on a day row', (tester) async {
+      const weekCount = 2;
+      const targetValue = 3;
+      final onTheDay = DateTime(2024, 6, 1, 10);
+      // 月曜始まりの同じ週。6/1 で終わる直近7日の外
+      final laterInCalendarWeek = DateTime(2024, 6, 2, 10);
+      final db = await _openMemoryDatabase();
+      await _insertAct(db, memId: _memId, start: onTheDay);
+      await _insertAct(db, memId: _memId, start: laterInCalendarWeek);
+      await _insertAct(
+        db,
+        memId: _memId,
+        start: DateTime(2024, 5, 29, 10),
+        actKind: ActKind.skipped.name,
+      );
+      await _insertAct(db, memId: _memId, start: DateTime(2024, 6, 3, 10));
+      await _insertAct(db,
+          memId: _otherMemId, start: DateTime(2024, 5, 28, 10));
+
+      await pumpItem(
+        tester,
+        mem,
+        groupDate: DateTime(2024, 6, 1),
+        target: _target(
+          TargetUnit.count,
+          targetValue,
+          period: Period.aWeek,
+        ),
+        acts: [_finishedAct(onTheDay)],
+      );
+
+      expect(find.text('$weekCount'), findsOneWidget);
+      expect(find.text('1'), findsNothing);
+      expect(find.text(' / '), findsNWidgets(2));
+      expect(find.text('$targetValue'), findsOneWidget);
+      expect(find.text('w'), findsOneWidget);
     });
 
     testWidgets('shows that day recorded time over the time target',
@@ -678,13 +738,68 @@ void main() {
   });
 }
 
-Target _target(TargetUnit unit, int value) => Target(
+const _otherMemId = 3;
+
+Target _target(
+  TargetUnit unit,
+  int value, {
+  Period period = Period.aMonth,
+}) =>
+    Target(
       memId: _memId,
       targetType: TargetType.equalTo,
       targetUnit: unit,
       value: value,
-      period: Period.aMonth,
+      period: period,
     );
+
+SavedActEntityV1 _finishedAct(DateTime start) => savedAct(
+      id: 1,
+      memId: _memId,
+      start: start,
+      end: start.add(const Duration(hours: 1)),
+      createdAt: start,
+    );
+
+Future<AppDatabase> _openMemoryDatabase() async {
+  final db = AppDatabase.memory();
+  await Migrator(db).createAll();
+  DriftDatabaseAccessor.reset();
+  Singleton.override<DriftDatabaseAccessor>(
+    DriftDatabaseAccessor.withDatabase(db),
+  );
+  addTearDown(() async {
+    await db.close();
+    DriftDatabaseAccessor.reset();
+  });
+  final createdAt = DateTime(2024, 6, 1);
+  Future<void> insertMem(int id, String name) => db.into(db.mems).insert(
+        MemsCompanion.insert(
+          id: Value(id),
+          name: name,
+          createdAt: createdAt,
+        ),
+      );
+  await insertMem(_memId, _memName);
+  await insertMem(_otherMemId, 'mem-b');
+  return db;
+}
+
+Future<void> _insertAct(
+  AppDatabase db, {
+  required int memId,
+  required DateTime start,
+  String? actKind,
+}) =>
+    db.into(db.acts).insert(
+          ActsCompanion.insert(
+            memId: memId,
+            createdAt: start,
+            start: Value(start),
+            end: Value(start.add(const Duration(hours: 1))),
+            actKind: Value(actKind),
+          ),
+        );
 
 String _timeText(WidgetTester tester, DateTime dateTime) =>
     TimeOfDay.fromDateTime(dateTime).format(
