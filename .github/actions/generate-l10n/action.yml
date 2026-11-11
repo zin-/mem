@@ -7,7 +7,7 @@ runs:
   steps:
     #    - id: cache
     #      name: "Cache"
-    #      uses: actions/cache@v4
+    #      uses: actions/cache@v6
     #      with:
     #        path: |
     #          .dart_tool/flutter_gen/gen_l10n/**.dart
