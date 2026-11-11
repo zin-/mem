@@ -9,7 +9,7 @@ import 'preference/preference_key.dart';
 
 part 'states.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class Preference<T> extends _$Preference<T> {
   @override
   T build(PreferenceKey<T> key) => v(
