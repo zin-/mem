@@ -37,5 +37,6 @@ analyzer:
     - windows/**
     - macos/**
     - linux/**
-  plugins:
-    # - custom_lint  # Temporarily disabled due to Riverpod 3.0 compatibility issues
+
+plugins:
+  riverpod_lint: ^3.2.0
