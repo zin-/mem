@@ -5,11 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_relations/mem_relation.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
-import 'package:mem/features/mem_relations/mem_relation_search_dialog.dart';
 import 'package:mem/features/mem_relations/mem_relation_state.dart';
 import 'package:mem/features/mems/mem.dart';
+import 'package:mem/features/mems/mem_select_dialog.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/framework/date_and_time/time_text_form_field.dart';
+import 'package:mem/l10n/l10n.dart';
 
 class MemRelationList extends ConsumerWidget {
   final int? sourceMemId;
@@ -22,6 +23,7 @@ class MemRelationList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
+          final l10n = buildL10n(context);
           return ref
               .watch(memRelationEntitiesByMemIdProvider(sourceMemId))
               .when(
@@ -51,12 +53,19 @@ class MemRelationList extends ConsumerWidget {
                 showDialog: v(
                   () => () => showDialog(
                         context: context,
-                        builder: (context) => MemRelationDialogStateful(
-                          sourceMemId: sourceMemId,
+                        builder: (context) => MemSelectDialog(
+                          candidates: ref.read(memEntitiesProvider).toList(),
+                          mode: MemSelectMode.multiple,
+                          excludedMemIds: sourceMemId == null
+                              ? const <int>{}
+                              : {sourceMemId!},
                           selectedMemIds:
                               selectedMems.map((e) => e.id!).toList(),
+                          title: l10n.addRelationTitle,
+                          confirmLabel: l10n.addAction,
+                          cancelLabel: l10n.cancelAction,
                           onSubmit: (selectedIds) {
-                            for (var selectedId in selectedIds) {
+                            for (final selectedId in selectedIds) {
                               onChanged(selectedId, 0);
                             }
                           },
@@ -70,7 +79,7 @@ class MemRelationList extends ConsumerWidget {
               return const CircularProgressIndicator();
             },
             error: (error, stackTrace) {
-              return const Text("Error");
+              return Text(l10n.loadError);
             },
           );
         },
@@ -99,9 +108,10 @@ class _MemRelationList extends StatelessWidget {
   @override
   Widget build(BuildContext context) => v(
         () {
+          final l10n = buildL10n(context);
           return Column(
             children: [
-              Text("Relations"),
+              Text(l10n.relationsTitle),
               SizedBox(
                 height: min(selectedMems.length * itemHeight, maxHeight),
                 child: ListView.builder(
@@ -123,7 +133,7 @@ class _MemRelationList extends StatelessWidget {
               TextButton.icon(
                 onPressed: showDialog,
                 icon: const Icon(Icons.add),
-                label: const Text("Add Relation"),
+                label: Text(l10n.addRelationTitle),
               ),
             ],
           );

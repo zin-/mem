@@ -94,6 +94,16 @@ void main() {
         const Duration(seconds: 10),
       );
 
+  Future<void> confirmSelection(WidgetTester tester) async {
+    await tester.pump();
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.text(_l10n.okAction),
+      ),
+    );
+  }
+
   MemEntity entity(ProviderContainer container, int id) =>
       container.read(memEntitiesProvider).singleWhere((mem) => mem.id == id);
 
@@ -170,7 +180,7 @@ void main() {
     );
     expect(
       tester.getTopLeft(find.text('Parent')).dy,
-      lessThan(tester.getTopLeft(find.text('Relations')).dy),
+      lessThan(tester.getTopLeft(find.text(_l10n.relationsTitle)).dy),
     );
   });
 
@@ -211,6 +221,7 @@ void main() {
     await tester.tap(
       find.descendant(of: dialog, matching: find.text('Parent A')),
     );
+    await confirmSelection(tester);
     await tester.pumpAndSettle(
       const Duration(milliseconds: 50),
       EnginePhase.sendSemanticsUpdate,
@@ -224,7 +235,8 @@ void main() {
       (await MemRepository().shipParentByMemId(child.id))?.parentMemId,
       parentA.id,
     );
-    expect(container.read(parentMemIdsWithUndoneChildrenProvider), {parentA.id});
+    expect(
+        container.read(parentMemIdsWithUndoneChildrenProvider), {parentA.id});
 
     await tester.tap(find.text('Parent A'));
     await tester.pumpAndSettle(
@@ -264,6 +276,7 @@ void main() {
     );
 
     await tester.tap(find.widgetWithText(ListTile, 'Parent B'));
+    await confirmSelection(tester);
     await tester.pumpAndSettle(
       const Duration(milliseconds: 50),
       EnginePhase.sendSemanticsUpdate,
@@ -276,7 +289,8 @@ void main() {
       (await MemRepository().shipParentByMemId(child.id))?.parentMemId,
       parentB.id,
     );
-    expect(container.read(parentMemIdsWithUndoneChildrenProvider), {parentB.id});
+    expect(
+        container.read(parentMemIdsWithUndoneChildrenProvider), {parentB.id});
 
     await tester.tap(find.byIcon(Icons.close));
     await tester.pumpAndSettle(
@@ -339,7 +353,7 @@ void main() {
     );
     expect(
       tester.getTopLeft(find.text('Child B')).dy,
-      lessThan(tester.getTopLeft(find.text('Relations')).dy),
+      lessThan(tester.getTopLeft(find.text(_l10n.relationsTitle)).dy),
     );
   });
 
@@ -473,6 +487,33 @@ void main() {
     );
   });
 
+  testWidgets('hides archived mems from the parent picker', (tester) async {
+    final child = await insertMem('Child');
+    await insertMem('Active');
+    final archived = await insertMem('Archived');
+    await MemRepository().replace(
+      archived.updatedWith(
+        archivedAt: () => DateTime(2024, 1, 1),
+        items: () => null,
+      ),
+    );
+
+    await pumpDetail(tester, child.id);
+
+    await tester.tap(find.text(_l10n.parentNone));
+    await settle(tester);
+
+    final dialog = find.byType(AlertDialog);
+    expect(
+      find.descendant(of: dialog, matching: find.text('Active')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: dialog, matching: find.text('Archived')),
+      findsNothing,
+    );
+  });
+
   testWidgets('leaves the parent unset when the picker is cancelled',
       (tester) async {
     final child = await insertMem('Child');
@@ -489,6 +530,23 @@ void main() {
         matching: find.text(_l10n.cancelAction),
       ),
     );
+    await settle(tester);
+
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.text(_l10n.parentNone), findsOneWidget);
+    expect(await MemRepository().shipParentByMemId(child.id), isNull);
+  });
+
+  testWidgets('leaves the parent unset when nothing is chosen', (tester) async {
+    final child = await insertMem('Child');
+    await insertMem('Parent');
+
+    await pumpDetail(tester, child.id);
+
+    await tester.tap(find.text(_l10n.parentNone));
+    await settle(tester);
+
+    await confirmSelection(tester);
     await settle(tester);
 
     expect(find.byType(AlertDialog), findsNothing);
@@ -517,6 +575,7 @@ void main() {
         matching: find.text('Child'),
       ),
     );
+    await confirmSelection(tester);
     await settle(tester);
 
     expect(find.byType(AlertDialog), findsNothing);
@@ -552,6 +611,7 @@ void main() {
         matching: find.text('Next'),
       ),
     );
+    await confirmSelection(tester);
     await settle(tester);
 
     expect(find.text('Next'), findsOneWidget);
@@ -601,6 +661,7 @@ void main() {
           matching: find.text('Parent'),
         ),
       );
+      await confirmSelection(tester);
       await tester.pump();
       await tester.pumpWidget(const SizedBox.shrink());
     } finally {
@@ -638,8 +699,7 @@ void main() {
     expect(entity(container, child.id).parentMemId, parent.id);
   });
 
-  testWidgets(
-      'disables the undone checkbox when the id is in the set',
+  testWidgets('disables the undone checkbox when the id is in the set',
       (tester) async {
     final parent = await insertMem('Parent');
     await pumpDetail(
