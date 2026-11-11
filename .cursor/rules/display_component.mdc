@@ -1,0 +1,64 @@
+---
+alwaysApply: true
+---
+
+# 一塊の表示は Widget にする
+
+`0 / 5 / w` のような一塊の表示は、親が `Text` や単位文字列を並べて作らない。
+
+その表示の Widget を一つ定義し、出す場所はすべてそれを使う。回数も時間も、` / ` と印を出すのはその Widget だけ。
+
+印の有無は型（`TargetPeriodMark`）が持つ。Widget はその型を描く。`mark == null` なら `0 / 5`、あるなら `0 / 5 / w`。
+
+## Example(具体例)
+
+**❌ 回数用と時間用がそれぞれ ` / ` を書く:**
+
+```dart
+Wrap(
+  children: [
+    Text(count.toString()),
+    const Text(' / '),
+    Text(target.toString()),
+    if (unit != null) ...[
+      const Text(' / '),
+      Text(unit),
+    ],
+  ],
+)
+
+Wrap(
+  children: [
+    Text(current.formatHHmm()),
+    const Text(' / '),
+    Text(Duration(seconds: targetSeconds).formatHHmm()),
+    if (unit != null) ...[
+      const Text(' / '),
+      Text(unit),
+    ],
+  ],
+)
+```
+
+**✅ `TargetRatioLabel` に渡す:**
+
+```dart
+TargetRatioLabel(
+  current: count.toString(),
+  target: target.toString(),
+  mark: mark,
+)
+
+TargetRatioLabel(
+  current: current.formatHHmm(),
+  target: Duration(seconds: targetSeconds).formatHHmm(),
+  mark: mark,
+)
+```
+
+## Relations(関連)
+
+- Dry（同じ表示を一箇所にまとめる）
+- ドメインは型にする（印の有無は `TargetPeriodMark` が持つ）
+- `TargetRatioLabel`
+- `TargetPeriodMark`
