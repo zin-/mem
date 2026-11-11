@@ -10,6 +10,9 @@ import 'package:mem/features/mem_relations/mem_relation_widget.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/framework/date_and_time/time_text_form_field.dart';
+import 'package:mem/generated/l10n/app_localizations.dart';
+
+final _l10n = lookupAppLocalizations(const Locale('en'));
 
 class _FakeMemEntities extends MemEntities {
   final Iterable<MemEntity> _state;
@@ -51,6 +54,9 @@ Widget _buildTestApp(Widget child, {List<Override>? overrides}) {
   return ProviderScope(
     overrides: overrides ?? [],
     child: MaterialApp(
+      locale: const Locale('en'),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(
         body: child,
       ),
@@ -97,11 +103,11 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.text('Relations'), findsOneWidget);
+      expect(find.text(_l10n.relationsTitle), findsOneWidget);
       expect(find.text('Mem 1'), findsOneWidget);
       expect(find.text('Mem 2'), findsOneWidget);
       expect(find.byType(TimeTextFormField), findsNWidgets(2));
-      expect(find.text('Add Relation'), findsOneWidget);
+      expect(find.text(_l10n.addRelationTitle), findsOneWidget);
     });
 
     testWidgets('displays CircularProgressIndicator when loading',
@@ -152,7 +158,7 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.text('Error'), findsOneWidget);
+      expect(find.text(_l10n.loadError), findsOneWidget);
     });
 
     testWidgets('displays empty list when no relations', (tester) async {
@@ -174,9 +180,9 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.text('Relations'), findsOneWidget);
+      expect(find.text(_l10n.relationsTitle), findsOneWidget);
       expect(find.byType(ListTile), findsNothing);
-      expect(find.text('Add Relation'), findsOneWidget);
+      expect(find.text(_l10n.addRelationTitle), findsOneWidget);
     });
 
     testWidgets('handles sourceMemId null', (tester) async {
@@ -196,8 +202,8 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.text('Relations'), findsOneWidget);
-      expect(find.text('Add Relation'), findsOneWidget);
+      expect(find.text(_l10n.relationsTitle), findsOneWidget);
+      expect(find.text(_l10n.addRelationTitle), findsOneWidget);
     });
 
     testWidgets('opens dialog when Add Relation button is pressed',
@@ -229,7 +235,7 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Add Relation').first);
+      await tester.tap(find.text(_l10n.addRelationTitle).first);
       await tester.pumpAndSettle();
 
       expect(find.byType(Dialog), findsOneWidget);
@@ -305,7 +311,7 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.text('Relations'), findsOneWidget);
+      expect(find.text(_l10n.relationsTitle), findsOneWidget);
       expect(find.byType(TimeTextFormField), findsNWidgets(4));
 
       final sizedBoxes = find.byType(SizedBox);
@@ -348,7 +354,7 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.text('Relations'), findsOneWidget);
+      expect(find.text(_l10n.relationsTitle), findsOneWidget);
       expect(find.byType(TimeTextFormField), findsNWidgets(2));
 
       final sizedBoxes = find.byType(SizedBox);

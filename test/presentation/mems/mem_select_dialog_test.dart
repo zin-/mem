@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_select_dialog.dart';
+import 'package:mem/l10n/l10n.dart';
 
 import '../../entity_factories.dart';
 import '../../helpers.dart';
@@ -83,6 +84,10 @@ void main() {
       expect(find.byType(AlertDialog), findsOneWidget);
       expect(find.text(_title), findsOneWidget);
       expect(find.byType(TextField), findsOneWidget);
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).decoration?.hintText,
+        buildL10n(tester.element(find.byType(TextField))).searchMemHint,
+      );
       expect(find.text('Mem 1'), findsOneWidget);
       expect(find.text('Mem 2'), findsOneWidget);
     });

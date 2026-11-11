@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/l10n/l10n.dart';
 import 'package:mem/values/dimens.dart';
 
 enum MemSelectMode { single, multiple }
@@ -99,9 +100,9 @@ class _MemSelectDialogState extends State<MemSelectDialog> {
               child: Column(
                 children: [
                   TextField(
-                    decoration: const InputDecoration(
-                      hintText: 'memを検索...',
-                      prefixIcon: Icon(Icons.search),
+                    decoration: InputDecoration(
+                      hintText: buildL10n(context).searchMemHint,
+                      prefixIcon: const Icon(Icons.search),
                     ),
                     onChanged: (value) => setState(() => _searchText = value),
                   ),

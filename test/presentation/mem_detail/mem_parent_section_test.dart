@@ -180,7 +180,7 @@ void main() {
     );
     expect(
       tester.getTopLeft(find.text('Parent')).dy,
-      lessThan(tester.getTopLeft(find.text('Relations')).dy),
+      lessThan(tester.getTopLeft(find.text(_l10n.relationsTitle)).dy),
     );
   });
 
@@ -353,7 +353,7 @@ void main() {
     );
     expect(
       tester.getTopLeft(find.text('Child B')).dy,
-      lessThan(tester.getTopLeft(find.text('Relations')).dy),
+      lessThan(tester.getTopLeft(find.text(_l10n.relationsTitle)).dy),
     );
   });
 
