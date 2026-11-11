@@ -154,5 +154,11 @@
 
   "parentNone": "None",
   "disconnectParentAction": "Disconnect",
-  "selectParentTitle": "Select parent"
+  "selectParentTitle": "Select parent",
+
+  "relationsTitle": "Relations",
+  "addRelationTitle": "Add Relation",
+  "addAction": "Add",
+  "searchMemHint": "Search mem...",
+  "loadError": "Error"
 }
