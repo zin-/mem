@@ -241,6 +241,61 @@ void main() {
       expect(find.byType(Dialog), findsOneWidget);
     });
 
+    testWidgets('adds the mems chosen in the dialog', (tester) async {
+      const sourceMemId = 1;
+      final now = DateTime.now();
+      final source = savedMem(
+        id: sourceMemId,
+        name: 'Mem 1',
+        createdAt: now,
+        updatedAt: now,
+      );
+      final target = savedMem(
+        id: 2,
+        name: 'Mem 2',
+        createdAt: now,
+        updatedAt: now,
+      );
+
+      await tester.pumpWidget(
+        _buildTestApp(
+          const MemRelationList(sourceMemId: sourceMemId),
+          overrides: [
+            memRelationEntitiesByMemIdProvider(sourceMemId).overrideWith(
+              () => _FakeMemRelationEntitiesByMemId(
+                (memId) async => <MemRelationEntityV1>[],
+              ),
+            ),
+            memEntitiesProvider.overrideWith(
+              () => _FakeMemEntities([source, target]),
+            ),
+          ],
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text(_l10n.addRelationTitle));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Mem 1'), findsNothing);
+      expect(find.text('Mem 2'), findsOneWidget);
+
+      await tester.tap(find.widgetWithText(CheckboxListTile, 'Mem 2'));
+      await tester.pump();
+      await tester.tap(find.text(_l10n.addAction));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(Dialog), findsNothing);
+      expect(find.text('Mem 2'), findsOneWidget);
+      expect(
+        tester
+            .widget<TimeTextFormField>(find.byType(TimeTextFormField))
+            .secondsOfTime,
+        0,
+      );
+    });
+
     testWidgets('calls onChanged when value is changed', (tester) async {
       const sourceMemId = 1;
       final now = DateTime.now();

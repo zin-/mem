@@ -287,5 +287,44 @@ void main() {
       expect(submitted, [2]);
       expect(find.byType(Dialog), findsNothing);
     });
+
+    testWidgets(
+        'submits nothing when single mode is confirmed with no selection',
+        (tester) async {
+      List<int>? submitted;
+
+      await _open(
+        tester,
+        mode: MemSelectMode.single,
+        candidates: [_mem(1, 'Mem 1')],
+        onSubmit: (ids) => submitted = ids,
+      );
+
+      await tester.tap(find.text(_confirmLabel));
+      await tester.pumpAndSettle();
+
+      expect(submitted, isEmpty);
+      expect(find.byType(Dialog), findsNothing);
+    });
+
+    testWidgets('keeps the single selection when the group reports no value',
+        (tester) async {
+      await _open(
+        tester,
+        mode: MemSelectMode.single,
+        candidates: [_mem(1, 'Mem 1')],
+        selectedMemIds: const [1],
+      );
+
+      tester
+          .widget<RadioGroup<int>>(find.byType(RadioGroup<int>))
+          .onChanged(null);
+      await tester.pump();
+
+      expect(
+        tester.widget<RadioGroup<int>>(find.byType(RadioGroup<int>)).groupValue,
+        1,
+      );
+    });
   });
 }

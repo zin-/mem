@@ -537,6 +537,23 @@ void main() {
     expect(await MemRepository().shipParentByMemId(child.id), isNull);
   });
 
+  testWidgets('leaves the parent unset when nothing is chosen', (tester) async {
+    final child = await insertMem('Child');
+    await insertMem('Parent');
+
+    await pumpDetail(tester, child.id);
+
+    await tester.tap(find.text(_l10n.parentNone));
+    await settle(tester);
+
+    await confirmSelection(tester);
+    await settle(tester);
+
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.text(_l10n.parentNone), findsOneWidget);
+    expect(await MemRepository().shipParentByMemId(child.id), isNull);
+  });
+
   testWidgets('keeps no parent when the chosen mem became a descendant',
       (tester) async {
     final editing = await insertMem('Editing');
