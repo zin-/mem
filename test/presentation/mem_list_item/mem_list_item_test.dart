@@ -1282,7 +1282,9 @@ void main() {
         );
 
         expect(find.text('$weekCount'), findsOneWidget);
+        expect(find.text(' / '), findsNWidgets(2));
         expect(find.text('$targetValue'), findsOneWidget);
+        expect(find.text('w'), findsOneWidget);
         expect(find.text('$todayCount'), findsNothing);
       });
 
@@ -1303,7 +1305,9 @@ void main() {
         );
 
         expect(find.text('0'), findsOneWidget);
+        expect(find.text(' / '), findsNWidgets(2));
         expect(find.text('$targetValue'), findsOneWidget);
+        expect(find.text('w'), findsOneWidget);
         expect(find.text('$todayCount'), findsNothing);
       });
 
@@ -1326,7 +1330,9 @@ void main() {
         );
 
         expect(find.text('0'), findsOneWidget);
+        expect(find.text(' / '), findsNWidgets(2));
         expect(find.text('$targetValue'), findsOneWidget);
+        expect(find.text('w'), findsOneWidget);
         expect(find.text('$weekCount'), findsNothing);
         expect(find.text('$todayCount'), findsNothing);
       });
@@ -1349,7 +1355,9 @@ void main() {
         );
 
         expect(find.text('$periodCount'), findsOneWidget);
+        expect(find.text(' / '), findsNWidgets(2));
         expect(find.text('$targetValue'), findsOneWidget);
+        expect(find.text('m'), findsOneWidget);
         expect(find.text('0'), findsNothing);
       });
 
@@ -1446,6 +1454,66 @@ void main() {
           find.text(const Duration(seconds: targetSeconds).formatHHmm()),
           findsOneWidget,
         );
+      });
+
+      testWidgets(
+          'shows the week recorded time and unit for a weekly time target',
+          (tester) async {
+        const targetSeconds = 3 * Duration.secondsPerHour;
+        const weekRecorded = Duration(hours: 1, minutes: 30);
+        const todayRecorded = Duration(minutes: 10);
+        const startOfDay = TimeOfDay(hour: 0, minute: 0);
+        final day = DateAndTime.now().logicalDay(startOfDay);
+        final at = DateTimeExt.startOfToday(startOfDay);
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              memNotificationsByMemIdProvider(memId).overrideWith(
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
+              ),
+              memEntitiesProvider.overrideWith(
+                () => _FakeMemEntities([
+                  savedMemFromDomain(baseMem).updatedWith(
+                    target: () => Target(
+                      memId: memId,
+                      targetType: TargetType.equalTo,
+                      targetUnit: TargetUnit.time,
+                      value: targetSeconds,
+                      period: Period.aWeek,
+                    ),
+                  ),
+                ]),
+              ),
+              preferenceProvider(startOfDayKey)
+                  .overrideWith(() => _FakeStartOfDay()),
+              listPeriodCountByMemIdProvider.overrideWith(
+                (ref) async => <int, int>{},
+              ),
+              viewedDayActAmountProvider(memId, day).overrideWith(
+                (ref) async => const DayActAmount(0, todayRecorded),
+              ),
+              viewedPeriodActAmountProvider(memId, Period.aWeek, at)
+                  .overrideWith(
+                (ref) async => const DayActAmount(0, weekRecorded),
+              ),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                body: MemListItemView(baseMem),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text(weekRecorded.formatHHmm()), findsOneWidget);
+        expect(find.text(todayRecorded.formatHHmm()), findsNothing);
+        expect(
+          find.text(const Duration(seconds: targetSeconds).formatHHmm()),
+          findsOneWidget,
+        );
+        expect(find.text(' / '), findsNWidgets(2));
+        expect(find.text('w'), findsOneWidget);
       });
     });
 
