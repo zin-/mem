@@ -25,7 +25,7 @@ on:
 jobs:
   medium_test-android:
     name: "Medium test (Android) (${{ inputs.target }})"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: ${{ inputs.timeout-minutes }}
 
     # TODO 画面サイズ
