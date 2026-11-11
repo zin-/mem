@@ -174,14 +174,16 @@ void main() {
     test('shouldNotifyRepeat suppresses a reached count inside one day',
         () async {
       final memId = await insertMem();
-      final end = DateTime.now().subtract(const Duration(minutes: 30));
+      // 0時直後に実行すると、30分前の実績が前日へ入り当日の回数が未達になる
+      final now = DateTime(2026, 6, 15, 15);
+      final end = now.subtract(const Duration(minutes: 30));
       await insertTarget(memId: memId, value: 2);
       for (var i = 0; i < 2; i++) {
         final start = end.subtract(Duration(hours: 2 - i));
         await insertAct(memId: memId, start: start, end: end);
       }
 
-      expect(await shouldNotifyRepeat(memId), isFalse);
+      expect(await shouldNotifyRepeat(memId, now: now), isFalse);
     });
 
     test('shouldNotifyRepeat keeps the one-day suppression for other targets',

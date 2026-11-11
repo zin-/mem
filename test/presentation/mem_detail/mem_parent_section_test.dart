@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +11,7 @@ import 'package:mem/features/mem_notifications/mem_notification_repository.dart'
 import 'package:mem/features/mem_parents/mem_parent.dart';
 import 'package:mem/features/mem_relations/mem_relation_repository.dart';
 import 'package:mem/features/mems/detail/body.dart';
+import 'package:mem/features/mems/detail/page.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
@@ -24,6 +27,35 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../helpers.mocks.dart';
 
 final _l10n = lookupAppLocalizations(const Locale('ja'));
+
+// メモリ DB は tap の中で完了する。mounted の return に入るには、その完了を画面を外すまで止める
+class _PausedDatabase {
+  Completer<void>? _release;
+  Future<void>? _pending;
+
+  Future<void> hold(WidgetTester tester) async {
+    final release = Completer<void>();
+    final entered = Completer<void>();
+    _release = release;
+    _pending = DriftDatabaseAccessor().driftDatabase.exclusively(() async {
+      entered.complete();
+      await release.future;
+    });
+    await tester.pump();
+    await entered.future;
+  }
+
+  Future<void> release(WidgetTester tester) async {
+    final release = _release;
+    final pending = _pending;
+    if (release == null || pending == null) return;
+    _release = null;
+    _pending = null;
+    if (!release.isCompleted) release.complete();
+    await pending;
+    await tester.pump();
+  }
+}
 
 void main() {
   final mockedLoggerWrapper = MockLoggerWrapper();
@@ -55,6 +87,15 @@ void main() {
 
   Future<MemEntity> insertMem(String name, {DateTime? doneAt}) =>
       MemRepository().receive(Mem(null, name, doneAt, null));
+
+  Future<void> settle(WidgetTester tester) => tester.pumpAndSettle(
+        const Duration(milliseconds: 50),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
+
+  MemEntity entity(ProviderContainer container, int id) =>
+      container.read(memEntitiesProvider).singleWhere((mem) => mem.id == id);
 
   Future<ProviderContainer> pumpDetail(
     WidgetTester tester,
@@ -91,11 +132,7 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle(
-      const Duration(milliseconds: 50),
-      EnginePhase.sendSemanticsUpdate,
-      const Duration(seconds: 10),
-    );
+    await settle(tester);
     return container;
   }
 
@@ -196,6 +233,36 @@ void main() {
       const Duration(seconds: 10),
     );
 
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.byType(MemDetailPage), findsOneWidget);
+
+    tester.state<NavigatorState>(find.byType(Navigator)).pop();
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 50),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
+
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 50),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
+
+    expect(find.text('Parent A'), findsNothing);
+    expect(find.text(_l10n.parentNone), findsOneWidget);
+    expect(find.byIcon(Icons.close), findsNothing);
+    expect(await MemRepository().shipParentByMemId(child.id), isNull);
+    expect(container.read(parentMemIdsWithUndoneChildrenProvider), isEmpty);
+
+    await tester.tap(find.text(_l10n.parentNone));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 50),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
+
     await tester.tap(find.widgetWithText(ListTile, 'Parent B'));
     await tester.pumpAndSettle(
       const Duration(milliseconds: 50),
@@ -276,6 +343,60 @@ void main() {
     );
   });
 
+  testWidgets('removes only the disconnected child', (tester) async {
+    final parent = await insertMem('Parent');
+    final childA = await insertMem('Child A');
+    final childB = await insertMem('Child B');
+    await MemRepository().receiveParent(
+      MemParent(memId: childA.id, parentMemId: parent.id),
+    );
+    await MemRepository().receiveParent(
+      MemParent(memId: childB.id, parentMemId: parent.id),
+    );
+
+    await pumpDetail(tester, parent.id);
+
+    await tester.tap(
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'Child A'),
+        matching: find.byIcon(Icons.close),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 50),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
+
+    expect(find.text('Child A'), findsNothing);
+    expect(find.text('Child B'), findsOneWidget);
+    expect(find.byType(MemDetailPage), findsNothing);
+    expect(await MemRepository().shipParentByMemId(childA.id), isNull);
+    expect(
+      (await MemRepository().shipParentByMemId(childB.id))?.parentMemId,
+      parent.id,
+    );
+  });
+
+  testWidgets('opens the child mem detail on tap', (tester) async {
+    final parent = await insertMem('Parent');
+    final child = await insertMem('Child');
+    await MemRepository().receiveParent(
+      MemParent(memId: child.id, parentMemId: parent.id),
+    );
+
+    await pumpDetail(tester, parent.id);
+
+    await tester.tap(find.text('Child'));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 50),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
+
+    expect(find.byType(MemDetailPage), findsOneWidget);
+  });
+
   testWidgets('hides the children field when a mem has no children',
       (tester) async {
     final mem = await insertMem('Alone');
@@ -308,7 +429,20 @@ void main() {
 
     await pumpDetail(tester, editing.id);
 
-    await tester.tap(find.text('Ancestor'));
+    expect(find.byIcon(Icons.close), findsNWidgets(2));
+    await tester.tap(
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'Ancestor'),
+        matching: find.byIcon(Icons.close),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 50),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
+
+    await tester.tap(find.text(_l10n.parentNone));
     await tester.pumpAndSettle(
       const Duration(milliseconds: 50),
       EnginePhase.sendSemanticsUpdate,
@@ -339,63 +473,169 @@ void main() {
     );
   });
 
-  testWidgets('disables the current parent in the picker', (tester) async {
+  testWidgets('leaves the parent unset when the picker is cancelled',
+      (tester) async {
     final child = await insertMem('Child');
-    final parent = await insertMem('Parent');
-    final other = await insertMem('Other');
-    await MemRepository().receiveParent(
-      MemParent(memId: child.id, parentMemId: parent.id),
-    );
+    await insertMem('Parent');
 
     await pumpDetail(tester, child.id);
 
-    await tester.tap(find.text('Parent'));
-    await tester.pumpAndSettle(
-      const Duration(milliseconds: 50),
-      EnginePhase.sendSemanticsUpdate,
-      const Duration(seconds: 10),
+    await tester.tap(find.text(_l10n.parentNone));
+    await settle(tester);
+
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.text(_l10n.cancelAction),
+      ),
+    );
+    await settle(tester);
+
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.text(_l10n.parentNone), findsOneWidget);
+    expect(await MemRepository().shipParentByMemId(child.id), isNull);
+  });
+
+  testWidgets('keeps no parent when the chosen mem became a descendant',
+      (tester) async {
+    final editing = await insertMem('Editing');
+    final child = await insertMem('Child');
+    await insertMem('Unrelated');
+
+    await pumpDetail(tester, editing.id);
+
+    await tester.tap(find.text(_l10n.parentNone));
+    await settle(tester);
+
+    await MemRepository().receiveParent(
+      MemParent(memId: child.id, parentMemId: editing.id),
     );
 
-    final dialog = find.byType(AlertDialog);
-    final currentParentTile = find.descendant(
-      of: dialog,
-      matching: find.widgetWithText(ListTile, 'Parent'),
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.text('Child'),
+      ),
     );
-    final otherTile = find.descendant(
-      of: dialog,
-      matching: find.widgetWithText(ListTile, 'Other'),
-    );
-    expect(currentParentTile, findsOneWidget);
-    expect(tester.widget<ListTile>(currentParentTile).enabled, isFalse);
-    expect(tester.widget<ListTile>(otherTile).enabled, isTrue);
+    await settle(tester);
 
-    await tester.tap(currentParentTile);
-    await tester.pumpAndSettle(
-      const Duration(milliseconds: 50),
-      EnginePhase.sendSemanticsUpdate,
-      const Duration(seconds: 10),
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.text(_l10n.parentNone), findsOneWidget);
+    expect(await MemRepository().shipParentByMemId(editing.id), isNull);
+    expect(
+      (await MemRepository().shipParentByMemId(child.id))?.parentMemId,
+      editing.id,
     );
+  });
 
-    expect(find.byType(AlertDialog), findsOneWidget);
+  testWidgets('reloads the previous parent replaced from a stale detail',
+      (tester) async {
+    final child = await insertMem('Child');
+    final previous = await insertMem('Previous');
+    final next = await insertMem('Next');
+
+    final container = await pumpDetail(tester, child.id);
+    await MemRepository().receiveParent(
+      MemParent(memId: child.id, parentMemId: previous.id),
+    );
+    await container.read(memEntitiesProvider.notifier).loadDetail(previous.id);
+    await tester.pump();
+
+    expect(find.text(_l10n.parentNone), findsOneWidget);
+    expect(entity(container, previous.id).childMemIds, [child.id]);
+
+    await tester.tap(find.text(_l10n.parentNone));
+    await settle(tester);
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.text('Next'),
+      ),
+    );
+    await settle(tester);
+
+    expect(find.text('Next'), findsOneWidget);
+    expect(
+      (await MemRepository().shipParentByMemId(child.id))?.parentMemId,
+      next.id,
+    );
+    expect(entity(container, previous.id).childMemIds, isEmpty);
+  });
+
+  testWidgets('does not open the parent picker after the detail is closed',
+      (tester) async {
+    final child = await insertMem('Child');
+    await insertMem('Parent');
+    await pumpDetail(tester, child.id);
+
+    final paused = _PausedDatabase();
+    try {
+      await paused.hold(tester);
+      await tester.tap(find.text(_l10n.parentNone));
+      await tester.pump();
+      await tester.pumpWidget(const SizedBox.shrink());
+    } finally {
+      await paused.release(tester);
+    }
+
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(await MemRepository().shipParentByMemId(child.id), isNull);
+  });
+
+  testWidgets(
+      'does not refresh parent details when the detail closes during save',
+      (tester) async {
+    final child = await insertMem('Child');
+    final parent = await insertMem('Parent');
+    final container = await pumpDetail(tester, child.id);
+
+    await tester.tap(find.text(_l10n.parentNone));
+    await settle(tester);
+
+    final paused = _PausedDatabase();
+    try {
+      await paused.hold(tester);
+      await tester.tap(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.text('Parent'),
+        ),
+      );
+      await tester.pump();
+      await tester.pumpWidget(const SizedBox.shrink());
+    } finally {
+      await paused.release(tester);
+    }
+
     expect(
       (await MemRepository().shipParentByMemId(child.id))?.parentMemId,
       parent.id,
     );
+    expect(entity(container, child.id).parentMemId, isNull);
+  });
 
-    await tester.tap(otherTile);
-    await tester.pumpAndSettle(
-      const Duration(milliseconds: 50),
-      EnginePhase.sendSemanticsUpdate,
-      const Duration(seconds: 10),
+  testWidgets(
+      'does not refresh parent details when the detail closes during disconnect',
+      (tester) async {
+    final child = await insertMem('Child');
+    final parent = await insertMem('Parent');
+    await MemRepository().receiveParent(
+      MemParent(memId: child.id, parentMemId: parent.id),
     );
+    final container = await pumpDetail(tester, child.id);
 
-    expect(find.byType(AlertDialog), findsNothing);
-    expect(find.text('Other'), findsOneWidget);
-    expect(find.text('Parent'), findsNothing);
-    expect(
-      (await MemRepository().shipParentByMemId(child.id))?.parentMemId,
-      other.id,
-    );
+    final paused = _PausedDatabase();
+    try {
+      await paused.hold(tester);
+      await tester.tap(find.byIcon(Icons.close));
+      await tester.pump();
+      await tester.pumpWidget(const SizedBox.shrink());
+    } finally {
+      await paused.release(tester);
+    }
+
+    expect(await MemRepository().shipParentByMemId(child.id), isNull);
+    expect(entity(container, child.id).parentMemId, parent.id);
   });
 
   testWidgets(

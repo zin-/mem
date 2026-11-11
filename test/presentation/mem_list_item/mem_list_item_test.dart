@@ -1452,6 +1452,28 @@ void main() {
     group('next time after last act', () {
       const interval = Duration(hours: 2);
 
+      // 間隔が日付をまたぐと一覧はその時刻を出さない
+      bool intervalStaysOnActDay(DateTime end) {
+        final next = end.add(interval);
+        return end.year == next.year &&
+            end.month == next.month &&
+            end.day == next.day;
+      }
+
+      DateTime endWhoseIntervalStaysOnItsDay(
+        DateTime end, {
+        required bool nextIsAhead,
+      }) {
+        if (intervalStaysOnActDay(end)) return end;
+        final now = DateTime.now();
+        final startOfToday = DateTime(now.year, now.month, now.day);
+        final day = nextIsAhead
+            ? startOfToday.add(const Duration(days: 1))
+            : startOfToday.subtract(const Duration(days: 1));
+        final atNoon = DateTime(day.year, day.month, day.day, _noonHour);
+        return nextIsAhead ? atNoon.subtract(interval) : atNoon;
+      }
+
       Target intervalTarget() => Target(
             memId: memId,
             targetType: TargetType.equalTo,
@@ -1462,8 +1484,30 @@ void main() {
           );
 
       const endedHoursAgo = 3;
+      const minutesAgoWhileNextIsAhead = 30;
       const notifyMinutesAgo = 90;
       const belowTargetCount = 1;
+
+      // 開始が前日だと、回数達成後の通知日が今日の過去時刻になり赤くなる
+      DateTime endWhoseStartStaysOnToday(DateTime now) {
+        final end = now.subtract(const Duration(hours: endedHoursAgo));
+        final start = end.subtract(const Duration(minutes: _actMinutes));
+        final startIsToday = start.year == now.year &&
+            start.month == now.month &&
+            start.day == now.day;
+        if (startIsToday) return end;
+        return DateTime(now.year, now.month, now.day).add(
+          const Duration(minutes: _actMinutes),
+        );
+      }
+
+      TimeOfDay notifyAlreadyPassedToday(DateTime now) {
+        final startOfToday = DateTime(now.year, now.month, now.day);
+        final passed = now.subtract(const Duration(minutes: notifyMinutesAgo));
+        return TimeOfDay.fromDateTime(
+          passed.isBefore(startOfToday) ? startOfToday : passed,
+        );
+      }
 
       Mem memEndedAt(DateTime endedAt) {
         final end = DateAndTime.from(endedAt, timeOfDay: endedAt);
@@ -1474,7 +1518,7 @@ void main() {
           null,
           latestAct: Act.by(
             memId,
-            startWhen: end.subtract(const Duration(minutes: 30)),
+            startWhen: end.subtract(const Duration(minutes: _actMinutes)),
             endWhen: end,
           ),
         );
@@ -1538,7 +1582,10 @@ void main() {
           (tester) async {
         await expectClock(
           tester,
-          DateTime.now().subtract(const Duration(hours: 3)),
+          endWhoseIntervalStaysOnItsDay(
+            DateTime.now().subtract(const Duration(hours: endedHoursAgo)),
+            nextIsAhead: false,
+          ),
           equals(warningColor),
         );
       });
@@ -1547,7 +1594,12 @@ void main() {
           (tester) async {
         await expectClock(
           tester,
-          DateTime.now().subtract(const Duration(minutes: 30)),
+          endWhoseIntervalStaysOnItsDay(
+            DateTime.now().subtract(
+              const Duration(minutes: minutesAgoWhileNextIsAhead),
+            ),
+            nextIsAhead: true,
+          ),
           isNot(equals(warningColor)),
         );
       });
@@ -1603,7 +1655,10 @@ void main() {
           'shows one clock with the time after the last act when a notification time is also set',
           (tester) async {
         final now = DateTime.now();
-        final endedAt = now.subtract(const Duration(hours: endedHoursAgo));
+        final endedAt = endWhoseIntervalStaysOnItsDay(
+          now.subtract(const Duration(hours: endedHoursAgo)),
+          nextIsAhead: false,
+        );
         final notify = TimeOfDay.fromDateTime(
           now.subtract(const Duration(minutes: notifyMinutesAgo)),
         );
@@ -1628,10 +1683,8 @@ void main() {
           'shows the next day notification time once the daily count is reached',
           (tester) async {
         final now = DateTime.now();
-        final endedAt = now.subtract(const Duration(hours: endedHoursAgo));
-        final notify = TimeOfDay.fromDateTime(
-          now.subtract(const Duration(minutes: notifyMinutesAgo)),
-        );
+        final endedAt = endWhoseStartStaysOnToday(now);
+        final notify = notifyAlreadyPassedToday(now);
         await pumpWithNotify(
           tester,
           mem: memEndedAt(endedAt),
