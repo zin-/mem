@@ -5,10 +5,15 @@ plugins {
 }
 
 def flutterCompileSdkVersion = flutter.compileSdkVersion
+def requiredCompileSdk = rootProject.ext.requiredCompileSdk
+// Flutter の値と依存の下限のうち、高い方を使う
+def compileSdkVersion = Math.max(flutterCompileSdkVersion as int, requiredCompileSdk as int)
 //println("flutter.ndkVersion: $flutter.ndkVersion")
 def flutterNdkVersion = flutter.ndkVersion
 //println("flutter.minSdkVersion: $flutter.minSdkVersion")
 def flutterMinSdkVersion = flutter.minSdkVersion
+def requiredMinSdk = rootProject.ext.requiredMinSdk
+def minSdkVersion = Math.max(flutterMinSdkVersion as int, requiredMinSdk as int)
 def flutterTargetSdkVersion = flutter.targetSdkVersion
 def javaVersion = JavaVersion.VERSION_17
 
@@ -32,7 +37,7 @@ if (keystorePropertiesFile.exists()) {
 android {
   namespace 'zin.playground.mem'
 
-  compileSdk = flutterCompileSdkVersion
+  compileSdk = compileSdkVersion
   ndkVersion = flutterNdkVersion
 
   compileOptions {
@@ -47,7 +52,7 @@ android {
 
     // You can update the following values to match your application needs.
     // For more information, see: https://flutter.dev/to/review-gradle-config.
-    minSdk = flutterMinSdkVersion
+    minSdk = minSdkVersion
     targetSdk = flutterTargetSdkVersion
     versionCode = flutterVersionCode.toInteger()
     versionName = flutterVersionName

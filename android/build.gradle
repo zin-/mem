@@ -1,3 +1,10 @@
+// flutter_local_notifications 23、permission_handler_android 14、androidx.core 1.19.0 は compileSdk 37 を要求する
+// sentry_flutter 10.3.0 の minSdkVersion は 26。アプリが下回ると manifest merger が失敗する
+ext {
+  requiredCompileSdk = 37
+  requiredMinSdk = 26
+}
+
 allprojects {
   repositories {
     google()
@@ -44,11 +51,17 @@ subprojects { subproject ->
     }
   }
   subproject.plugins.withId("com.android.library") {
-    // 一部プラグイン（例: sentry_flutter）が compileSdk 34 のまま。package_info_plus 等は compileSdk 36+ を要求する
+    // 一部プラグイン（例: sentry_flutter）が compileSdk 34 のまま。依存は requiredCompileSdk 以上を要求する
     // afterEvaluate では変更が too late になるため finalizeDsl で引き上げる
     subproject.androidComponents.finalizeDsl { extension ->
-      if (extension.compileSdk != null && extension.compileSdk < 36) {
-        extension.compileSdk = 36
+      def requiredCompileSdk = rootProject.ext.requiredCompileSdk
+      if (extension.compileSdk != null && extension.compileSdk < requiredCompileSdk) {
+        extension.compileSdk = requiredCompileSdk
+      }
+      def requiredMinSdk = rootProject.ext.requiredMinSdk
+      def minSdk = extension.defaultConfig.minSdk
+      if (minSdk != null && minSdk < requiredMinSdk) {
+        extension.defaultConfig.minSdk = requiredMinSdk
       }
     }
     // プラグインごとに Java targetCompatibility と Kotlin jvmTarget がずれる（例: Java 17 / Kotlin 1.8）
