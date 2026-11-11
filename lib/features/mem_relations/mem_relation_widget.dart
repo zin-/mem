@@ -5,9 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_relations/mem_relation.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
-import 'package:mem/features/mem_relations/mem_relation_search_dialog.dart';
 import 'package:mem/features/mem_relations/mem_relation_state.dart';
 import 'package:mem/features/mems/mem.dart';
+import 'package:mem/features/mems/mem_select_dialog.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/framework/date_and_time/time_text_form_field.dart';
 
@@ -51,12 +51,19 @@ class MemRelationList extends ConsumerWidget {
                 showDialog: v(
                   () => () => showDialog(
                         context: context,
-                        builder: (context) => MemRelationDialogStateful(
-                          sourceMemId: sourceMemId,
+                        builder: (context) => MemSelectDialog(
+                          candidates: ref.read(memEntitiesProvider).toList(),
+                          mode: MemSelectMode.multiple,
+                          excludedMemIds: sourceMemId == null
+                              ? const <int>{}
+                              : {sourceMemId!},
                           selectedMemIds:
                               selectedMems.map((e) => e.id!).toList(),
+                          title: 'Add Relation',
+                          confirmLabel: '追加',
+                          cancelLabel: 'キャンセル',
                           onSubmit: (selectedIds) {
-                            for (var selectedId in selectedIds) {
+                            for (final selectedId in selectedIds) {
                               onChanged(selectedId, 0);
                             }
                           },

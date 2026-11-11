@@ -5,6 +5,7 @@ import 'package:mem/features/mem_parents/mem_parent.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
+import 'package:mem/features/mems/mem_select_dialog.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/mems/transitions.dart';
@@ -116,9 +117,8 @@ class _MemParentSection extends StatelessWidget {
               memRow(
                 icon: Icons.account_tree,
                 name: parent?.name ?? l10n.parentNone,
-                onTap: parentId == null
-                    ? _onSetParent
-                    : () => _onOpen(parentId),
+                onTap:
+                    parentId == null ? _onSetParent : () => _onOpen(parentId),
                 onDisconnect:
                     parentId == null ? null : () => _onDisconnect(_memId),
               ),
@@ -143,24 +143,36 @@ class _MemParentSection extends StatelessWidget {
 
 Future<void> _setParent(BuildContext context, WidgetRef ref, int memId) => v(
       () async {
-        final mems = await MemRepository().ship();
+        final mems = await MemRepository().ship(archived: false);
         final excludedIds = await _excludedParentCandidateIds(memId);
         final currentParent = await MemRepository().shipParentByMemId(memId);
         if (!context.mounted) return;
 
-        final candidates = mems
-            .where((mem) => !excludedIds.contains(mem.id))
-            .toList()
-          ..sort((a, b) => a.name.compareTo(b.name));
-        final selectedId = await showDialog<int>(
+        final candidates = mems..sort((a, b) => a.name.compareTo(b.name));
+        final l10n = buildL10n(context);
+        int? selectedId;
+        await showDialog<void>(
           context: context,
-          builder: (context) => _SelectParentDialog(candidates: candidates),
+          builder: (context) => MemSelectDialog(
+            candidates: candidates,
+            mode: MemSelectMode.single,
+            excludedMemIds: excludedIds,
+            selectedMemIds: const [],
+            title: l10n.selectParentTitle,
+            confirmLabel: l10n.okAction,
+            cancelLabel: l10n.cancelAction,
+            onSubmit: (ids) {
+              if (ids.isEmpty) return;
+              selectedId = ids.single;
+            },
+          ),
         );
-        if (selectedId == null || !context.mounted) return;
+        final chosenId = selectedId;
+        if (chosenId == null || !context.mounted) return;
 
         try {
           await MemRepository().replaceParent(
-            MemParent(memId: memId, parentMemId: selectedId),
+            MemParent(memId: memId, parentMemId: chosenId),
           );
         } on ArgumentError {
           // 循環のときは replaceParent が拒否し、今の親を残す
@@ -171,7 +183,7 @@ Future<void> _setParent(BuildContext context, WidgetRef ref, int memId) => v(
           ref,
           memId: memId,
           previousParentMemId: currentParent?.parentMemId,
-          nextParentMemId: selectedId,
+          nextParentMemId: chosenId,
         );
       },
       memId,
@@ -247,46 +259,4 @@ MemEntity? _entityById(Iterable<MemEntity> entities, int id) {
     if (entity.id == id) return entity;
   }
   return null;
-}
-
-class _SelectParentDialog extends StatelessWidget {
-  final List<MemEntity> _candidates;
-
-  const _SelectParentDialog({
-    required List<MemEntity> candidates,
-  }) : _candidates = candidates;
-
-  @override
-  Widget build(BuildContext context) => v(
-        () {
-          final l10n = buildL10n(context);
-
-          return AlertDialog(
-            title: Text(l10n.selectParentTitle),
-            content: SizedBox(
-              width: double.maxFinite,
-              height: MediaQuery.sizeOf(context).height / 2,
-              child: ListView.builder(
-                itemCount: _candidates.length,
-                itemBuilder: (context, index) {
-                  final mem = _candidates[index];
-                  return ListTile(
-                    title: Text(mem.name),
-                    onTap: () => Navigator.of(context).pop(mem.id),
-                  );
-                },
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(l10n.cancelAction),
-              ),
-            ],
-          );
-        },
-        {
-          'candidates': _candidates,
-        },
-      );
 }
