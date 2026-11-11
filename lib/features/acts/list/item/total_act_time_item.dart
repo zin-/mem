@@ -65,7 +65,7 @@ class TotalActTimeListItem extends ConsumerWidget {
             title: _title(
               showsElapsed ? latestAct : null,
               amount,
-              mark?.text,
+              mark,
               recorded,
             ),
             subtitle: _mem == null ? null : Text(_mem.name),
@@ -116,7 +116,7 @@ class TotalActTimeListItem extends ConsumerWidget {
   Widget _title(
     Act? statusAct,
     DayActAmount? amount,
-    String? periodUnit,
+    TargetPeriodMark? mark,
     Duration recorded,
   ) {
     final range = _actListRange(_actList.map((act) => act.value));
@@ -129,7 +129,7 @@ class TotalActTimeListItem extends ConsumerWidget {
           statusAct,
           _target,
           amount,
-          unit: periodUnit,
+          mark: mark,
           time: _groupDuration(recorded, amount, _target),
           centerTime: false,
         ),

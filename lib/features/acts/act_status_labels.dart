@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:mem/features/acts/act.dart';
-import 'package:mem/features/acts/act_count_label.dart';
 import 'package:mem/features/acts/day_act_amount.dart';
 import 'package:mem/features/acts/list/duration.dart';
+import 'package:mem/features/acts/list/target_period_mark.dart';
+import 'package:mem/features/acts/target_ratio_label.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/modules/live_elapsed_time_text.dart';
@@ -40,15 +41,15 @@ class DayTargetLabel extends StatelessWidget {
   final Target _target;
   final DayActAmount _amount;
   final Act? _act;
-  final String? _unit;
+  final TargetPeriodMark? _mark;
 
   const DayTargetLabel(
     this._target,
     this._amount,
     this._act, {
-    String? unit,
+    TargetPeriodMark? mark,
     super.key,
-  }) : _unit = unit;
+  }) : _mark = mark;
 
   static bool shows(Target? target) => target != null && target.value > 0;
 
@@ -57,17 +58,17 @@ class DayTargetLabel extends StatelessWidget {
         () {
           final act = _act;
           return switch (_target.targetUnit) {
-            TargetUnit.count => ActCountLabel(
-                _amount.count,
-                _target.value,
-                unit: _unit,
+            TargetUnit.count => TargetRatioLabel(
+                current: _amount.count.toString(),
+                target: _target.value.toString(),
+                mark: _mark,
               ),
             TargetUnit.time => _TimeTargetLabel(
                 _amount.recorded,
                 // 一時停止してからの時間は作業時間ではない
                 act is ActiveAct ? act.period?.start : null,
                 _target.value,
-                _unit,
+                _mark,
               ),
           };
         },
@@ -75,7 +76,7 @@ class DayTargetLabel extends StatelessWidget {
           '_target': _target,
           '_amount': _amount,
           '_act': _act,
-          '_unit': _unit,
+          '_mark': _mark,
         },
       );
 }
@@ -87,7 +88,7 @@ class ActStatusLabels extends StatelessWidget {
   final Widget? _leading;
   final Widget? _time;
   final bool _centerTime;
-  final String? _unit;
+  final TargetPeriodMark? _mark;
 
   const ActStatusLabels(
     this._act,
@@ -96,12 +97,12 @@ class ActStatusLabels extends StatelessWidget {
     Widget? leading,
     Widget? time,
     bool centerTime = true,
-    String? unit,
+    TargetPeriodMark? mark,
     super.key,
   })  : _leading = leading,
         _time = time,
         _centerTime = centerTime,
-        _unit = unit;
+        _mark = mark;
 
   @override
   Widget build(BuildContext context) => v(
@@ -157,7 +158,7 @@ class ActStatusLabels extends StatelessWidget {
           '_act': _act,
           '_target': _target,
           '_amount': _amount,
-          '_unit': _unit,
+          '_mark': _mark,
         },
       );
 
@@ -170,7 +171,7 @@ class ActStatusLabels extends StatelessWidget {
           amount != null &&
           DayTargetLabel.shows(target) &&
           target.targetUnit == TargetUnit.time)
-        DayTargetLabel(target, amount, _act, unit: _unit),
+        DayTargetLabel(target, amount, _act, mark: _mark),
       if (StateElapsedTime.shows(_act)) StateElapsedTime(_act),
     ];
     if (children.isEmpty) {
@@ -192,7 +193,7 @@ class ActStatusLabels extends StatelessWidget {
         target.targetUnit != TargetUnit.count) {
       return null;
     }
-    return DayTargetLabel(target, amount, _act, unit: _unit);
+    return DayTargetLabel(target, amount, _act, mark: _mark);
   }
 }
 
@@ -200,13 +201,13 @@ class _TimeTargetLabel extends StatefulWidget {
   final Duration _recorded;
   final DateTime? _runningSince;
   final int _targetSeconds;
-  final String? _unit;
+  final TargetPeriodMark? _mark;
 
   const _TimeTargetLabel(
     this._recorded,
     this._runningSince,
     this._targetSeconds,
-    this._unit,
+    this._mark,
   );
 
   @override
@@ -249,24 +250,17 @@ class _TimeTargetLabelState extends State<_TimeTargetLabel> {
               (since == null
                   ? Duration.zero
                   : DateTime.now().difference(since));
-          final unit = widget._unit;
-          return Wrap(
-            children: [
-              Text(current.formatHHmm()),
-              const Text(' / '),
-              Text(Duration(seconds: widget._targetSeconds).formatHHmm()),
-              if (unit != null) ...[
-                const Text(' / '),
-                Text(unit),
-              ],
-            ],
+          return TargetRatioLabel(
+            current: current.formatHHmm(),
+            target: Duration(seconds: widget._targetSeconds).formatHHmm(),
+            mark: widget._mark,
           );
         },
         {
           '_recorded': widget._recorded,
           '_runningSince': widget._runningSince,
           '_targetSeconds': widget._targetSeconds,
-          '_unit': widget._unit,
+          '_mark': widget._mark,
         },
       );
 
