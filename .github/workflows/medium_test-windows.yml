@@ -29,7 +29,7 @@ jobs:
     timeout-minutes: ${{ inputs.timeout-minutes }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: "Flutter doctor"
         uses: ./.github/actions/install-flutter
@@ -48,7 +48,7 @@ jobs:
 
       - if: always()
         name: "Report"
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v3
         with:
           name: "Report (Medium test (Windows) (${{ inputs.target }}))"
           path: "reports/test_report.log"
@@ -57,7 +57,7 @@ jobs:
           fail-on-empty: true
       - if: always()
         name: "Upload coverage"
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
