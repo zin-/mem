@@ -10,7 +10,9 @@ alwaysApply: true
 
 親が膨らむなら、サブドメインとして親が持つ。`Mem.notifyAt` は `MemNotifyAt` を返す。
 
-同じ手続きを一箇所にまとめるローカル関数は、DRY のまま使ってよい。テストから参照するための公開は `no_meta` のままトップレベル関数でよい。
+ドメイン型の手続きは、ファイル私有でもトップレベル関数にしない。その型の private メソッドにする。
+
+一つの関数の中だけで繰り返す手続きは、ローカル関数でよい。テストから参照するための公開は `no_meta` のままトップレベル関数でよい。
 
 ## Example(具体例)
 
@@ -42,11 +44,40 @@ class MemNotifyAt {
 }
 ```
 
+**❌ ファイル私有のトップレベル関数:**
+
+```dart
+class ActListGroup {
+  static ActListGroup? of({required DateTime at}) {
+    final start = _bucketStart(at);
+    if (start == null) return null;
+    return ActListGroup._(start);
+  }
+}
+
+DateTime? _bucketStart(DateTime at) { /* ... */ }
+```
+
+**✅ 手続きはその型の private メソッド:**
+
+```dart
+class ActListGroup {
+  static ActListGroup? of({required DateTime at}) {
+    final start = _bucketStart(at);
+    if (start == null) return null;
+    return ActListGroup._(start);
+  }
+
+  static DateTime? _bucketStart(DateTime at) { /* ... */ }
+}
+```
+
 ## Relations(関連)
 
 - Entity（永続化される実体とは別）
-- Dry（手続きの共通化はローカル関数）
+- Dry（一つの関数の中の手続きはローカル関数）
 - `no_meta`（テスト用の公開）
 - `NextAtAfterLastAct`
 - `CountTarget`
 - `MemNotifyAt`
+- `ActListGroup`
