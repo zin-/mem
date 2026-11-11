@@ -1488,6 +1488,27 @@ void main() {
       const notifyMinutesAgo = 90;
       const belowTargetCount = 1;
 
+      // 開始が前日だと、回数達成後の通知日が今日の過去時刻になり赤くなる
+      DateTime endWhoseStartStaysOnToday(DateTime now) {
+        final end = now.subtract(const Duration(hours: endedHoursAgo));
+        final start = end.subtract(const Duration(minutes: _actMinutes));
+        final startIsToday = start.year == now.year &&
+            start.month == now.month &&
+            start.day == now.day;
+        if (startIsToday) return end;
+        return DateTime(now.year, now.month, now.day).add(
+          const Duration(minutes: _actMinutes),
+        );
+      }
+
+      TimeOfDay notifyAlreadyPassedToday(DateTime now) {
+        final startOfToday = DateTime(now.year, now.month, now.day);
+        final passed = now.subtract(const Duration(minutes: notifyMinutesAgo));
+        return TimeOfDay.fromDateTime(
+          passed.isBefore(startOfToday) ? startOfToday : passed,
+        );
+      }
+
       Mem memEndedAt(DateTime endedAt) {
         final end = DateAndTime.from(endedAt, timeOfDay: endedAt);
         return Mem(
@@ -1497,7 +1518,7 @@ void main() {
           null,
           latestAct: Act.by(
             memId,
-            startWhen: end.subtract(const Duration(minutes: 30)),
+            startWhen: end.subtract(const Duration(minutes: _actMinutes)),
             endWhen: end,
           ),
         );
@@ -1662,10 +1683,8 @@ void main() {
           'shows the next day notification time once the daily count is reached',
           (tester) async {
         final now = DateTime.now();
-        final endedAt = now.subtract(const Duration(hours: endedHoursAgo));
-        final notify = TimeOfDay.fromDateTime(
-          now.subtract(const Duration(minutes: notifyMinutesAgo)),
-        );
+        final endedAt = endWhoseStartStaysOnToday(now);
+        final notify = notifyAlreadyPassedToday(now);
         await pumpWithNotify(
           tester,
           mem: memEndedAt(endedAt),
