@@ -99,3 +99,16 @@ class DateAndTimePeriodTextFormFields extends StatelessWidget {
         _dateAndTimePeriod,
       );
 }
+
+extension WithStartAndEndRangeFormat on WithStartAndEnd {
+  String formatCompactRange(MaterialLocalizations localizations) {
+    final startLabel = localizations.formatCompactDate(start);
+    final inclusiveEnd = end.shiftCalendarDays(-1);
+    if (start.year == inclusiveEnd.year &&
+        start.month == inclusiveEnd.month &&
+        start.day == inclusiveEnd.day) {
+      return startLabel;
+    }
+    return '$startLabel – ${localizations.formatCompactDate(inclusiveEnd)}';
+  }
+}

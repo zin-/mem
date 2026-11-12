@@ -3,43 +3,34 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period_view.dart';
-import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_status_labels.dart';
-import 'package:mem/features/acts/day_act_amount.dart';
+import 'package:mem/features/acts/act_amount.dart';
+import 'package:mem/framework/date_and_time/period.dart';
+import 'package:mem/features/acts/list/act_list_group.dart';
 import 'package:mem/features/acts/list/duration.dart';
 import 'package:mem/features/acts/states.dart';
+import 'package:mem/features/acts/target_progress_label.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/mems/transitions.dart';
-import 'package:mem/features/settings/preference/keys.dart';
-import 'package:mem/features/settings/states.dart';
 import 'package:mem/features/targets/target.dart';
 
 class TotalActTimeListItem extends ConsumerWidget {
   final List<SavedActEntityV1> _actList;
   final Mem? _mem;
   final Target? _target;
-  final DateTime _groupDate;
-  final bool _isDateView;
+  final ActListGroup _group;
 
   const TotalActTimeListItem(
     this._actList,
     this._mem,
     this._target,
-    this._groupDate,
-    this._isDateView, {
+    this._group, {
     super.key,
   });
-
-  bool _isCurrentPeriod(DateAndTime now, TimeOfDay startOfDay) {
-    if (_isDateView) {
-      return now.isSameLogicalDay(_groupDate, startOfDay);
-    }
-    return now.isSameLogicalMonth(_groupDate, startOfDay);
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
@@ -52,22 +43,22 @@ class TotalActTimeListItem extends ConsumerWidget {
           // 実行中が前日始まりでも、今の行のボタンがずれないように期間内 Act は見ない
           final latestAct =
               loadedMem != null ? loadedMem.latestAct : _mem?.latestAct;
-          final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
           final now = DateAndTime.now();
-          final actions = _isCurrentPeriod(now, startOfDay)
+          final showsActions = _group.contains(now);
+          final actions = showsActions
               ? _actions(ref, memId, latestAct)
               : (leading: null, trailing: null);
-          final isToday =
-              _isDateView && now.isSameLogicalDay(_groupDate, startOfDay);
+          final statusAct = _group.isCurrentDay(now) ? latestAct : null;
           final target = _target;
-          final amount = _dayAmount(ref, memId, target);
+          final groupAmount = ActAmount.of(_actList.map((act) => act.value));
+          final amount = _amount(ref, memId, target, groupAmount);
 
           return ListTile(
             leading: actions.leading,
             title: _title(
-              // 今日の日表示だけ。月表示と別の日には今の状態を出さない
-              isToday ? latestAct : null,
+              statusAct,
               amount,
+              groupAmount,
             ),
             subtitle: _mem == null ? null : Text(_mem.name),
             trailing: actions.trailing,
@@ -77,26 +68,30 @@ class TotalActTimeListItem extends ConsumerWidget {
         {
           '_actList': _actList,
           '_mem': _mem,
-          '_groupDate': _groupDate,
-          '_isDateView': _isDateView,
+          '_group': _group,
         },
       );
 
-  DayActAmount? _dayAmount(WidgetRef ref, int memId, Target? target) {
-    if (!_isDateView || !DayTargetLabel.shows(target)) {
+  ActAmount? _amount(
+    WidgetRef ref,
+    int memId,
+    Target? target,
+    ActAmount groupAmount,
+  ) {
+    if (!TargetProgressLabel.shows(target)) {
       return null;
     }
-    final day = DateTime(_groupDate.year, _groupDate.month, _groupDate.day);
-    return ref.watch(viewedDayActAmountProvider(memId, day)).value;
+    if (_group.unit == Period.aDay) {
+      return ref.watch(viewedDayActAmountProvider(memId, _group.start!)).value;
+    }
+    return groupAmount;
   }
 
-  Widget _title(Act? statusAct, DayActAmount? amount) {
-    final recorded = _actList.fold<Duration>(
-      Duration.zero,
-      (sum, act) => sum + (act.value.period?.duration ?? Duration.zero),
-    );
-    final target = _target;
-    final progress = _progress(amount, recorded, target);
+  Widget _title(
+    Act? statusAct,
+    ActAmount? amount,
+    ActAmount groupAmount,
+  ) {
     final range = _actListRange(_actList.map((act) => act.value));
 
     return Column(
@@ -105,48 +100,35 @@ class TotalActTimeListItem extends ConsumerWidget {
       children: [
         ActStatusLabels(
           statusAct,
-          target,
-          progress,
-          time: _groupDuration(recorded, progress, target),
+          _target,
+          amount,
+          shownIn: _group.unit,
+          time: _groupDuration(groupAmount, amount, _target),
           centerTime: false,
         ),
         if (range != null)
           DateAndTimePeriodTexts(
             range,
-            showDate: !_isDateView,
+            showDate: _group.unit != Period.aDay,
           ),
       ],
     );
   }
 
-  // 日表示の進捗は Mem 一覧と同じ今日の集計。月表示だけ、その月の Act から作る
-  DayActAmount? _progress(
-    DayActAmount? dayAmount,
-    Duration recorded,
-    Target? target,
-  ) {
-    if (_isDateView) {
-      return dayAmount;
-    }
-    if (!DayTargetLabel.shows(target)) {
-      return null;
-    }
-    return DayActAmount(_actList.length, recorded);
-  }
-
-  // 時間目標が同じ合計を出す月表示では、合計時間を重ねて出さない
+  // 進捗がグループ合計そのもののときは、合計時間を重ねて出さない
   Widget? _groupDuration(
-    Duration recorded,
-    DayActAmount? progress,
+    ActAmount groupAmount,
+    ActAmount? progress,
     Target? target,
   ) {
-    if (!_isDateView &&
+    if (_group.unit != Period.aDay &&
         progress != null &&
+        progress.recorded == groupAmount.recorded &&
         target != null &&
         target.targetUnit == TargetUnit.time) {
       return null;
     }
-    return Text(recorded.formatHHmm());
+    return Text(groupAmount.recorded.formatHHmm());
   }
 
   ({Widget? leading, Widget? trailing}) _actions(

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/database.dart' hide Mem, Target;
-import 'package:mem/features/acts/line_chart/states.dart';
+import 'package:mem/framework/date_and_time/period.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/targets/target.dart';

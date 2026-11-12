@@ -3,6 +3,7 @@ import 'package:mem/databases/database.dart' hide Act, Target;
 import 'package:mem/databases/database.dart' as drift_schema;
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/acts/act_amount.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_service.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -139,21 +140,14 @@ class ActQueryService {
         },
       );
 
-  Future<({int count, Duration recorded})> amountByMemIdAndPeriod(
+  Future<ActAmount> amountByMemIdAndPeriod(
     int memId,
     DateAndTimePeriod? period,
   ) =>
       v(
         () async {
           final acts = await fetchByMemIdAndPeriod(memId, period);
-          return (
-            count: acts.length,
-            recorded: acts.fold<Duration>(
-              Duration.zero,
-              (sum, act) =>
-                  sum + (act.toDomain().period?.duration ?? Duration.zero),
-            ),
-          );
+          return ActAmount.of(acts.map((act) => act.toDomain()));
         },
         {
           'memId': memId,

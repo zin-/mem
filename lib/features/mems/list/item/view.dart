@@ -4,8 +4,10 @@ import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_status_labels.dart';
-import 'package:mem/features/acts/day_act_amount.dart';
+import 'package:mem/features/acts/act_amount.dart';
+import 'package:mem/framework/date_and_time/period.dart';
 import 'package:mem/features/acts/states.dart';
+import 'package:mem/features/acts/target_progress_label.dart';
 import 'package:mem/features/mems/count_target.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mems_state.dart';
@@ -131,7 +133,7 @@ ListTile _render(
   void Function() closeAct,
   Iterable<MemNotificationEntityV1> memNotificationEntities,
   Target? target,
-  DayActAmount? amount,
+  ActAmount? amount,
   DateTime? listAt,
   bool hasUndoneChildren,
 ) =>
@@ -227,56 +229,62 @@ int? _periodCount(WidgetRef ref, int memId) {
   return counts.value![memId] ?? 0;
 }
 
-DayActAmount? _timeAmount(
+ActAmount? _dayAmount(
   WidgetRef ref,
   int memId,
-  Target target,
   TimeOfDay startOfDay,
 ) {
   final day = DateAndTime.now().logicalDay(startOfDay);
   return ref.watch(viewedDayActAmountProvider(memId, day)).value;
 }
 
-DayActAmount? _labelAmount(
+ActAmount? _labelAmount(
   WidgetRef ref,
   Mem mem,
   Target? target,
   int? periodCount,
   TimeOfDay startOfDay,
 ) {
-  if (!DayTargetLabel.shows(target)) {
+  if (!TargetProgressLabel.shows(target)) {
     return null;
   }
+  final memId = mem.id as int;
   if (target!.targetUnit == TargetUnit.time) {
-    return _timeAmount(ref, mem.id as int, target, startOfDay);
+    return _dayAmount(ref, memId, startOfDay);
   }
-  if (target.targetUnit != TargetUnit.count || periodCount == null) {
+  if (target.targetUnit != TargetUnit.count) {
     return null;
   }
-
-  final shown = ListFrameCount.of(
-    target: target,
-    periodCount: periodCount,
-    latestAct: mem.latestAct,
-    scheduleAnchorAct: mem.scheduleAnchorAct,
-    startOfToday: DateTimeExt.startOfToday(startOfDay),
-    startOfDay: startOfDay,
-  );
-  return DayActAmount(
-    shown?.value ?? periodCount,
-    Duration.zero,
-  );
+  if (target.period == Period.aDay) {
+    if (periodCount == null) return null;
+    final shown = ListFrameCount.of(
+      target: target,
+      periodCount: periodCount,
+      latestAct: mem.latestAct,
+      scheduleAnchorAct: mem.scheduleAnchorAct,
+      startOfToday: DateTimeExt.startOfToday(startOfDay),
+      startOfDay: startOfDay,
+    );
+    return ActAmount(
+      shown?.value ?? periodCount,
+      Duration.zero,
+    );
+  }
+  final day = _dayAmount(ref, memId, startOfDay);
+  if (day == null) return null;
+  return ActAmount(day.count, Duration.zero);
 }
 
 Widget _title(
   Mem mem,
   Act? latestAct,
   Target? target,
-  DayActAmount? amount,
+  ActAmount? amount,
 ) =>
     ActStatusLabels(
       latestAct,
       target,
       amount,
       leading: MemNameText(mem.id),
+      shownIn: Period.aDay,
     );

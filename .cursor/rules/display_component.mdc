@@ -1,0 +1,67 @@
+---
+alwaysApply: true
+---
+
+# 一塊の表示は Widget にする
+
+`0 / 5` や `0 / 5 / all` のような一塊の表示は、親が `Text` や単位文字列を並べて作らない。
+
+その表示の Widget を一つ定義し、出す場所はすべてそれを使う。回数も時間も、` / ` と期間の短い表示を出すのはその Widget だけ。
+
+`TargetProgressLabel` は `ActAmount` と `Target` と、行の期間 `shownIn` を受ける。回数なら整数、時間なら `formatHHmm`。目標値は `TargetShownValue` で表示期間へ換算し、割り切れないときだけ末尾に `~` を付ける。換算できたときは期間ラベルを出さない。`Period.all` で換算できないときだけ `PeriodView.shortLabel` を付ける。同じ期間なら `0 / 5`、1日3回を週で見るなら `0 / 21`、全期間の目標なら `0 / 5 / all`。
+
+## Example(具体例)
+
+**❌ 回数用と時間用がそれぞれ ` / ` を書く:**
+
+```dart
+Wrap(
+  children: [
+    Text(count.toString()),
+    const Text(' / '),
+    Text(target.toString()),
+    if (periodLabel != null) ...[
+      const Text(' / '),
+      Text(periodLabel),
+    ],
+  ],
+)
+
+Wrap(
+  children: [
+    Text(current.formatHHmm()),
+    const Text(' / '),
+    Text(Duration(seconds: targetSeconds).formatHHmm()),
+    if (periodLabel != null) ...[
+      const Text(' / '),
+      Text(periodLabel),
+    ],
+  ],
+)
+```
+
+**✅ `TargetProgressLabel` に渡す:**
+
+```dart
+TargetProgressLabel(
+  ActAmount(count, Duration.zero),
+  target,
+  shownIn: Period.aDay,
+)
+
+TargetProgressLabel(
+  amount,
+  target,
+  shownIn: shownIn,
+  act: act,
+)
+```
+
+## Relations(関連)
+
+- Dry（同じ表示を一箇所にまとめる）
+- `PeriodView.shortLabel`
+- `TargetProgressLabel`
+- `TargetShownValue`
+- `ActAmount`
+- `Target`

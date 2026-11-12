@@ -1,12 +1,55 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
-import 'package:mem/features/logger/log_service.dart';
 
-enum Period { aDay, aWeek, aMonth, threeMonth, aYear, all }
+enum Period {
+  aDay,
+  aWeek,
+  aMonth,
+  threeMonth,
+  aYear,
+  all;
+
+  int? get months => switch (this) {
+        Period.aMonth => 1,
+        Period.threeMonth => 3,
+        Period.aYear => DateTime.monthsPerYear,
+        Period.aDay || Period.aWeek || Period.all => null,
+      };
+
+  static const _weeksInMonth = 4;
+  static const _weeksInYear = 52;
+
+  // 目標の換算は暦の月や年ではなく、週数を固定した日数で行う
+  int? get fixedDays => switch (this) {
+        Period.aDay => 1,
+        Period.aWeek => DateTime.daysPerWeek,
+        Period.aMonth => _weeksInMonth * DateTime.daysPerWeek,
+        Period.threeMonth => 3 * _weeksInMonth * DateTime.daysPerWeek,
+        Period.aYear => _weeksInYear * DateTime.daysPerWeek,
+        Period.all => null,
+      };
+
+  DateAndTime exclusiveEnd(DateTime start) {
+    final day = DateAndTime(start.year, start.month, start.day);
+    return switch (this) {
+      Period.aDay => day.shiftCalendarDays(1),
+      Period.aWeek => day.shiftCalendarDays(DateTime.daysPerWeek),
+      Period.aMonth || Period.threeMonth || Period.aYear => DateAndTime(
+          start.year,
+          start.month + months!,
+          1,
+        ),
+      Period.all => throw ArgumentError(this),
+    };
+  }
+}
 
 extension PeriodExt on Period {
+  bool isLongerThan(Period other) => index > other.index;
+
   WithStartAndEnd? toPeriod(
     DateAndTime now,
     TimeOfDay startOfDay, {
@@ -14,13 +57,8 @@ extension PeriodExt on Period {
   }) =>
       v(
         () {
-          DateAndTime at(int year, int month, int day) => DateAndTime(
-                year,
-                month,
-                day,
-                startOfDay.hour,
-                startOfDay.minute,
-              );
+          DateAndTime at(int year, int month, int day) =>
+              DateTime(year, month, day).atStartOfDay(startOfDay);
 
           final day = now.logicalDay(startOfDay);
           final base = at(day.year, day.month, day.day);
@@ -56,11 +94,9 @@ extension PeriodExt on Period {
             case Period.aWeek:
               return trailingDays(DateTime.daysPerWeek);
             case Period.aMonth:
-              return trailingMonths(1);
             case Period.threeMonth:
-              return trailingMonths(3);
             case Period.aYear:
-              return trailingMonths(12);
+              return trailingMonths(months!);
             case Period.all:
               return null;
           }
@@ -71,17 +107,4 @@ extension PeriodExt on Period {
           'offset': offset,
         },
       );
-}
-
-extension WithStartAndEndRangeFormat on WithStartAndEnd {
-  String formatCompactRange(MaterialLocalizations localizations) {
-    final startLabel = localizations.formatCompactDate(start);
-    final inclusiveEnd = end.shiftCalendarDays(-1);
-    if (start.year == inclusiveEnd.year &&
-        start.month == inclusiveEnd.month &&
-        start.day == inclusiveEnd.day) {
-      return startLabel;
-    }
-    return '$startLabel – ${localizations.formatCompactDate(inclusiveEnd)}';
-  }
 }

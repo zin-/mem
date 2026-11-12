@@ -3,7 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/database.dart' hide Act;
-import 'package:mem/features/acts/line_chart/states.dart';
+import 'package:mem/framework/date_and_time/period.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mems/list/widget.dart';
 import 'package:mem/features/mems/mem_repository.dart';

@@ -1,7 +1,8 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
+import 'package:mem/framework/date_and_time/date_and_time_period_view.dart';
+import 'package:mem/framework/date_and_time/period.dart';
 
 void main() {
   const startOfDay = TimeOfDay(hour: 5, minute: 0);
@@ -86,6 +87,38 @@ void main() {
     test('all returns null', () {
       final now = DateAndTime(2026, 10, 13, 12, 0);
       expect(Period.all.toPeriod(now, startOfDay), isNull);
+    });
+  });
+
+  group('Period.fixedDays', () {
+    test('uses a fixed number of weeks', () {
+      expect(Period.aDay.fixedDays, 1);
+      expect(Period.aWeek.fixedDays, 7);
+      expect(Period.aMonth.fixedDays, 28);
+      expect(Period.threeMonth.fixedDays, 84);
+      expect(Period.aYear.fixedDays, 364);
+      expect(Period.all.fixedDays, isNull);
+    });
+  });
+
+  group('Period.isLongerThan', () {
+    test('a later declared period is longer', () {
+      const order = [
+        Period.aDay,
+        Period.aWeek,
+        Period.aMonth,
+        Period.threeMonth,
+        Period.aYear,
+        Period.all,
+      ];
+
+      for (var i = 0; i < order.length; i++) {
+        expect(order[i].isLongerThan(order[i]), isFalse);
+        for (var j = 0; j < i; j++) {
+          expect(order[i].isLongerThan(order[j]), isTrue);
+          expect(order[j].isLongerThan(order[i]), isFalse);
+        }
+      }
     });
   });
 

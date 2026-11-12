@@ -3,10 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/acts_summary.dart';
 import 'package:mem/features/acts/line_chart/line_chart_wrapper.dart';
-import 'package:mem/features/acts/line_chart/states.dart';
+import 'package:mem/framework/date_and_time/period.dart';
+import 'package:mem/features/acts/period_menu_item.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
+import 'package:mem/framework/date_and_time/date_and_time_period_view.dart';
 import 'package:mem/framework/view/async_value_view.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -84,10 +86,10 @@ class _ActLineChartPageState extends ConsumerState<ActLineChartPage> {
       appBar: AppBar(
         title: Text('$memName : ${_aggregationType.name}'),
         actions: [
-          PopupMenuButton(
-            itemBuilder: (context) => <PopupMenuEntry>[
+          PopupMenuButton<Period>(
+            itemBuilder: (context) => <PopupMenuEntry<Period>>[
               ...AggregationType.values.map(
-                (e) => PopupMenuItem(
+                (e) => PopupMenuItem<Period>(
                   enabled: e != _aggregationType,
                   onTap: () => setState(() => _aggregationType = e),
                   child: Text(e.name),
@@ -95,10 +97,10 @@ class _ActLineChartPageState extends ConsumerState<ActLineChartPage> {
               ),
               const PopupMenuDivider(),
               ...Period.values.map(
-                (e) => PopupMenuItem(
-                  enabled: e != _period,
+                (e) => PeriodMenuItem(
+                  period: e,
+                  selected: _period,
                   onTap: () => _selectPeriod(e),
-                  child: Text(e.name),
                 ),
               ),
             ],

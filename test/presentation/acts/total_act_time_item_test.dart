@@ -1,15 +1,20 @@
+import 'package:drift/drift.dart' hide isNull;
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/databases/database.dart' hide Act, Mem, Target;
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
-import 'package:mem/features/acts/day_act_amount.dart';
-import 'package:mem/features/acts/line_chart/states.dart';
+import 'package:mem/features/acts/act_amount.dart';
+import 'package:mem/framework/date_and_time/period.dart';
+import 'package:mem/features/acts/list/act_list_group.dart';
 import 'package:mem/features/acts/list/item/total_act_time_item.dart';
 import 'package:mem/features/acts/states.dart';
+import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_view.dart';
+import 'package:mem/framework/singleton.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
@@ -172,17 +177,22 @@ void main() {
     WidgetTester tester,
     Mem? mem, {
     DateTime? groupDate,
-    bool isDateView = true,
+    Period group = Period.aDay,
     Act? latestAct,
     _FakeActEntities? actEntities,
     List<SavedActEntityV1>? acts,
     Target? target,
-    DayActAmount? dayAmount,
+    ActAmount? dayAmount,
   }) async {
     await tester.binding.setSurfaceSize(const Size(390, 844));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
     final resolvedGroupDate = groupDate ?? DateTime(2024, 6, 1);
+    final actListGroup = ActListGroup.of(
+      unit: group,
+      at: resolvedGroupDate,
+      startOfDay: const TimeOfDay(hour: 0, minute: 0),
+    )!;
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -214,8 +224,7 @@ void main() {
                   ],
               mem,
               target,
-              resolvedGroupDate,
-              isDateView,
+              actListGroup,
             ),
           ),
         ),
@@ -420,7 +429,7 @@ void main() {
         tester,
         mem,
         groupDate: DateTime(now.year, now.month, 1),
-        isDateView: false,
+        group: Period.aMonth,
         latestAct: ActiveAct(_memId, DateAndTime(2026, 10, 20, 9)),
       );
 
@@ -435,7 +444,7 @@ void main() {
         tester,
         mem,
         groupDate: DateTime(2024, 6, 1),
-        isDateView: false,
+        group: Period.aMonth,
         latestAct: ActiveAct(_memId, DateAndTime(2026, 10, 20, 9)),
       );
 
@@ -541,7 +550,7 @@ void main() {
       await pumpItem(
         tester,
         mem,
-        isDateView: false,
+        group: Period.aMonth,
         groupDate: DateTime(2024, 6, 1),
         acts: [
           savedAct(
@@ -593,7 +602,7 @@ void main() {
         tester,
         mem,
         groupDate: DateTime(DateTime.now().year, DateTime.now().month, 1),
-        isDateView: false,
+        group: Period.aMonth,
         latestAct: running,
       );
       expect(find.byType(LiveElapsedTimeText), findsNothing);
@@ -610,20 +619,41 @@ void main() {
       expect(find.byType(LiveElapsedTimeText), findsOneWidget);
     });
 
-    testWidgets('shows that day count to the right of the total',
+    testWidgets(
+        'shows that day count and the scaled target to the right of the total',
         (tester) async {
+      const monthCount = 2;
+      const dayCount = 1;
+      final onTheDay = DateTime(2024, 6, 1, 10);
+      // 6/1 で終わる直近1ヶ月の外で、暦月の中
+      final laterInCalendarMonth = DateTime(2024, 6, 20, 10);
+      final db = await _openMemoryDatabase();
+      await _insertAct(db, memId: _memId, start: onTheDay);
+      await _insertAct(db, memId: _memId, start: laterInCalendarMonth);
+      await _insertAct(
+        db,
+        memId: _memId,
+        start: DateTime(2024, 6, 15, 10),
+        actKind: ActKind.skipped.name,
+      );
+      await _insertAct(db, memId: _memId, start: DateTime(2024, 7, 1, 10));
+      await _insertAct(db,
+          memId: _otherMemId, start: DateTime(2024, 6, 10, 10));
+
       await pumpItem(
         tester,
         mem,
         groupDate: DateTime(2024, 6, 1),
         target: _target(TargetUnit.count, 5),
-        dayAmount: const DayActAmount(2, Duration.zero),
+        acts: [_finishedAct(onTheDay)],
       );
 
-      expect(find.text('2'), findsOneWidget);
+      expect(find.text('$dayCount'), findsOneWidget);
+      expect(find.text('$monthCount'), findsNothing);
       expect(find.text(' / '), findsOneWidget);
-      expect(find.text('5'), findsOneWidget);
-      expect(find.text('1'), findsNothing);
+      expect(find.text('0~'), findsOneWidget);
+      expect(find.text('5'), findsNothing);
+      expect(find.text('m'), findsNothing);
       expect(find.text('1:00'), findsOneWidget);
       expect(find.byType(LiveElapsedTimeText), findsNothing);
       final row = tester.getRect(
@@ -636,9 +666,50 @@ void main() {
       );
       expect(tester.getTopLeft(find.text('1:00')).dx, closeTo(row.left, 1));
       expect(
-        tester.getTopRight(find.text('5')).dx,
+        tester.getTopRight(find.text('0~')).dx,
         closeTo(row.right, 1),
       );
+    });
+
+    testWidgets('shows that day count and the scaled target on a day row',
+        (tester) async {
+      const weekCount = 2;
+      const dayCount = 1;
+      const targetValue = 3;
+      final onTheDay = DateTime(2024, 6, 1, 10);
+      // 月曜始まりの同じ週。6/1 で終わる直近7日の外
+      final laterInCalendarWeek = DateTime(2024, 6, 2, 10);
+      final db = await _openMemoryDatabase();
+      await _insertAct(db, memId: _memId, start: onTheDay);
+      await _insertAct(db, memId: _memId, start: laterInCalendarWeek);
+      await _insertAct(
+        db,
+        memId: _memId,
+        start: DateTime(2024, 5, 29, 10),
+        actKind: ActKind.skipped.name,
+      );
+      await _insertAct(db, memId: _memId, start: DateTime(2024, 6, 3, 10));
+      await _insertAct(db,
+          memId: _otherMemId, start: DateTime(2024, 5, 28, 10));
+
+      await pumpItem(
+        tester,
+        mem,
+        groupDate: DateTime(2024, 6, 1),
+        target: _target(
+          TargetUnit.count,
+          targetValue,
+          period: Period.aWeek,
+        ),
+        acts: [_finishedAct(onTheDay)],
+      );
+
+      expect(find.text('$dayCount'), findsOneWidget);
+      expect(find.text('$weekCount'), findsNothing);
+      expect(find.text(' / '), findsOneWidget);
+      expect(find.text('0~'), findsOneWidget);
+      expect(find.text('$targetValue'), findsNothing);
+      expect(find.text('w'), findsNothing);
     });
 
     testWidgets('shows that day recorded time over the time target',
@@ -647,8 +718,12 @@ void main() {
         tester,
         mem,
         groupDate: DateTime(2024, 6, 1),
-        target: _target(TargetUnit.time, 3 * 60 * 60),
-        dayAmount: const DayActAmount(1, Duration(minutes: 30)),
+        target: _target(
+          TargetUnit.time,
+          3 * 60 * 60,
+          period: Period.aDay,
+        ),
+        dayAmount: const ActAmount(1, Duration(minutes: 30)),
       );
 
       expect(find.text('0:30'), findsOneWidget);
@@ -661,7 +736,7 @@ void main() {
         tester,
         mem,
         groupDate: DateTime(2024, 6, 1),
-        isDateView: false,
+        group: Period.aMonth,
         target: _target(TargetUnit.time, 3 * 60 * 60),
         latestAct: ActiveAct(_memId, DateAndTime(2026, 10, 20, 9)),
       );
@@ -671,16 +746,92 @@ void main() {
       expect(find.text('3:00'), findsOneWidget);
       expect(find.text('0:30'), findsNothing);
     });
+
+    testWidgets(
+        'shows the group amount when the target period is longer than the group',
+        (tester) async {
+      await pumpItem(
+        tester,
+        mem,
+        groupDate: DateTime(2024, 6, 1),
+        group: Period.aMonth,
+        target: _target(
+          TargetUnit.time,
+          3 * 60 * 60,
+          period: Period.aYear,
+        ),
+      );
+
+      expect(find.text('1:00'), findsOneWidget);
+      expect(find.text('0:13~'), findsOneWidget);
+      expect(find.text('3:00'), findsNothing);
+      expect(find.text('y'), findsNothing);
+    });
   });
 }
 
-Target _target(TargetUnit unit, int value) => Target(
+const _otherMemId = 3;
+
+Target _target(
+  TargetUnit unit,
+  int value, {
+  Period period = Period.aMonth,
+}) =>
+    Target(
       memId: _memId,
       targetType: TargetType.equalTo,
       targetUnit: unit,
       value: value,
-      period: Period.aMonth,
+      period: period,
     );
+
+SavedActEntityV1 _finishedAct(DateTime start) => savedAct(
+      id: 1,
+      memId: _memId,
+      start: start,
+      end: start.add(const Duration(hours: 1)),
+      createdAt: start,
+    );
+
+Future<AppDatabase> _openMemoryDatabase() async {
+  final db = AppDatabase.memory();
+  await Migrator(db).createAll();
+  DriftDatabaseAccessor.reset();
+  Singleton.override<DriftDatabaseAccessor>(
+    DriftDatabaseAccessor.withDatabase(db),
+  );
+  addTearDown(() async {
+    await db.close();
+    DriftDatabaseAccessor.reset();
+  });
+  final createdAt = DateTime(2024, 6, 1);
+  Future<void> insertMem(int id, String name) => db.into(db.mems).insert(
+        MemsCompanion.insert(
+          id: Value(id),
+          name: name,
+          createdAt: createdAt,
+        ),
+      );
+  await insertMem(_memId, _memName);
+  await insertMem(_otherMemId, 'mem-b');
+  return db;
+}
+
+Future<void> _insertAct(
+  AppDatabase db, {
+  required int memId,
+  required DateTime start,
+  String? actKind,
+}) =>
+    db.into(db.acts).insert(
+          ActsCompanion.insert(
+            memId: memId,
+            createdAt: start,
+            start: Value(start),
+            end: Value(start.add(const Duration(hours: 1))),
+            actKind: Value(actKind),
+          ),
+        );
 
 String _timeText(WidgetTester tester, DateTime dateTime) =>
     TimeOfDay.fromDateTime(dateTime).format(
