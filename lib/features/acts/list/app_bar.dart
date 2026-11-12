@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
+import 'package:mem/features/acts/period_menu_item.dart';
 import 'package:mem/features/acts/period_view.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/states.dart';
@@ -67,10 +68,9 @@ class _ActListAppBar extends StatelessWidget {
               icon: Icon(_group.icon),
               itemBuilder: (context) => [
                 for (final unit in Period.values)
-                  PopupMenuItem(
-                    value: unit,
-                    enabled: unit != _group,
-                    child: Text(unit.name),
+                  PeriodMenuItem(
+                    period: unit,
+                    selected: _group,
                   ),
               ],
             ),
