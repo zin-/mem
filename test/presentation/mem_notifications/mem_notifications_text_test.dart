@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
@@ -54,7 +54,7 @@ Future<void> _pumpText(
         memEntitiesProvider.overrideWithValue([]),
       ],
       child: MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('en'),
         onGenerateTitle: (context) => buildL10n(context).test,
@@ -93,8 +93,7 @@ void main() {
       );
 
       final context = tester.element(find.byType(MemNotificationText));
-      final formattedTime =
-          const TimeOfDay(hour: 1, minute: 0).format(context);
+      final formattedTime = const TimeOfDay(hour: 1, minute: 0).format(context);
       final l10n = buildL10n(context);
 
       expect(

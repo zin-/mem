@@ -1,5 +1,5 @@
 import 'package:day_picker/day_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -21,7 +21,7 @@ Widget _buildTestApp(
   return ProviderScope(
     overrides: overrides ?? [],
     child: MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      localizationsDelegates: appLocalizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: const Locale('en'),
       onGenerateTitle: (context) => buildL10n(context).test,

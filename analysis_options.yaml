@@ -37,5 +37,9 @@ analyzer:
     - windows/**
     - macos/**
     - linux/**
-  plugins:
-    # - custom_lint  # Temporarily disabled due to Riverpod 3.0 compatibility issues
+    # gen-l10n は Flutter 3.50 で非推奨になった GlobalMaterialLocalizations を出す。
+    # 生成のたびに戻るので、ここは解析対象から外す。
+    - lib/generated/**
+
+plugins:
+  riverpod_lint: ^3.2.0

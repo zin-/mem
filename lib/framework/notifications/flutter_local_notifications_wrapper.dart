@@ -178,6 +178,10 @@ Future<void> onDidReceiveNotificationResponse(
               payload[memIdKey],
             );
             break;
+
+          // 通知を閉じただけでは mem を開かず、アクションもしない
+          case fln.NotificationResponseType.notificationDismissed:
+            break;
         }
       },
       {

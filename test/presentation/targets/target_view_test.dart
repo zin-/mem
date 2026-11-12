@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/targets/target_view.dart';
@@ -9,6 +9,7 @@ import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/generated/l10n/app_localizations.dart';
 import 'package:mem/framework/view/integer_text_form_field.dart';
 import 'package:mem/framework/date_and_time/time_text_form_field.dart';
+import 'package:mem/l10n/l10n.dart';
 
 class _FakeTargetState extends TargetState {
   final TargetEntityV1 _entity;
@@ -43,7 +44,7 @@ void main() {
               ),
             ],
             child: MaterialApp(
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              localizationsDelegates: appLocalizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(
                 body: TargetText(1),
@@ -78,7 +79,7 @@ void main() {
               ),
             ],
             child: MaterialApp(
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              localizationsDelegates: appLocalizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(
                 body: TargetText(1),
@@ -171,7 +172,7 @@ void main() {
               ),
             ],
             child: MaterialApp(
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              localizationsDelegates: appLocalizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(
                 body: TargetText(1),
@@ -216,7 +217,7 @@ void main() {
               ),
             ],
             child: MaterialApp(
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              localizationsDelegates: appLocalizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(
                 body: TargetText(1),
@@ -262,7 +263,7 @@ void main() {
               ),
             ],
             child: MaterialApp(
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              localizationsDelegates: appLocalizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(
                 body: TargetText(1),
@@ -308,7 +309,7 @@ void main() {
               ),
             ],
             child: MaterialApp(
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              localizationsDelegates: appLocalizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(
                 body: TargetText(1),
@@ -354,7 +355,7 @@ void main() {
               ),
             ],
             child: MaterialApp(
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              localizationsDelegates: appLocalizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(
                 body: TargetText(1),
@@ -399,7 +400,7 @@ void main() {
               ),
             ],
             child: MaterialApp(
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              localizationsDelegates: appLocalizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(
                 body: TargetText(1),
@@ -570,7 +571,7 @@ Future<ProviderContainer> _pumpTargetText(
     UncontrolledProviderScope(
       container: container,
       child: MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: TargetText(1),

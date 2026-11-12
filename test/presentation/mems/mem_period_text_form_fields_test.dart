@@ -1,6 +1,6 @@
 import '../../entity_factories.dart';
 import '../../helpers.mocks.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -132,7 +132,8 @@ void main() {
         expect(editingMem.value.period?.start?.minute, pickedTime.minute);
         expect(
           startTimeFieldDisplayText(tester),
-          pickedTime.format(tester.element(find.byType(TimeOfDayTextFormField).first)),
+          pickedTime.format(
+              tester.element(find.byType(TimeOfDayTextFormField).first)),
         );
       },
     );

@@ -1,6 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:day_picker/day_picker.dart';
-import 'package:flutter/material.dart';
+// day_picker 2.3.0 のボタンは package:flutter/material.dart の Theme を読む
+// ignore: deprecated_member_use
+import 'package:flutter/material.dart' as flutter_material;
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -86,22 +89,25 @@ class _MemRepeatByDaysOfWeekNotificationView extends StatelessWidget {
           final locale = Localizations.localeOf(context);
           final colorScheme = Theme.of(context).colorScheme;
 
-          return SelectWeekDays(
-            onSelect: (days) => _onChanged(days.map(int.parse)),
-            days: weekdaysInLocalizedOrder(localizations)
-                .map((weekday) => DayInWeek(
-                      weekdayLabel(localizations, locale, weekday),
-                      dayKey: weekday.toString(),
-                      isSelected: _repeatByDaysOfWeek.contains(weekday),
-                    ))
-                .toList(growable: false),
-            backgroundColor: colorScheme.surface,
-            selectedDaysFillColor: colorScheme.primary,
-            selectedDayTextColor: colorScheme.onPrimary,
-            unselectedDaysFillColor: Colors.transparent,
-            unSelectedDayTextColor: colorScheme.onSurface,
-            elevation: 0,
-            border: false,
+          return flutter_material.Theme(
+            data: flutter_material.ThemeData(),
+            child: SelectWeekDays(
+              onSelect: (days) => _onChanged(days.map(int.parse)),
+              days: weekdaysInLocalizedOrder(localizations)
+                  .map((weekday) => DayInWeek(
+                        weekdayLabel(localizations, locale, weekday),
+                        dayKey: weekday.toString(),
+                        isSelected: _repeatByDaysOfWeek.contains(weekday),
+                      ))
+                  .toList(growable: false),
+              backgroundColor: colorScheme.surface,
+              selectedDaysFillColor: colorScheme.primary,
+              selectedDayTextColor: colorScheme.onPrimary,
+              unselectedDaysFillColor: Colors.transparent,
+              unSelectedDayTextColor: colorScheme.onSurface,
+              elevation: 0,
+              border: false,
+            ),
           );
         },
         {

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/mems/list/item/completion_dialog.dart';
 import 'package:mem/generated/l10n/app_localizations.dart';
@@ -90,7 +90,7 @@ void main() {
       var dialogShown = false;
       await tester.pumpWidget(
         MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: Builder(
@@ -111,7 +111,8 @@ void main() {
       expect(dialogShown, isTrue);
     });
 
-    testWidgets('memListCompletionStopButton without skip menu', (tester) async {
+    testWidgets('memListCompletionStopButton without skip menu',
+        (tester) async {
       var dialogShown = false;
       await tester.pumpWidget(
         MaterialApp(

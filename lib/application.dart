@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'generated/l10n/app_localizations.dart';
 import 'l10n/l10n.dart';
@@ -21,7 +21,7 @@ class MemApplication extends StatelessWidget {
         () => MaterialApp.router(
           routerConfig: buildRouter(_initialPath),
           onGenerateTitle: (context) => buildL10n(context).appTitle,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           // ローカルでWindows向けにテストするときに必要
           locale: _languageCode == null ? null : Locale(_languageCode),

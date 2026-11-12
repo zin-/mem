@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../../entity_factories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
@@ -38,7 +38,14 @@ void main() {
         (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60 + 30 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
+      final notification = savedMemNotification(
+          id: 1,
+          memId: memId,
+          type: MemNotificationType.repeat,
+          timeOfDaySeconds: 9 * 60 * 60 + 30 * 60,
+          message: 'Repeat',
+          createdAt: now,
+          updatedAt: now);
 
       await tester.pumpWidget(
         _buildTestApp(
@@ -66,7 +73,13 @@ void main() {
         (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, message: 'Repeat', createdAt: now, updatedAt: now);
+      final notification = savedMemNotification(
+          id: 1,
+          memId: memId,
+          type: MemNotificationType.repeat,
+          message: 'Repeat',
+          createdAt: now,
+          updatedAt: now);
 
       await tester.pumpWidget(
         _buildTestApp(
@@ -92,7 +105,14 @@ void main() {
     testWidgets('calls onTimeChanged when time is changed', (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60 + 30 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
+      final notification = savedMemNotification(
+          id: 1,
+          memId: memId,
+          type: MemNotificationType.repeat,
+          timeOfDaySeconds: 9 * 60 * 60 + 30 * 60,
+          message: 'Repeat',
+          createdAt: now,
+          updatedAt: now);
 
       final notifier =
           ListValueStateNotifier<MemNotificationEntityV1>([notification]);
@@ -126,7 +146,14 @@ void main() {
         (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60 + 30 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
+      final notification = savedMemNotification(
+          id: 1,
+          memId: memId,
+          type: MemNotificationType.repeat,
+          timeOfDaySeconds: 9 * 60 * 60 + 30 * 60,
+          message: 'Repeat',
+          createdAt: now,
+          updatedAt: now);
 
       final notifier =
           ListValueStateNotifier<MemNotificationEntityV1>([notification]);
@@ -157,7 +184,14 @@ void main() {
         (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60 + 30 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
+      final notification = savedMemNotification(
+          id: 1,
+          memId: memId,
+          type: MemNotificationType.repeat,
+          timeOfDaySeconds: 9 * 60 * 60 + 30 * 60,
+          message: 'Repeat',
+          createdAt: now,
+          updatedAt: now);
 
       final notifier =
           ListValueStateNotifier<MemNotificationEntityV1>([notification]);
@@ -189,7 +223,14 @@ void main() {
 
     testWidgets('handles memId null', (tester) async {
       final now = DateTime.now();
-      final notification = savedMemNotification(id: 1, memId: null, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60 + 30 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
+      final notification = savedMemNotification(
+          id: 1,
+          memId: null,
+          type: MemNotificationType.repeat,
+          timeOfDaySeconds: 9 * 60 * 60 + 30 * 60,
+          message: 'Repeat',
+          createdAt: now,
+          updatedAt: now);
 
       await tester.pumpWidget(
         _buildTestApp(
