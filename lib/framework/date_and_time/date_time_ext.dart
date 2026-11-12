@@ -3,15 +3,17 @@ import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 
 extension DateTimeExt on DateTime {
+  DateAndTime atStartOfDay(TimeOfDay startOfDay) => DateAndTime(
+        year,
+        month,
+        day,
+        startOfDay.hour,
+        startOfDay.minute,
+      );
+
   // 0 時の暦日に logicalDay を使うと、startOfDay より前なので前日になる
   WithStartAndEnd dayPeriod(TimeOfDay startOfDay) {
-    final start = DateAndTime(
-      year,
-      month,
-      day,
-      startOfDay.hour,
-      startOfDay.minute,
-    );
+    final start = atStartOfDay(startOfDay);
     return WithStartAndEnd(start, start.shiftCalendarDays(1));
   }
 

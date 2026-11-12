@@ -44,13 +44,8 @@ extension PeriodExt on Period {
   }) =>
       v(
         () {
-          DateAndTime at(int year, int month, int day) => DateAndTime(
-                year,
-                month,
-                day,
-                startOfDay.hour,
-                startOfDay.minute,
-              );
+          DateAndTime at(int year, int month, int day) =>
+              DateTime(year, month, day).atStartOfDay(startOfDay);
 
           final day = now.logicalDay(startOfDay);
           final base = at(day.year, day.month, day.day);

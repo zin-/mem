@@ -96,17 +96,8 @@ class ActListGroup {
   ) {
     final end = unit.exclusiveEnd(start);
     return WithStartAndEnd(
-      _atStartOfDay(start, startOfDay),
-      _atStartOfDay(end, startOfDay),
+      start.atStartOfDay(startOfDay),
+      end.atStartOfDay(startOfDay),
     );
   }
-
-  static DateAndTime _atStartOfDay(DateTime day, TimeOfDay startOfDay) =>
-      DateAndTime(
-        day.year,
-        day.month,
-        day.day,
-        startOfDay.hour,
-        startOfDay.minute,
-      );
 }
