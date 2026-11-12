@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/modules/live_elapsed_time_text.dart';
 
@@ -34,8 +34,7 @@ void main() {
     });
   });
 
-  testWidgets(
-      'when start changes, elapsed display uses new start immediately',
+  testWidgets('when start changes, elapsed display uses new start immediately',
       (WidgetTester tester) async {
     final key = GlobalKey();
     final longAgo = DateTime.now().subtract(const Duration(hours: 48));

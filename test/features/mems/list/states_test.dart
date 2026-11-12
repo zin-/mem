@@ -1,6 +1,6 @@
 import '../../../entity_factories.dart';
 import 'helpers.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
@@ -576,7 +576,8 @@ void main() {
       expect(section, DateAndTime(2024, 10, 12));
     });
 
-    test('sorts a reached daily count with notifyAt against a mem still on today',
+    test(
+        'sorts a reached daily count with notifyAt against a mem still on today',
         () {
       final reached = entity(
         id: 1,

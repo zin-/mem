@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/mems/list/filter_value.dart';
@@ -19,8 +19,9 @@ class MemListFilter extends StatelessWidget {
             builder: (context, ref, child) {
               final filter = ref.watch(memListFilterStateProvider);
 
-              void update(MemListFilterValue value) =>
-                  ref.read(memListFilterStateProvider.notifier).updatedBy(value);
+              void update(MemListFilterValue value) => ref
+                  .read(memListFilterStateProvider.notifier)
+                  .updatedBy(value);
 
               final sections = [
                 Column(

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/framework/date_and_time/date_view.dart';
 import 'package:mem/generated/l10n/app_localizations.dart';
@@ -14,7 +14,7 @@ void main() {
   ) async {
     await widgetTester.pumpWidget(
       MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         onGenerateTitle: (context) => buildL10n(context).test,
         home: Scaffold(

@@ -1,5 +1,5 @@
 // coverage:ignore-file
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:settings_ui/settings_ui.dart';

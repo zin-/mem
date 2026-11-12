@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -31,7 +31,7 @@ int randomInt([int max = 42949671]) => Random().nextInt(max);
 void main() {}
 
 Widget buildTestApp(Widget widget) => MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      localizationsDelegates: appLocalizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       // FIXME この仕組みはなくす
       onGenerateTitle: (context) => buildL10n(context).test,

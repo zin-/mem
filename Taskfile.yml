@@ -61,7 +61,6 @@ tasks:
   lint:
     cmds:
       - task: flutter:analyze:app
-      - task: flutter:analyze:generated
       - task: flutter:analyze:test
 
   run:

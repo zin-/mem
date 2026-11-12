@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/generated/l10n/app_localizations.dart';

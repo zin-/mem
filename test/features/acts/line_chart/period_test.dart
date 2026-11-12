@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
@@ -66,8 +66,7 @@ void main() {
       expect(current.start, DateAndTime(2026, 7, 14, 5, 0));
       expect(current.end, DateAndTime(2026, 10, 14, 5, 0));
 
-      final previous =
-          Period.threeMonth.toPeriod(now, startOfDay, offset: -1)!;
+      final previous = Period.threeMonth.toPeriod(now, startOfDay, offset: -1)!;
       expect(previous.start, DateAndTime(2026, 4, 14, 5, 0));
       expect(previous.end, DateAndTime(2026, 7, 14, 5, 0));
     });

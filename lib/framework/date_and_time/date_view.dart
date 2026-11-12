@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/framework/view/synced_text_editing_controller.dart';
 

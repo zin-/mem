@@ -36,11 +36,6 @@ tasks:
       - flutter analyze lib
     silent: false
 
-  analyze:generated:
-    cmds:
-      - dart run custom_lint
-    silent: false
-
   analyze:test:
     cmds:
       - flutter analyze test

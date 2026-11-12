@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/framework/workmanager_wrapper.dart';
 import 'package:mem/features/logger/log_service.dart';

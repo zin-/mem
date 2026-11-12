@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/databases/database.dart' hide Mem, MemParent;
@@ -25,6 +25,7 @@ import 'package:mockito/mockito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../helpers.mocks.dart';
+import 'package:mem/l10n/l10n.dart';
 
 final _l10n = lookupAppLocalizations(const Locale('ja'));
 
@@ -132,7 +133,7 @@ void main() {
         container: container,
         child: MaterialApp(
           locale: const Locale('ja'),
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: Form(

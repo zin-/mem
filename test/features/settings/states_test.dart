@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/settings/constants.dart';
@@ -47,8 +47,8 @@ void main() {
     test('replace updates store and persists', () async {
       const updated = TimeOfDay(hour: 9, minute: 0);
 
-      when(mockedPreferenceRepository.shipByKey(startOfDayKey))
-          .thenAnswer((_) async => PreferenceEntity(startOfDayKey, defaultStartOfDay));
+      when(mockedPreferenceRepository.shipByKey(startOfDayKey)).thenAnswer(
+          (_) async => PreferenceEntity(startOfDayKey, defaultStartOfDay));
       when(mockedPreferenceRepository.shipByKey(notifyAfterInactivity))
           .thenAnswer((_) async => PreferenceEntity(
                 notifyAfterInactivity,

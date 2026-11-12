@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mem/framework/view/app_bar_actions_builder.dart';
 import 'package:mem/l10n/l10n.dart';

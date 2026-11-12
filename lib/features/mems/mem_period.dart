@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period_view.dart';
 import 'package:mem/features/mems/list/states.dart';
@@ -73,9 +73,7 @@ class MemPeriodTextFormFields extends ConsumerWidget {
               () {
                 final latestMemEntity =
                     ref.read(editingMemByMemIdProvider(_memId));
-                ref
-                    .read(editingMemByMemIdProvider(_memId).notifier)
-                    .updatedBy(
+                ref.read(editingMemByMemIdProvider(_memId).notifier).updatedBy(
                       latestMemEntity.updatedWith(
                         (mem) => mem.withPeriod(pickedPeriod),
                       ),
