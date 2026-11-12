@@ -52,6 +52,17 @@ await saveToDatabase(user);
 await batchUpdate(users);
 ```
 
+**❌ 関数名で言えることをコメントする:**
+```dart
+// 宣言順が後の期間の方が長い
+bool isLongerThan(Period other) => index > other.index;
+```
+
+**✅ 比較の意味は関数名が持つ:**
+```dart
+bool isLongerThan(Period other) => index > other.index;
+```
+
 **原則**: コードが「何をしているか」は自明。コメントは「なぜそうしたか」のみ書く
 
 **テストコードでの注意:**
