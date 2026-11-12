@@ -1,0 +1,40 @@
+---
+description: 画面は Material Design 3 に従う（UI 実装時）
+globs: lib/**/*.dart
+alwaysApply: false
+---
+
+# Material Design 3
+
+画面は Material Design 3 に従う。色、形、高さ、文字、間隔は、仕様と `ThemeData` から取る。
+
+仕様が定めている値を使う。コンポーネントは Material 3 の Widget を使い、同じ役割の見た目を独自に作らない。
+
+数値は `lib/values/dimens.dart` に名前を付け、使用箇所はそこを参照する。仕様の項目ごとにルールファイルは足さない。
+
+既存画面の一括置換はしない。新たに書く箇所と、その変更で触った箇所だけ従う。
+
+## Example(具体例)
+
+**❌ カードの全方向に画面端の 16 を付け、カード間が 32 になる:**
+
+```dart
+Card(
+  margin: defaultPadding,
+)
+```
+
+**✅ 横は画面端の 16、縦は隣と足してカード間 8。値は `dimens.dart`:**
+
+```dart
+Card(
+  margin: cardMargin,
+)
+```
+
+## Relations(関連)
+
+- No Magic Number
+- `lib/values/dimens.dart`
+- `ThemeData`（`useMaterial3: true`）
+- [Material Design 3](https://m3.material.io/)
