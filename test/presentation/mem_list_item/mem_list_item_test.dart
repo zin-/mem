@@ -1287,9 +1287,10 @@ void main() {
         );
 
         expect(find.text('$todayCount'), findsOneWidget);
-        expect(find.text(' / '), findsNWidgets(2));
-        expect(find.text('$targetValue'), findsOneWidget);
-        expect(find.text('w'), findsOneWidget);
+        expect(find.text(' / '), findsOneWidget);
+        expect(find.text('0~'), findsOneWidget);
+        expect(find.text('$targetValue'), findsNothing);
+        expect(find.text('w'), findsNothing);
         expect(find.text('$weekCount'), findsNothing);
       });
 
@@ -1311,9 +1312,10 @@ void main() {
         );
 
         expect(find.text('$todayCount'), findsOneWidget);
-        expect(find.text(' / '), findsNWidgets(2));
-        expect(find.text('$targetValue'), findsOneWidget);
-        expect(find.text('w'), findsOneWidget);
+        expect(find.text(' / '), findsOneWidget);
+        expect(find.text('0~'), findsOneWidget);
+        expect(find.text('$targetValue'), findsNothing);
+        expect(find.text('w'), findsNothing);
         expect(find.text('0'), findsNothing);
       });
 
@@ -1336,9 +1338,10 @@ void main() {
         );
 
         expect(find.text('$todayCount'), findsOneWidget);
-        expect(find.text(' / '), findsNWidgets(2));
-        expect(find.text('$targetValue'), findsOneWidget);
-        expect(find.text('w'), findsOneWidget);
+        expect(find.text(' / '), findsOneWidget);
+        expect(find.text('0~'), findsOneWidget);
+        expect(find.text('$targetValue'), findsNothing);
+        expect(find.text('w'), findsNothing);
         expect(find.text('0'), findsNothing);
         expect(find.text('$weekCount'), findsNothing);
       });
@@ -1364,9 +1367,10 @@ void main() {
 
         expect(find.text('$dayCount'), findsOneWidget);
         expect(find.text('$periodCount'), findsNothing);
-        expect(find.text(' / '), findsNWidgets(2));
-        expect(find.text('$targetValue'), findsOneWidget);
-        expect(find.text('m'), findsOneWidget);
+        expect(find.text(' / '), findsOneWidget);
+        expect(find.text('0~'), findsOneWidget);
+        expect(find.text('$targetValue'), findsNothing);
+        expect(find.text('m'), findsNothing);
         expect(find.text('0'), findsNothing);
       });
 
@@ -1466,7 +1470,7 @@ void main() {
       });
 
       testWidgets(
-          'shows today recorded time and the week unit for a weekly time target',
+          'shows today recorded time over the daily equivalent of a weekly time target',
           (tester) async {
         const targetSeconds = 3 * Duration.secondsPerHour;
         const weekRecorded = Duration(hours: 1, minutes: 30);
@@ -1517,12 +1521,13 @@ void main() {
 
         expect(find.text(todayRecorded.formatHHmm()), findsOneWidget);
         expect(find.text(weekRecorded.formatHHmm()), findsNothing);
+        expect(find.text('0:25~'), findsOneWidget);
         expect(
           find.text(const Duration(seconds: targetSeconds).formatHHmm()),
-          findsOneWidget,
+          findsNothing,
         );
-        expect(find.text(' / '), findsNWidgets(2));
-        expect(find.text('w'), findsOneWidget);
+        expect(find.text(' / '), findsOneWidget);
+        expect(find.text('w'), findsNothing);
       });
     });
 

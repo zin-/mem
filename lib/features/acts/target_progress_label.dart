@@ -8,8 +8,10 @@ import 'package:mem/features/acts/list/duration.dart';
 import 'package:mem/features/acts/period_view.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/targets/target.dart';
+import 'package:mem/features/targets/target_shown_value.dart';
 
 const _tickInterval = Duration(seconds: 1);
+const _approximateMark = '~';
 
 class TargetProgressLabel extends StatefulWidget {
   final ActAmount _amount;
@@ -42,10 +44,28 @@ class TargetProgressLabel extends StatefulWidget {
         TargetUnit.time => _recordedAt(now).formatHHmm(),
       };
 
-  String _targetText() => switch (_target.targetUnit) {
-        TargetUnit.count => _target.value.toString(),
-        TargetUnit.time => Duration(seconds: _target.value).formatHHmm(),
-      };
+  TargetShownValue? _shownValue() => TargetShownValue.of(
+        value: _target.value,
+        period: _target.period,
+        shownIn: _shownIn,
+      );
+
+  String _targetText() {
+    String textOf(int value) => switch (_target.targetUnit) {
+          TargetUnit.count => value.toString(),
+          TargetUnit.time => Duration(seconds: value).formatHHmm(),
+        };
+
+    final shown = _shownValue();
+    if (shown == null) {
+      return textOf(_target.value);
+    }
+    final text = textOf(shown.value);
+    if (!shown.approximate) {
+      return text;
+    }
+    return '$text$_approximateMark';
+  }
 
   Duration _recordedAt(DateTime now) {
     final since = _runningSince();
@@ -56,11 +76,10 @@ class TargetProgressLabel extends StatefulWidget {
   }
 
   String? _periodLabel() {
-    final period = _target.period;
-    if (period == _shownIn) {
+    if (_shownValue() != null) {
       return null;
     }
-    return period.shortLabel;
+    return _target.period.shortLabel;
   }
 
   @override

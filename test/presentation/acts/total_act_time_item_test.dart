@@ -620,7 +620,7 @@ void main() {
     });
 
     testWidgets(
-        'shows that day count and the month unit to the right of the total',
+        'shows that day count and the scaled target to the right of the total',
         (tester) async {
       const monthCount = 2;
       const dayCount = 1;
@@ -650,9 +650,10 @@ void main() {
 
       expect(find.text('$dayCount'), findsOneWidget);
       expect(find.text('$monthCount'), findsNothing);
-      expect(find.text(' / '), findsNWidgets(2));
-      expect(find.text('5'), findsOneWidget);
-      expect(find.text('m'), findsOneWidget);
+      expect(find.text(' / '), findsOneWidget);
+      expect(find.text('0~'), findsOneWidget);
+      expect(find.text('5'), findsNothing);
+      expect(find.text('m'), findsNothing);
       expect(find.text('1:00'), findsOneWidget);
       expect(find.byType(LiveElapsedTimeText), findsNothing);
       final row = tester.getRect(
@@ -665,12 +666,12 @@ void main() {
       );
       expect(tester.getTopLeft(find.text('1:00')).dx, closeTo(row.left, 1));
       expect(
-        tester.getTopRight(find.text('m')).dx,
+        tester.getTopRight(find.text('0~')).dx,
         closeTo(row.right, 1),
       );
     });
 
-    testWidgets('shows that day count and the week unit on a day row',
+    testWidgets('shows that day count and the scaled target on a day row',
         (tester) async {
       const weekCount = 2;
       const dayCount = 1;
@@ -705,9 +706,10 @@ void main() {
 
       expect(find.text('$dayCount'), findsOneWidget);
       expect(find.text('$weekCount'), findsNothing);
-      expect(find.text(' / '), findsNWidgets(2));
-      expect(find.text('$targetValue'), findsOneWidget);
-      expect(find.text('w'), findsOneWidget);
+      expect(find.text(' / '), findsOneWidget);
+      expect(find.text('0~'), findsOneWidget);
+      expect(find.text('$targetValue'), findsNothing);
+      expect(find.text('w'), findsNothing);
     });
 
     testWidgets('shows that day recorded time over the time target',
@@ -761,8 +763,9 @@ void main() {
       );
 
       expect(find.text('1:00'), findsOneWidget);
-      expect(find.text('3:00'), findsOneWidget);
-      expect(find.text('y'), findsOneWidget);
+      expect(find.text('0:13~'), findsOneWidget);
+      expect(find.text('3:00'), findsNothing);
+      expect(find.text('y'), findsNothing);
     });
   });
 }
