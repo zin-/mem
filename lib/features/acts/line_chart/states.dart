@@ -7,14 +7,31 @@ import 'package:mem/features/logger/log_service.dart';
 enum Period {
   aDay,
   aWeek,
-  aMonth(1),
-  threeMonth(3),
-  aYear(12),
+  aMonth,
+  threeMonth,
+  aYear,
   all;
 
-  final int? months;
+  int? get months => switch (this) {
+        Period.aMonth => 1,
+        Period.threeMonth => 3,
+        Period.aYear => DateTime.monthsPerYear,
+        Period.aDay || Period.aWeek || Period.all => null,
+      };
 
-  const Period([this.months]);
+  DateAndTime exclusiveEnd(DateTime start) {
+    final day = DateAndTime(start.year, start.month, start.day);
+    return switch (this) {
+      Period.aDay => day.shiftCalendarDays(1),
+      Period.aWeek => day.shiftCalendarDays(DateTime.daysPerWeek),
+      Period.aMonth || Period.threeMonth || Period.aYear => DateAndTime(
+          start.year,
+          start.month + months!,
+          1,
+        ),
+      Period.all => throw ArgumentError(this),
+    };
+  }
 }
 
 extension PeriodExt on Period {

@@ -94,19 +94,7 @@ class ActListGroup {
     DateTime start,
     TimeOfDay startOfDay,
   ) {
-    final day = DateAndTime(start.year, start.month, start.day);
-    final end = switch (unit) {
-      Period.aDay => day.shiftCalendarDays(1),
-      Period.aWeek => day.shiftCalendarDays(DateTime.daysPerWeek),
-      Period.aMonth => DateAndTime(start.year, start.month + 1, 1),
-      Period.threeMonth => DateAndTime(
-          start.year,
-          start.month + Period.threeMonth.months!,
-          1,
-        ),
-      Period.aYear => DateAndTime(start.year + 1, DateTime.january, 1),
-      Period.all => throw ArgumentError(unit),
-    };
+    final end = unit.exclusiveEnd(start);
     return WithStartAndEnd(
       _atStartOfDay(start, startOfDay),
       _atStartOfDay(end, startOfDay),
