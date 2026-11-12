@@ -1,4 +1,4 @@
-import 'package:mem/features/acts/line_chart/states.dart';
+import 'package:mem/framework/date_and_time/period.dart';
 
 enum TargetType { equalTo, lessThan, moreThan }
 

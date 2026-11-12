@@ -5,7 +5,7 @@ import 'package:mem/features/targets/target_view.dart';
 import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/targets/target.dart';
-import 'package:mem/features/acts/line_chart/states.dart';
+import 'package:mem/framework/date_and_time/period.dart';
 import 'package:mem/generated/l10n/app_localizations.dart';
 import 'package:mem/framework/view/integer_text_form_field.dart';
 import 'package:mem/framework/date_and_time/time_text_form_field.dart';

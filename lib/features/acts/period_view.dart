@@ -1,5 +1,5 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:mem/features/acts/line_chart/states.dart';
+import 'package:mem/framework/date_and_time/period.dart';
 
 extension PeriodView on Period {
   String get shortLabel => switch (this) {

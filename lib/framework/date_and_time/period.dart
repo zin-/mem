@@ -1,8 +1,8 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
-import 'package:mem/features/logger/log_service.dart';
 
 enum Period {
   aDay,
@@ -94,17 +94,4 @@ extension PeriodExt on Period {
           'offset': offset,
         },
       );
-}
-
-extension WithStartAndEndRangeFormat on WithStartAndEnd {
-  String formatCompactRange(MaterialLocalizations localizations) {
-    final startLabel = localizations.formatCompactDate(start);
-    final inclusiveEnd = end.shiftCalendarDays(-1);
-    if (start.year == inclusiveEnd.year &&
-        start.month == inclusiveEnd.month &&
-        start.day == inclusiveEnd.day) {
-      return startLabel;
-    }
-    return '$startLabel – ${localizations.formatCompactDate(inclusiveEnd)}';
-  }
 }
