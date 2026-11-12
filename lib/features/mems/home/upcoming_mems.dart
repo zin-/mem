@@ -42,33 +42,55 @@ List<MemEntity> upcomingMems(
   required DateTime now,
   required DateTime startOfToday,
   Map<int, int> periodCountByMemId = const {},
-}) {
-  DateTime? notifyAtOf(MemEntity mem) => mem
-      .toDomain()
-      .notifyAt(
-        startOfToday,
-        savedMemNotifications
-            .where((notification) => notification.value.memId == mem.id)
-            .map((notification) => notification.value),
-        mem.latestAct,
-        target: mem.target,
-        todayCount: periodCountByMemId[mem.id] ?? 0,
-      )
-      ?.at;
+}) =>
+    _memsByNotifyAt(
+      mems,
+      savedMemNotifications,
+      startOfToday: startOfToday,
+      periodCountByMemId: periodCountByMemId,
+      include: (notifyAt) => !notifyAt.isBefore(now),
+    ).take(3).toList();
 
-  final upcoming = <({MemEntity mem, DateTime notifyAt})>[];
+List<MemEntity> overdueMems(
+  Iterable<MemEntity> mems,
+  Iterable<SavedMemNotificationEntityV1> savedMemNotifications, {
+  required DateTime now,
+  required DateTime startOfToday,
+  Map<int, int> periodCountByMemId = const {},
+}) =>
+    _memsByNotifyAt(
+      mems,
+      savedMemNotifications,
+      startOfToday: startOfToday,
+      periodCountByMemId: periodCountByMemId,
+      include: (notifyAt) => notifyAt.isBefore(now),
+    );
+
+List<MemEntity> _memsByNotifyAt(
+  Iterable<MemEntity> mems,
+  Iterable<SavedMemNotificationEntityV1> savedMemNotifications, {
+  required DateTime startOfToday,
+  required Map<int, int> periodCountByMemId,
+  required bool Function(DateTime notifyAt) include,
+}) {
+  final selected = <({MemEntity mem, DateTime notifyAt})>[];
   for (final mem in mems) {
     if (mem.isArchived || mem.doneAt != null) {
       continue;
     }
-    final notifyAt = notifyAtOf(mem);
-    if (notifyAt == null || notifyAt.isBefore(now)) {
+    final notifyAt = _notifyAtOf(
+      mem,
+      savedMemNotifications,
+      startOfToday,
+      periodCountByMemId,
+    );
+    if (notifyAt == null || !include(notifyAt)) {
       continue;
     }
-    upcoming.add((mem: mem, notifyAt: notifyAt));
+    selected.add((mem: mem, notifyAt: notifyAt));
   }
 
-  upcoming.sort((a, b) {
+  selected.sort((a, b) {
     final compared = a.notifyAt.compareTo(b.notifyAt);
     if (compared != 0) {
       return compared;
@@ -76,5 +98,24 @@ List<MemEntity> upcomingMems(
     return a.mem.id.compareTo(b.mem.id);
   });
 
-  return upcoming.take(3).map((entry) => entry.mem).toList();
+  return selected.map((entry) => entry.mem).toList();
 }
+
+DateTime? _notifyAtOf(
+  MemEntity mem,
+  Iterable<SavedMemNotificationEntityV1> savedMemNotifications,
+  DateTime startOfToday,
+  Map<int, int> periodCountByMemId,
+) =>
+    mem
+        .toDomain()
+        .notifyAt(
+          startOfToday,
+          savedMemNotifications
+              .where((notification) => notification.value.memId == mem.id)
+              .map((notification) => notification.value),
+          mem.latestAct,
+          target: mem.target,
+          todayCount: periodCountByMemId[mem.id] ?? 0,
+        )
+        ?.at;

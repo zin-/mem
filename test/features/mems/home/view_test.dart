@@ -12,6 +12,7 @@ import 'package:mem/features/settings/states.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/home_screen.dart';
 import 'package:mem/l10n/l10n.dart';
+import 'package:mem/values/colors.dart';
 
 import '../../../entity_factories.dart';
 
@@ -109,6 +110,82 @@ void main() {
 
       expect(find.byIcon(Icons.add), findsOneWidget);
       expect(find.text('Mem 3'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'shows overdue mems above at most three upcoming mems',
+    (tester) async {
+      final mems = [
+        at(1, DateTime(2099, 1, 3, 10)),
+        at(2, DateTime(2099, 1, 1, 10)),
+        at(3, DateTime(2099, 1, 4, 10)),
+        at(4, DateTime(2099, 1, 2, 10)),
+        at(20, DateTime(2020, 1, 1, 10)),
+        at(21, DateTime(2020, 1, 2, 10)),
+        at(22, DateTime(2020, 1, 3, 10)),
+        at(23, DateTime(2020, 1, 4, 10)),
+      ];
+      final memEntities = _FakeMemEntities(mems);
+      final l10n = buildL10n();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            preferenceProvider(startOfDayKey).overrideWith(
+              () => _FakePreference(),
+            ),
+            memEntitiesProvider.overrideWith(() => memEntities),
+            savedMemNotificationsProvider.overrideWith(
+              (ref) => ListValueStateNotifier<SavedMemNotificationEntityV1>([]),
+            ),
+            for (final mem in mems)
+              memNotificationsByMemIdProvider(mem.id).overrideWith(
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
+              ),
+          ],
+          child: MaterialApp(
+            home: HomeScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        tester
+            .widgetList<Text>(find.byType(Text))
+            .map((text) => text.data)
+            .whereType<String>()
+            .where(
+              (data) =>
+                  data == l10n.overdueMemsHeader || data.startsWith('Mem '),
+            )
+            .toList(),
+        [
+          l10n.overdueMemsHeader,
+          'Mem 20',
+          'Mem 21',
+          'Mem 22',
+          'Mem 23',
+          'Mem 2',
+          'Mem 4',
+          'Mem 1',
+        ],
+      );
+
+      ListTile tileOf(String name) => tester.widget<ListTile>(
+            find.ancestor(
+              of: find.text(name),
+              matching: find.byType(ListTile),
+            ),
+          );
+
+      for (final name in ['Mem 20', 'Mem 21', 'Mem 22', 'Mem 23']) {
+        expect(tileOf(name).tileColor, warningColor);
+      }
+      for (final name in ['Mem 2', 'Mem 4', 'Mem 1']) {
+        expect(tileOf(name).tileColor, isNull);
+      }
     },
   );
 }
