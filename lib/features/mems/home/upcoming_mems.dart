@@ -8,7 +8,23 @@ import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
 
-final upcomingMemsProvider = Provider.autoDispose<List<MemEntity>>((ref) {
+final upcomingMemsProvider = Provider.autoDispose<List<MemEntity>>(
+  (ref) => _homeMems(ref, upcomingMems),
+);
+
+final overdueMemsProvider = Provider.autoDispose<List<MemEntity>>(
+  (ref) => _homeMems(ref, overdueMems),
+);
+
+typedef _SelectHomeMems = List<MemEntity> Function(
+  Iterable<MemEntity> mems,
+  Iterable<SavedMemNotificationEntityV1> savedMemNotifications, {
+  required DateTime now,
+  required DateTime startOfToday,
+  Map<int, int> periodCountByMemId,
+});
+
+List<MemEntity> _homeMems(Ref ref, _SelectHomeMems select) {
   ref.listen(loadMemListProvider, (_, __) {});
 
   final mems = ref.watch(memEntitiesProvider);
@@ -20,7 +36,7 @@ final upcomingMemsProvider = Provider.autoDispose<List<MemEntity>>((ref) {
   );
 
   return v(
-    () => upcomingMems(
+    () => select(
       mems,
       savedMemNotifications,
       now: DateTime.now(),
@@ -34,7 +50,7 @@ final upcomingMemsProvider = Provider.autoDispose<List<MemEntity>>((ref) {
       'periodCountByMemId': periodCountByMemId,
     },
   );
-});
+}
 
 List<MemEntity> upcomingMems(
   Iterable<MemEntity> mems,

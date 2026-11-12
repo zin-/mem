@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/home/upcoming_mems.dart';
 import 'package:mem/features/mems/list/item/view.dart';
+import 'package:mem/l10n/l10n.dart';
+import 'package:mem/values/colors.dart';
+import 'package:mem/values/dimens.dart';
 
 class HomeView extends StatelessWidget {
   final ScrollController _scrollController;
@@ -15,11 +18,43 @@ class HomeView extends StatelessWidget {
           controller: _scrollController,
           physics: const AlwaysScrollableScrollPhysics(),
           children: const [
+            OverdueMemsView(),
             UpcomingMemsView(),
           ],
         ),
         {
           '_scrollController': _scrollController,
+        },
+      );
+}
+
+class OverdueMemsView extends ConsumerWidget {
+  const OverdueMemsView({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => v(
+        () {
+          final mems = ref.watch(overdueMemsProvider);
+          if (mems.isEmpty) {
+            return const SizedBox.shrink();
+          }
+
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: defaultPadding,
+                child: Text(buildL10n(context).overdueMemsHeader),
+              ),
+              for (final mem in mems)
+                MemListItemView(
+                  mem.toDomain(),
+                  key: ValueKey(mem.id),
+                  tileColor: warningColor,
+                ),
+            ],
+          );
         },
       );
 }
