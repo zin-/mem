@@ -29,18 +29,9 @@ class _FakePreference extends Preference<TimeOfDay> {
 
 class _FakeActEntities extends ActEntities {
   final Iterable<SavedActEntityV1> _initialState;
-  final List<SavedActEntityV1> _upserted = [];
-  final List<int> _removed = [];
-  int _fetchCallCount = 0;
   int? _lastFetchOffset;
-  int _startActbyCallCount = 0;
   int _resumeActByCallCount = 0;
-  int _pauseByMemIdCallCount = 0;
-  int _closeByMemIdCallCount = 0;
-  int _finishActbyCallCount = 0;
   int _skipActByCallCount = 0;
-  int _editCallCount = 0;
-  int _removeAsyncCallCount = 0;
 
   _FakeActEntities([Iterable<SavedActEntityV1>? initialState])
       : _initialState = initialState ?? [];
@@ -54,7 +45,6 @@ class _FakeActEntities extends ActEntities {
     Period period, {
     int offset = 0,
   }) async {
-    _fetchCallCount++;
     _lastFetchOffset = offset;
     await Future.microtask(() => upsert(_initialState));
     return _initialState;
@@ -62,7 +52,6 @@ class _FakeActEntities extends ActEntities {
 
   @override
   Future<void> startActby(int memId) async {
-    _startActbyCallCount++;
     final now = DateTime.now();
     final act = savedAct(
         id: 1,
@@ -89,13 +78,10 @@ class _FakeActEntities extends ActEntities {
   }
 
   @override
-  Future<void> pauseByMemId(int memId) async {
-    _pauseByMemIdCallCount++;
-  }
+  Future<void> pauseByMemId(int memId) async {}
 
   @override
   Future<void> closeByMemId(int memId) async {
-    _closeByMemIdCallCount++;
     final act = state.firstWhereOrNull((e) => e.value.memId == memId);
     if (act != null) {
       remove([act.id]);
@@ -104,7 +90,6 @@ class _FakeActEntities extends ActEntities {
 
   @override
   Future<void> finishActby(int memId) async {
-    _finishActbyCallCount++;
     final now = DateTime.now();
     final act = savedAct(
         id: 1,
@@ -137,29 +122,12 @@ class _FakeActEntities extends ActEntities {
 
   @override
   Future<void> edit(SavedActEntityV1 act) async {
-    _editCallCount++;
     upsert([act]);
   }
 
   @override
-  Future<Iterable<SavedActEntityV1>> removeAsync(Iterable<int> ids) async {
-    _removeAsyncCallCount++;
-    _removed.addAll(ids);
-    return remove(ids);
-  }
-
-  List<SavedActEntityV1> get upserted => _upserted;
-  List<int> get removed => _removed;
-  int get fetchCallCount => _fetchCallCount;
-  int? get lastFetchOffset => _lastFetchOffset;
-  int get startActbyCallCount => _startActbyCallCount;
-  int get resumeActByCallCount => _resumeActByCallCount;
-  int get pauseByMemIdCallCount => _pauseByMemIdCallCount;
-  int get closeByMemIdCallCount => _closeByMemIdCallCount;
-  int get finishActbyCallCount => _finishActbyCallCount;
-  int get skipActByCallCount => _skipActByCallCount;
-  int get editCallCount => _editCallCount;
-  int get removeAsyncCallCount => _removeAsyncCallCount;
+  Future<Iterable<SavedActEntityV1>> removeAsync(Iterable<int> ids) async =>
+      remove(ids);
 }
 
 void main() {
@@ -285,7 +253,7 @@ void main() {
 
       await notifier.resumeActBy(1);
       expect(container.read(actEntitiesProvider), isNotEmpty);
-      expect(fake.resumeActByCallCount, 1);
+      expect(fake._resumeActByCallCount, 1);
     });
 
     test('upsert after listeners are gone does not throw', () async {
@@ -385,7 +353,7 @@ void main() {
 
       await notifier.skipActBy(1);
 
-      expect(fake.skipActByCallCount, 1);
+      expect(fake._skipActByCallCount, 1);
       expect(
         container.read(actEntitiesProvider).single.value.actKind,
         ActKind.skipped,
@@ -481,7 +449,7 @@ void main() {
       addTearDown(container.dispose);
 
       await container.read(loadActListProvider(1, Period.aWeek, -2).future);
-      expect(fake.lastFetchOffset, -2);
+      expect(fake._lastFetchOffset, -2);
     });
   });
 
