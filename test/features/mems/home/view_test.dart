@@ -12,6 +12,7 @@ import 'package:mem/features/settings/states.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/home_screen.dart';
 import 'package:mem/l10n/l10n.dart';
+import 'package:mem/values/colors.dart';
 
 import '../../../entity_factories.dart';
 
@@ -103,12 +104,142 @@ void main() {
             .toList(),
         ['Mem 2', 'Mem 4', 'Mem 1'],
       );
+      expect(find.byType(Card), findsOneWidget);
+      for (final name in ['Mem 2', 'Mem 4', 'Mem 1']) {
+        expect(
+          find.descendant(of: find.byType(Card), matching: find.text(name)),
+          findsOneWidget,
+        );
+      }
 
       await tester.tap(find.text(l10n.memListDestinationLabel));
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.add), findsOneWidget);
       expect(find.text('Mem 3'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'shows overdue mems above at most three upcoming mems',
+    (tester) async {
+      final mems = [
+        at(1, DateTime(2099, 1, 3, 10)),
+        at(2, DateTime(2099, 1, 1, 10)),
+        at(3, DateTime(2099, 1, 4, 10)),
+        at(4, DateTime(2099, 1, 2, 10)),
+        at(20, DateTime(2020, 1, 1, 10)),
+        at(21, DateTime(2020, 1, 2, 10)),
+        at(22, DateTime(2020, 1, 3, 10)),
+        at(23, DateTime(2020, 1, 4, 10)),
+      ];
+      final memEntities = _FakeMemEntities(mems);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            preferenceProvider(startOfDayKey).overrideWith(
+              () => _FakePreference(),
+            ),
+            memEntitiesProvider.overrideWith(() => memEntities),
+            savedMemNotificationsProvider.overrideWith(
+              (ref) => ListValueStateNotifier<SavedMemNotificationEntityV1>([]),
+            ),
+            for (final mem in mems)
+              memNotificationsByMemIdProvider(mem.id).overrideWith(
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
+              ),
+          ],
+          child: MaterialApp(
+            home: HomeScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        tester
+            .widgetList<Text>(find.byType(Text))
+            .map((text) => text.data)
+            .whereType<String>()
+            .where((data) => data.startsWith('Mem '))
+            .toList(),
+        [
+          'Mem 20',
+          'Mem 21',
+          'Mem 22',
+          'Mem 23',
+          'Mem 2',
+          'Mem 4',
+          'Mem 1',
+        ],
+      );
+
+      expect(find.byType(Card), findsNWidgets(2));
+
+      Card cardOf(String name) => tester.widget<Card>(
+            find.ancestor(
+              of: find.text(name),
+              matching: find.byType(Card),
+            ),
+          );
+
+      final overdueCard = cardOf('Mem 20');
+      expect(
+        overdueCard.color,
+        warningSurfaceOn(
+          Theme.of(tester.element(find.byWidget(overdueCard)))
+              .colorScheme
+              .surface,
+        ),
+      );
+      final upcomingCard = cardOf('Mem 2');
+      expect(upcomingCard, isNot(same(overdueCard)));
+      expect(upcomingCard.color, isNull);
+
+      EdgeInsets resolved(EdgeInsetsGeometry insets) =>
+          insets.resolve(TextDirection.ltr);
+
+      final listPadding = resolved(
+        tester
+                .widget<ListView>(
+                  find.ancestor(
+                    of: find.byWidget(overdueCard),
+                    matching: find.byType(ListView),
+                  ),
+                )
+                .padding ??
+            EdgeInsets.zero,
+      );
+      final overdueMargin = resolved(overdueCard.margin!);
+      final upcomingMargin = resolved(upcomingCard.margin!);
+
+      void expectPageEdgeMargin(EdgeInsets margin) {
+        expect(margin.left, 16);
+        expect(margin.right, 16);
+      }
+
+      expect(overdueMargin.bottom + upcomingMargin.top, 8);
+      expectPageEdgeMargin(overdueMargin);
+      expectPageEdgeMargin(upcomingMargin);
+      expect(listPadding.top + overdueMargin.top, 16);
+      expect(listPadding.bottom + upcomingMargin.bottom, 16);
+
+      ListTile tileOf(String name) => tester.widget<ListTile>(
+            find.ancestor(
+              of: find.text(name),
+              matching: find.byType(ListTile),
+            ),
+          );
+
+      for (final name in ['Mem 20', 'Mem 21', 'Mem 22', 'Mem 23']) {
+        expect(cardOf(name), same(overdueCard));
+        expect(tileOf(name).tileColor, isNull);
+      }
+      for (final name in ['Mem 2', 'Mem 4', 'Mem 1']) {
+        expect(cardOf(name), same(upcomingCard));
+        expect(tileOf(name).tileColor, isNull);
+      }
     },
   );
 }

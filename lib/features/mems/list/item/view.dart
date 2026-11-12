@@ -31,7 +31,10 @@ import 'subtitle.dart';
 class MemListItemView extends ConsumerWidget {
   final Mem _mem;
 
-  const MemListItemView(this._mem, {super.key});
+  const MemListItemView(
+    this._mem, {
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
