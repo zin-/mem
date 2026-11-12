@@ -1,9 +1,11 @@
 import 'package:collection/collection.dart';
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mems/mem_client.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mems/mem_service.dart';
+import 'package:mem/features/mems/mem_view_data.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/shared/entities_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -97,6 +99,21 @@ class MemEntities extends _$MemEntities
           return removed;
         },
         {'ids': ids},
+      );
+
+  Future<void> removeMem(int memId, List<MemItemEntityV1> items) => v(
+        () async {
+          final removed = await removeAsync([memId]);
+          for (final entity in removed) {
+            ref
+                .read(removedMemProvider(entity.id).notifier)
+                .updatedBy(MemViewData.fromEntityV2(entity));
+            ref
+                .read(removedMemItemsProvider(entity.id).notifier)
+                .updatedBy(items);
+          }
+        },
+        {'memId': memId},
       );
 
   Future<void> undoRemove(int id) => v(

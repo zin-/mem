@@ -2,7 +2,8 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/framework/view/app_bar_actions_builder.dart';
 import 'package:mem/l10n/l10n.dart';
-import 'package:mem/features/mems/detail/actions.dart';
+import 'package:mem/features/mems/detail/states.dart';
+import 'package:mem/features/mems/mems_state.dart';
 
 const keyRemoveMem = Key("remove-mem");
 
@@ -56,13 +57,15 @@ class _RemoveMemAlertDialog extends ConsumerWidget {
             ElevatedButton(
               key: keyOk,
               onPressed: () async {
-                if (await ref.read(removeMem(_memId))) {
-                  if (context.mounted) {
-                    Navigator.of(context)
-                      ..pop()
-                      ..pop()
-                      ..pop(true);
-                  }
+                final items = ref.read(memItemsByMemIdProvider(_memId));
+                await ref
+                    .read(memEntitiesProvider.notifier)
+                    .removeMem(_memId, items);
+                if (context.mounted) {
+                  Navigator.of(context)
+                    ..pop()
+                    ..pop()
+                    ..pop(true);
                 }
               },
               child: Text(l10n.okAction),

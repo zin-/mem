@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/databases/database.dart' hide Mem, MemParent;
+import 'package:mem/databases/database.dart' hide Mem, MemItem, MemParent;
+import 'package:mem/features/mem_items/mem_item.dart';
+import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/features/mem_parents/mem_parent.dart';
 import 'package:mem/features/mem_relations/mem_relation_repository.dart';
@@ -147,6 +149,23 @@ void main() {
     final removed = await notifier().removeAsync([saved.id]);
     expect(removed.map((mem) => mem.id), [saved.id]);
     expect(container.read(memEntitiesProvider), isEmpty);
+  });
+
+  test('removeMem keeps the mem and items for undo', () async {
+    final saved = await insertMem('gone');
+    await notifier().loadMemList();
+    final items = [
+      MemItemEntityV1(MemItem(saved.id, MemItemType.memo, 'note')),
+    ];
+
+    await notifier().removeMem(saved.id, items);
+
+    expect(container.read(memEntitiesProvider), isEmpty);
+    expect(
+      container.read(removedMemProvider(saved.id))?.value.name,
+      'gone',
+    );
+    expect(container.read(removedMemItemsProvider(saved.id)), items);
   });
 
   test('archive and unarchive update state, and ignore an unknown id',
