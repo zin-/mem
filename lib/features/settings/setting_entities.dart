@@ -4,10 +4,10 @@ import 'package:mem/features/settings/preference/preference_key.dart';
 import 'package:mem/features/settings/preference/repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'setting_store.g.dart';
+part 'setting_entities.g.dart';
 
 @Riverpod(keepAlive: true)
-class SettingStore extends _$SettingStore {
+class SettingEntities extends _$SettingEntities {
   final _loadingKeys = <PreferenceKey>{};
 
   @override
@@ -45,5 +45,5 @@ class SettingStore extends _$SettingStore {
         {'key': key, 'value': value},
       );
 
-  SettingStore();
+  SettingEntities();
 }
