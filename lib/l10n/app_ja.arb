@@ -6,7 +6,6 @@
   "timePeriod": "対象期間",
 
   "homeDestinationLabel": "Home",
-  "overdueMemsHeader": "超過",
   "memListDestinationLabel": "List",
   "memListToDoSubHeader": "ToDo",
   "actListDestinationLabel": "Acts",

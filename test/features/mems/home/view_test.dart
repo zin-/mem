@@ -127,7 +127,6 @@ void main() {
         at(23, DateTime(2020, 1, 4, 10)),
       ];
       final memEntities = _FakeMemEntities(mems);
-      final l10n = buildL10n();
 
       await tester.pumpWidget(
         ProviderScope(
@@ -156,13 +155,9 @@ void main() {
             .widgetList<Text>(find.byType(Text))
             .map((text) => text.data)
             .whereType<String>()
-            .where(
-              (data) =>
-                  data == l10n.overdueMemsHeader || data.startsWith('Mem '),
-            )
+            .where((data) => data.startsWith('Mem '))
             .toList(),
         [
-          l10n.overdueMemsHeader,
           'Mem 20',
           'Mem 21',
           'Mem 22',

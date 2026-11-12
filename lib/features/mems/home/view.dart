@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/home/upcoming_mems.dart';
 import 'package:mem/features/mems/list/item/view.dart';
-import 'package:mem/l10n/l10n.dart';
 import 'package:mem/values/colors.dart';
 import 'package:mem/values/dimens.dart';
 
@@ -48,10 +47,6 @@ class OverdueMemsView extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Padding(
-                  padding: defaultPadding,
-                  child: Text(buildL10n(context).overdueMemsHeader),
-                ),
                 for (final mem in mems)
                   MemListItemView(
                     mem.toDomain(),
