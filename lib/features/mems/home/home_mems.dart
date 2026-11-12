@@ -17,17 +17,22 @@ typedef SelectHomeMems = List<MemEntity> Function(
 });
 
 class HomeMems {
-  HomeMems._();
+  final Ref _ref;
 
-  static List<MemEntity> of(Ref ref, SelectHomeMems select) {
-    ref.listen(loadMemListProvider, (_, __) {});
+  HomeMems._(this._ref);
 
-    final mems = ref.watch(memEntitiesProvider);
-    final savedMemNotifications = ref.watch(savedMemNotificationsProvider);
+  static List<MemEntity> of(Ref ref, SelectHomeMems select) =>
+      HomeMems._(ref)._mems(select);
+
+  List<MemEntity> _mems(SelectHomeMems select) {
+    _ref.listen(loadMemListProvider, (_, __) {});
+
+    final mems = _ref.watch(memEntitiesProvider);
+    final savedMemNotifications = _ref.watch(savedMemNotificationsProvider);
     final periodCountByMemId =
-        ref.watch(listPeriodCountByMemIdProvider).value ?? const {};
+        _ref.watch(listPeriodCountByMemIdProvider).value ?? const {};
     final startOfToday = DateTimeExt.startOfToday(
-      ref.watch(preferenceProvider(startOfDayKey)),
+      _ref.watch(preferenceProvider(startOfDayKey)),
     );
 
     return v(
