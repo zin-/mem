@@ -4,7 +4,18 @@ import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/features/logger/log_service.dart';
 
-enum Period { aDay, aWeek, aMonth, threeMonth, aYear, all }
+enum Period {
+  aDay,
+  aWeek,
+  aMonth(1),
+  threeMonth(3),
+  aYear(12),
+  all;
+
+  final int? months;
+
+  const Period([this.months]);
+}
 
 extension PeriodExt on Period {
   bool isLongerThan(Period other) => index > other.index;
@@ -58,11 +69,9 @@ extension PeriodExt on Period {
             case Period.aWeek:
               return trailingDays(DateTime.daysPerWeek);
             case Period.aMonth:
-              return trailingMonths(1);
             case Period.threeMonth:
-              return trailingMonths(3);
             case Period.aYear:
-              return trailingMonths(12);
+              return trailingMonths(months!);
             case Period.all:
               return null;
           }

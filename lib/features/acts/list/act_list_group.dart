@@ -13,8 +13,6 @@ class ActListGroup {
     Period.aYear,
   ];
 
-  static const _monthsInQuarter = 3;
-
   final Period unit;
   final DateTime start;
   final WithStartAndEnd period;
@@ -80,8 +78,9 @@ class ActListGroup {
   }
 
   static int _quarterStartMonth(int month) {
+    final monthsInQuarter = Period.threeMonth.months!;
     final monthsBefore = month - DateTime.january;
-    return (monthsBefore ~/ _monthsInQuarter) * _monthsInQuarter +
+    return (monthsBefore ~/ monthsInQuarter) * monthsInQuarter +
         DateTime.january;
   }
 
@@ -100,7 +99,7 @@ class ActListGroup {
       Period.aMonth => DateAndTime(start.year, start.month + 1, 1),
       Period.threeMonth => DateAndTime(
           start.year,
-          start.month + _monthsInQuarter,
+          start.month + Period.threeMonth.months!,
           1,
         ),
       Period.aYear => DateAndTime(start.year + 1, DateTime.january, 1),
