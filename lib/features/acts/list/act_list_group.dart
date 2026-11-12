@@ -37,6 +37,8 @@ class ActListGroup {
 
   bool contains(DateTime at) => period.includesStart(at);
 
+  bool isCurrentDay(DateTime at) => unit == Period.aDay && contains(at);
+
   String label(MaterialLocalizations localizations) => switch (unit) {
         Period.aDay => localizations.formatCompactDate(start),
         Period.aWeek ||

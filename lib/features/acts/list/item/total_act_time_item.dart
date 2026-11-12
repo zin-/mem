@@ -48,8 +48,7 @@ class TotalActTimeListItem extends ConsumerWidget {
           final actions = showsActions
               ? _actions(ref, memId, latestAct)
               : (leading: null, trailing: null);
-          // 経過は今日の日グループだけ。週や月の途中でも今の状態は出さない
-          final showsElapsed = _group.unit == Period.aDay && showsActions;
+          final statusAct = _group.isCurrentDay(now) ? latestAct : null;
           final target = _target;
           final recorded = _recorded();
           String? periodLabel;
@@ -64,7 +63,7 @@ class TotalActTimeListItem extends ConsumerWidget {
           return ListTile(
             leading: actions.leading,
             title: _title(
-              showsElapsed ? latestAct : null,
+              statusAct,
               amount,
               periodLabel,
               recorded,
