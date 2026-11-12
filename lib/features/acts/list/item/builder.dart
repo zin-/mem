@@ -6,13 +6,14 @@ import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/targets/target.dart';
 
 import '../act_list_group.dart';
+import '../act_list_view.dart';
 import 'total_act_time_item.dart';
 import 'view.dart';
 
 class ActListItemBuilder {
   final MapEntry<ActListGroup, List<SavedActEntityV1>> _groupedActs;
   final List<Mem> _memList;
-  final bool _isTimeView;
+  final ActListView _view;
   final List<Target> _targetList;
 
   late final Map<int, List<SavedActEntityV1>> _actListGroupedByMemId;
@@ -20,10 +21,10 @@ class ActListItemBuilder {
   ActListItemBuilder(
     this._groupedActs,
     this._memList,
-    this._isTimeView,
+    this._view,
     this._targetList,
   ) {
-    if (_isTimeView) {
+    if (_view == ActListView.totalTime) {
       _actListGroupedByMemId =
           _groupedActs.value.groupListsBy((element) => element.value.memId);
     }
@@ -31,7 +32,7 @@ class ActListItemBuilder {
 
   Widget? build(BuildContext context, int index) => v(
         () {
-          if (_isTimeView) {
+          if (_view == ActListView.totalTime) {
             final entry = _actListGroupedByMemId.entries.toList()[index];
 
             return TotalActTimeListItem(
@@ -56,6 +57,7 @@ class ActListItemBuilder {
         },
       );
 
-  int get childCount =>
-      _isTimeView ? _actListGroupedByMemId.length : _groupedActs.value.length;
+  int get childCount => _view == ActListView.totalTime
+      ? _actListGroupedByMemId.length
+      : _groupedActs.value.length;
 }

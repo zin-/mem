@@ -5,14 +5,12 @@ import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/acts/list/act_list.dart';
 import 'package:mem/features/acts/list/item/total_act_time_item.dart';
-import 'package:mem/features/acts/list/states.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/preference/preference_key.dart';
 import 'package:mem/features/settings/states.dart';
-import 'package:mem/framework/view/value_state_notifier.dart';
 
 import '../../entity_factories.dart';
 
@@ -67,9 +65,6 @@ Future<void> _pumpActList(
         preferenceProvider(startOfDayKey).overrideWith(
           () => _FakePreference(startOfDay),
         ),
-        actListGroupUnitProvider.overrideWith(
-          (ref) => ValueStateNotifier(group),
-        ),
         memEntitiesProvider.overrideWith(
           () => _FakeMemEntities([
             savedMem(id: _memId, name: _memName),
@@ -77,10 +72,14 @@ Future<void> _pumpActList(
         ),
         actListProvider(_memId).overrideWith((ref) => acts),
       ],
-      child: const MaterialApp(
-        locale: Locale('en'),
+      child: MaterialApp(
+        locale: const Locale('en'),
         home: Scaffold(
-          body: ActList(_memId, null),
+          body: ActList(
+            _memId,
+            null,
+            groupUnit: group,
+          ),
         ),
       ),
     ),

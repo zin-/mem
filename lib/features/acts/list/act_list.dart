@@ -14,19 +14,21 @@ import 'package:mem/features/targets/target.dart';
 import 'package:mem/widgets/infinite_scroll.dart';
 
 import 'act_list_group.dart';
+import 'act_list_view.dart';
 import 'app_bar.dart';
 import 'item/builder.dart';
-import 'states.dart';
 import 'sub_header.dart';
 
 class ActList extends ConsumerStatefulWidget {
   final int? memId;
   final ScrollController? scrollController;
+  final Period groupUnit;
 
   const ActList(
     this.memId,
     this.scrollController, {
     super.key,
+    this.groupUnit = Period.aDay,
   });
 
   @override
@@ -34,11 +36,14 @@ class ActList extends ConsumerStatefulWidget {
 }
 
 class _ActListState extends ConsumerState<ActList> {
+  late Period _groupUnit;
+  ActListView _view = ActListView.totalTime;
   InfiniteScrollController? _infiniteScrollController;
 
   @override
   void initState() {
     super.initState();
+    _groupUnit = widget.groupUnit;
     if (widget.scrollController != null) {
       _infiniteScrollController = InfiniteScrollController(
         scrollController: widget.scrollController!,
@@ -47,6 +52,10 @@ class _ActListState extends ConsumerState<ActList> {
       );
     }
   }
+
+  void _changeGroupUnit(Period unit) => setState(() => _groupUnit = unit);
+
+  void _changeView(ActListView view) => setState(() => _view = view);
 
   @override
   void dispose() {
@@ -70,8 +79,10 @@ class _ActListState extends ConsumerState<ActList> {
 
           return _ActList(
             memId,
-            ref.watch(actListGroupUnitProvider),
-            ref.watch(timeViewProvider),
+            _groupUnit,
+            _changeGroupUnit,
+            _view,
+            _changeView,
             ref.watch(preferenceProvider(startOfDayKey)),
             ref.watch(actListProvider(memId)),
             listed?.map((e) => e.toDomain()).toList() ?? const [],
@@ -88,7 +99,9 @@ class _ActListState extends ConsumerState<ActList> {
 class _ActList extends StatelessWidget {
   final int? _memId;
   final Period _groupUnit;
-  final bool _isTimeView;
+  final void Function(Period unit) _changeGroupUnit;
+  final ActListView _view;
+  final void Function(ActListView view) _changeView;
   final TimeOfDay _startOfDay;
   final List<SavedActEntityV1> _actList;
   final List<Mem> _memList;
@@ -98,7 +111,9 @@ class _ActList extends StatelessWidget {
   const _ActList(
     this._memId,
     this._groupUnit,
-    this._isTimeView,
+    this._changeGroupUnit,
+    this._view,
+    this._changeView,
     this._startOfDay,
     this._actList,
     this._memList,
@@ -113,6 +128,10 @@ class _ActList extends StatelessWidget {
           slivers: [
             ActListAppBar(
               _memId,
+              _groupUnit,
+              _changeGroupUnit,
+              _view,
+              _changeView,
             ),
             ..._groupedActs().entries.map(
                   (e) => SliverStickyHeader(
@@ -125,7 +144,7 @@ class _ActList extends StatelessWidget {
                         final builder = ActListItemBuilder(
                           e,
                           _memList,
-                          _isTimeView,
+                          _view,
                           _targetList,
                         );
 
@@ -142,7 +161,7 @@ class _ActList extends StatelessWidget {
         {
           '_memId': _memId,
           '_groupUnit': _groupUnit,
-          '_isTimeView': _isTimeView,
+          '_view': _view,
           '_startOfDay': _startOfDay,
           '_actList': _actList,
           '_memList': _memList,

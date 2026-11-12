@@ -8,13 +8,21 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/values/constants.dart';
 
-import 'states.dart';
+import 'act_list_view.dart';
 
 class ActListAppBar extends ConsumerWidget {
   final int? _memId;
+  final Period _groupUnit;
+  final void Function(Period unit) _changeGroupUnit;
+  final ActListView _view;
+  final void Function(ActListView view) _changeView;
 
   const ActListAppBar(
-    this._memId, {
+    this._memId,
+    this._groupUnit,
+    this._changeGroupUnit,
+    this._view,
+    this._changeView, {
     super.key,
   });
 
@@ -24,15 +32,15 @@ class ActListAppBar extends ConsumerWidget {
           _memId == null
               ? buildL10n(context).defaultActListPageTitle
               : ref.read(memByMemIdProvider(_memId))?.name ?? somethingWrong,
-          ref.watch(actListGroupUnitProvider),
-          (Period unit) =>
-              ref.read(actListGroupUnitProvider.notifier).updatedBy(unit),
-          ref.watch(timeViewProvider),
-          (bool changed) =>
-              ref.read(timeViewProvider.notifier).updatedBy(changed),
+          _groupUnit,
+          _changeGroupUnit,
+          _view,
+          _changeView,
         ),
         {
           "_memId": _memId,
+          "_groupUnit": _groupUnit,
+          "_view": _view,
         },
       );
 }
@@ -41,15 +49,15 @@ class _ActListAppBar extends StatelessWidget {
   final String _title;
   final Period _group;
   final void Function(Period unit) _changeGroup;
-  final bool _isTimeView;
-  final void Function(bool changed) _changeTimeViewMode;
+  final ActListView _view;
+  final void Function(ActListView view) _changeView;
 
   const _ActListAppBar(
     this._title,
     this._group,
     this._changeGroup,
-    this._isTimeView,
-    this._changeTimeViewMode,
+    this._view,
+    this._changeView,
   );
 
   @override
@@ -77,11 +85,13 @@ class _ActListAppBar extends StatelessWidget {
             ),
             IconButton(
               onPressed: () => v(
-                () => _changeTimeViewMode(!_isTimeView),
-                {"_isTimeView": _isTimeView},
+                () => _changeView(_view.toggled()),
+                {"_view": _view},
               ),
               icon: Icon(
-                _isTimeView ? Icons.numbers : Icons.access_time,
+                _view == ActListView.totalTime
+                    ? Icons.numbers
+                    : Icons.access_time,
               ),
             )
           ],
@@ -89,7 +99,7 @@ class _ActListAppBar extends StatelessWidget {
         {
           "_title": _title,
           "_group": _group,
-          "_isTimeView": _isTimeView,
+          "_view": _view,
         },
       );
 }
