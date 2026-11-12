@@ -39,21 +39,26 @@ class OverdueMemsView extends ConsumerWidget {
             return const SizedBox.shrink();
           }
 
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: defaultPadding,
-                child: Text(buildL10n(context).overdueMemsHeader),
-              ),
-              for (final mem in mems)
-                MemListItemView(
-                  mem.toDomain(),
-                  key: ValueKey(mem.id),
-                  tileColor: warningColor,
+          return Card(
+            margin: defaultPadding,
+            color: warningSurfaceOn(Theme.of(context).colorScheme.surface),
+            clipBehavior: Clip.antiAlias,
+            semanticContainer: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: defaultPadding,
+                  child: Text(buildL10n(context).overdueMemsHeader),
                 ),
-            ],
+                for (final mem in mems)
+                  MemListItemView(
+                    mem.toDomain(),
+                    key: ValueKey(mem.id),
+                  ),
+              ],
+            ),
           );
         },
       );

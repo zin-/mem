@@ -173,6 +173,15 @@ void main() {
         ],
       );
 
+      final card = find.byType(Card);
+      expect(card, findsOneWidget);
+      expect(
+        tester.widget<Card>(card).color,
+        warningSurfaceOn(
+          Theme.of(tester.element(card)).colorScheme.surface,
+        ),
+      );
+
       ListTile tileOf(String name) => tester.widget<ListTile>(
             find.ancestor(
               of: find.text(name),
@@ -181,9 +190,17 @@ void main() {
           );
 
       for (final name in ['Mem 20', 'Mem 21', 'Mem 22', 'Mem 23']) {
-        expect(tileOf(name).tileColor, warningColor);
+        expect(
+          find.descendant(of: card, matching: find.text(name)),
+          findsOneWidget,
+        );
+        expect(tileOf(name).tileColor, isNull);
       }
       for (final name in ['Mem 2', 'Mem 4', 'Mem 1']) {
+        expect(
+          find.descendant(of: card, matching: find.text(name)),
+          findsNothing,
+        );
         expect(tileOf(name).tileColor, isNull);
       }
     },

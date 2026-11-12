@@ -30,11 +30,9 @@ import 'subtitle.dart';
 
 class MemListItemView extends ConsumerWidget {
   final Mem _mem;
-  final Color? tileColor;
 
   const MemListItemView(
     this._mem, {
-    this.tileColor,
     super.key,
   });
 
@@ -116,12 +114,10 @@ class MemListItemView extends ConsumerWidget {
             amount,
             listAt,
             hasUndoneChildren,
-            tileColor,
           );
         },
         {
           '_mem': _mem,
-          'tileColor': tileColor,
         },
       );
 }
@@ -143,7 +139,6 @@ ListTile _render(
   ActAmount? amount,
   DateTime? listAt,
   bool hasUndoneChildren,
-  Color? tileColor,
 ) =>
     v(
       () {
@@ -205,7 +200,7 @@ ListTile _render(
                       mem,
                       doneEdit.onChanged,
                     ),
-          tileColor: mem.isArchived ? secondaryGreyColor : tileColor,
+          tileColor: mem.isArchived ? secondaryGreyColor : null,
           trailing: !mem.isDone && hasEnableMemNotifications
               ? hasActiveAct
                   ? stopIconButton
@@ -226,7 +221,6 @@ ListTile _render(
         'amount': amount,
         'listAt': listAt,
         'hasUndoneChildren': hasUndoneChildren,
-        'tileColor': tileColor,
       },
     );
 
