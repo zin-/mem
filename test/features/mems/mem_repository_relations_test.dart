@@ -197,7 +197,7 @@ void main() {
       );
 
       final (_, _, _, savedRelations, savedMem) = await MemService().save((
-        MemViewData.fromEntityV2(source),
+        MemViewData.fromEntity(source),
         [],
         [],
         null,
@@ -227,7 +227,7 @@ void main() {
       );
 
       final (_, _, _, savedRelations, _) = await MemService().save((
-        MemViewData.fromEntityV2(source),
+        MemViewData.fromEntity(source),
         [],
         [],
         null,
@@ -247,7 +247,7 @@ void main() {
       );
 
       final (_, _, _, savedRelations, _) = await MemService().save((
-        MemViewData.fromEntityV2(source),
+        MemViewData.fromEntity(source),
         [],
         [],
         null,

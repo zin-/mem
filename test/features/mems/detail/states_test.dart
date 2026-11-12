@@ -239,13 +239,13 @@ void main() {
         DateTime(2024, 6, 1),
         null,
       );
-      when(mockMemRepository.shipById(
-        memId,
-        loadLatestAct: true,
-      )).thenAnswer(
-        (_) async => savedMem(id: memId, name: 'loaded').updatedWith(
-          items: () => [shipped],
-        ),
+      whenShip(
+        id: memId,
+        mems: [
+          savedMem(id: memId, name: 'loaded').updatedWith(
+            items: () => [shipped],
+          ),
+        ],
       );
 
       final container = containerFor();
@@ -291,8 +291,12 @@ void main() {
         container.read(memEntitiesProvider).single.items!.single.value,
         'later',
       );
-      verify(mockMemRepository.shipById(
-        memId,
+      verify(mockMemRepository.ship(
+        id: memId,
+        archived: anyNamed('archived'),
+        done: anyNamed('done'),
+        offset: anyNamed('offset'),
+        limit: anyNamed('limit'),
         loadLatestAct: true,
       )).called(1);
     });
@@ -308,13 +312,13 @@ void main() {
         DateTime(2024, 6, 1),
         null,
       );
-      when(mockMemRepository.shipById(
-        memId,
-        loadLatestAct: true,
-      )).thenAnswer(
-        (_) async => savedMem(id: memId, name: 'loaded').updatedWith(
-          items: () => [shipped],
-        ),
+      whenShip(
+        id: memId,
+        mems: [
+          savedMem(id: memId, name: 'loaded').updatedWith(
+            items: () => [shipped],
+          ),
+        ],
       );
 
       final container = containerFor();

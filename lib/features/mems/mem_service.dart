@@ -232,7 +232,7 @@ class MemService {
 
           await save(
             (
-              MemViewData.fromEntityV2(doneMem),
+              MemViewData.fromEntity(doneMem),
               [],
               null,
               null,
@@ -263,7 +263,7 @@ class MemService {
 
           await save(
             (
-              MemViewData.fromEntityV2(undoneMem),
+              MemViewData.fromEntity(undoneMem),
               [],
               null,
               null,

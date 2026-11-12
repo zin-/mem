@@ -24,7 +24,7 @@ class MemViewData with EntityV1<Mem> implements Identifiable<int> {
 
   factory MemViewData.newMem() => MemViewData(Mem(null, "", null, null));
 
-  factory MemViewData.fromEntityV2(MemEntity entity) =>
+  factory MemViewData.fromEntity(MemEntity entity) =>
       MemViewData(entity.toDomain());
 
   @override

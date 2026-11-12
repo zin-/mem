@@ -584,7 +584,7 @@ void main() {
       stubSaveDependencies();
 
       await memService().save((
-        MemViewData.fromEntityV2(memEntity),
+        MemViewData.fromEntity(memEntity),
         <MemItemEntityV1>[],
         <MemNotificationEntityV1>[],
         null,
@@ -618,7 +618,7 @@ void main() {
       stubSaveDependencies();
 
       await memService().save((
-        MemViewData.fromEntityV2(memEntity),
+        MemViewData.fromEntity(memEntity),
         <MemItemEntityV1>[],
         <MemNotificationEntityV1>[],
         null,
@@ -665,7 +665,7 @@ void main() {
       stubSaveDependencies();
 
       await memService().save((
-        MemViewData.fromEntityV2(memEntity),
+        MemViewData.fromEntity(memEntity),
         <MemItemEntityV1>[],
         [repeat, nDay],
         null,

@@ -21,7 +21,7 @@ void listenMemInitialLoad(
     memByMemIdProvider(memId),
     (prev, next) {
       if (prev == null && next != null) {
-        notifier.updatedBy(MemViewData.fromEntityV2(next));
+        notifier.updatedBy(MemViewData.fromEntity(next));
       }
     },
   );
@@ -63,7 +63,7 @@ final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
     () {
       final mem = ref.read(memByMemIdProvider(memId));
       final notifier = ValueStateNotifier(
-        mem == null ? MemViewData.newMem() : MemViewData.fromEntityV2(mem),
+        mem == null ? MemViewData.newMem() : MemViewData.fromEntity(mem),
       );
 
       listenMemInitialLoad(ref, memId, notifier);

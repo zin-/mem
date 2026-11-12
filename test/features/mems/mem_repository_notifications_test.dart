@@ -182,7 +182,7 @@ void main() {
       );
 
       final (_, savedNotifications, _, _, savedMem) = await MemService().save((
-        MemViewData.fromEntityV2(created),
+        MemViewData.fromEntity(created),
         [],
         [edited],
         null,
@@ -218,7 +218,7 @@ void main() {
       );
 
       final (_, savedNotifications, _, _, _) = await MemService().save((
-        MemViewData.fromEntityV2(created),
+        MemViewData.fromEntity(created),
         [],
         [
           SavedMemNotificationEntityV1.fromEntityV2(repeat),
@@ -266,7 +266,7 @@ void main() {
       );
 
       final (_, savedNotifications, _, _, _) = await MemService().save((
-        MemViewData.fromEntityV2(created),
+        MemViewData.fromEntity(created),
         [],
         [
           SavedMemNotificationEntityV1.fromEntityV2(repeat),
@@ -331,7 +331,7 @@ void main() {
       );
 
       final (_, savedNotifications, _, _, _) = await MemService().save((
-        MemViewData.fromEntityV2(created),
+        MemViewData.fromEntity(created),
         [],
         null,
         null,

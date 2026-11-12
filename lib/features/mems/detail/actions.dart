@@ -39,7 +39,7 @@ final saveMem =
 
               ref
                   .read(editingMemByMemIdProvider(memId).notifier)
-                  .updatedBy(MemViewData.fromEntityV2(memEntityV2));
+                  .updatedBy(MemViewData.fromEntity(memEntityV2));
 
               ref.read(memItemsByMemIdProvider(memId).notifier).updatedBy(
                     List<MemItemEntityV1>.of(savedMemItems),
@@ -62,30 +62,3 @@ final saveMem =
           },
           memId,
         ));
-
-final removeMem = Provider.autoDispose.family<Future<bool> Function(), int?>(
-  (ref, memId) => () => v(
-        () async {
-          if (memId != null) {
-            final removedMemEntities = await ref
-                .read(memEntitiesProvider.notifier)
-                .removeAsync([memId]);
-
-            for (var e in removedMemEntities) {
-              ref
-                  .read(removedMemProvider(e.id).notifier)
-                  .updatedBy(MemViewData.fromEntityV2(e));
-              ref.read(removedMemItemsProvider(e.id).notifier).updatedBy(
-                    ref.read(memItemsByMemIdProvider(e.id)),
-                  );
-              // TODO mem notificationsにも同様の処理が必要では？
-            }
-
-            return true;
-          }
-
-          return false;
-        },
-        memId,
-      ),
-);

@@ -1,9 +1,11 @@
 import 'package:collection/collection.dart';
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mems/mem_client.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mems/mem_service.dart';
+import 'package:mem/features/mems/mem_view_data.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/shared/entities_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -45,12 +47,14 @@ class MemEntities extends _$MemEntities
         },
       );
 
-  Future<MemEntity> loadByMemId(int memId) => v(
+  Future<MemEntity?> loadByMemId(int memId) => v(
         () async {
-          final mem = await MemRepository().shipById(
+          final mem = await _shipOne(
+            MemRepository(),
             memId,
             loadLatestAct: true,
           );
+          if (mem == null) return null;
 
           upsert([mem]);
 
@@ -78,25 +82,33 @@ class MemEntities extends _$MemEntities
 
   Future<void> refreshLatestActForMem(int memId) => v(
         () async {
-          final rows = await MemRepository().ship(
-            id: memId,
+          final mem = await _shipOne(
+            MemRepository(),
+            memId,
             loadLatestAct: true,
           );
-          if (rows.isEmpty) return;
-          upsert([rows.single]);
+          if (mem == null) return;
+          upsert([mem]);
         },
         {'memId': memId},
       );
 
-  Future<Iterable<MemEntity>> removeAsync(Iterable<int> ids) => v(
+  Future<void> removeMem(int memId, List<MemItemEntityV1> items) => v(
         () async {
-          await Future.wait(ids.map((id) => MemClient().remove(id)));
+          await MemClient().remove(memId);
 
-          final removed = remove(ids);
+          final removed = remove([memId]);
           await _refreshParentMemIdsWithUndoneChildren();
-          return removed;
+          for (final entity in removed) {
+            ref
+                .read(removedMemProvider(entity.id).notifier)
+                .updatedBy(MemViewData.fromEntity(entity));
+            ref
+                .read(removedMemItemsProvider(entity.id).notifier)
+                .updatedBy(items);
+          }
         },
-        {'ids': ids},
+        {'memId': memId},
       );
 
   Future<void> undoRemove(int id) => v(
@@ -180,9 +192,33 @@ class MemEntities extends _$MemEntities
         },
       );
 
+  Future<MemEntity?> _shipOne(
+    MemRepository repository,
+    int memId, {
+    bool loadLatestAct = false,
+  }) async {
+    final rows = await repository.ship(
+      id: memId,
+      loadLatestAct: loadLatestAct,
+    );
+    if (rows.isEmpty) return null;
+    return rows.single;
+  }
+
   Future<void> _fetchDetail(int memId) async {
     final repository = MemRepository();
-    final mem = await repository.shipById(memId, loadLatestAct: true);
+    final mem = await _shipOne(
+      repository,
+      memId,
+      loadLatestAct: true,
+    );
+    if (mem == null) {
+      final cached = _entity(memId);
+      if (cached != null && !cached.parentsLoaded) {
+        upsert([cached.updatedWith(parentsLoaded: () => true)]);
+      }
+      return;
+    }
     final parent = await repository.shipParentByMemId(memId);
     final children = await repository.shipChildrenByParentMemId(memId);
 
@@ -193,7 +229,9 @@ class MemEntities extends _$MemEntities
     final missing = <MemEntity>[];
     for (final id in relatedIds) {
       if (id == memId || _entity(id) != null) continue;
-      missing.add(await repository.shipById(id));
+      final related = await _shipOne(repository, id);
+      if (related == null) continue;
+      missing.add(related);
     }
     final toInsert = [
       for (final entity in missing)

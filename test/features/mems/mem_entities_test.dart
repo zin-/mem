@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/databases/database.dart' hide Mem, MemParent;
+import 'package:mem/databases/database.dart' hide Mem, MemItem, MemParent;
+import 'package:mem/features/mem_items/mem_item.dart';
+import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/features/mem_parents/mem_parent.dart';
 import 'package:mem/features/mem_relations/mem_relation_repository.dart';
@@ -61,6 +63,13 @@ void main() {
 
   Future<MemEntity> insertMem(String name) =>
       MemRepository().receive(Mem(null, name, null, null));
+
+  Future<void> deleteMemRow(int id) async {
+    final db = DriftDatabaseAccessor().driftDatabase;
+    await db.customStatement('PRAGMA foreign_keys = OFF');
+    await (db.delete(db.mems)..where((t) => t.id.equals(id))).go();
+    await db.customStatement('PRAGMA foreign_keys = ON');
+  }
 
   test(
       'default reload keeps active mems, later reloads grow the cache, and the list follows the filter',
@@ -134,7 +143,7 @@ void main() {
     expect(container.read(memEntitiesProvider).single.name, 'reloaded');
   });
 
-  test('removeAsync drops the mem and undoRemove puts it back', () async {
+  test('undoRemove puts the mem back and removeMem drops it', () async {
     final saved = await insertMem('gone');
     await notifier().loadMemList();
 
@@ -144,9 +153,25 @@ void main() {
     await notifier().undoRemove(saved.id);
     expect(container.read(memEntitiesProvider).single.name, 'back');
 
-    final removed = await notifier().removeAsync([saved.id]);
-    expect(removed.map((mem) => mem.id), [saved.id]);
+    await notifier().removeMem(saved.id, []);
     expect(container.read(memEntitiesProvider), isEmpty);
+  });
+
+  test('removeMem keeps the mem and items for undo', () async {
+    final saved = await insertMem('gone');
+    await notifier().loadMemList();
+    final items = [
+      MemItemEntityV1(MemItem(saved.id, MemItemType.memo, 'note')),
+    ];
+
+    await notifier().removeMem(saved.id, items);
+
+    expect(container.read(memEntitiesProvider), isEmpty);
+    expect(
+      container.read(removedMemProvider(saved.id))?.value.name,
+      'gone',
+    );
+    expect(container.read(removedMemItemsProvider(saved.id)), items);
   });
 
   test('archive and unarchive update state, and ignore an unknown id',
@@ -213,6 +238,44 @@ void main() {
     expect(cachedMem(child.id).childMemIds, [other.id]);
   });
 
+  test('loadByMemId and loadDetail leave state empty when the mem is gone',
+      () async {
+    expect(await notifier().loadByMemId(1), isNull);
+    expect(container.read(memEntitiesProvider), isEmpty);
+
+    await notifier().loadDetail(1);
+    expect(container.read(memEntitiesProvider), isEmpty);
+  });
+
+  test('loadDetail stops when a cached mem row is already gone', () async {
+    final saved = await insertMem('gone');
+    notifier().upsert([saved]);
+    await deleteMemRow(saved.id);
+
+    await notifier().loadDetail(saved.id);
+
+    expect(cachedMem(saved.id).parentsLoaded, isTrue);
+  });
+
+  test('loadDetail skips a parent mem that is already gone', () async {
+    final parent = await insertMem('Parent');
+    final child = await insertMem('Child');
+    await MemRepository().receiveParent(
+      MemParent(memId: child.id, parentMemId: parent.id),
+    );
+    await deleteMemRow(parent.id);
+
+    await notifier().loadDetail(child.id);
+
+    final loadedChild = cachedMem(child.id);
+    expect(loadedChild.parentsLoaded, isTrue);
+    expect(loadedChild.parentMemId, parent.id);
+    expect(
+      container.read(memEntitiesProvider).where((e) => e.id == parent.id),
+      isEmpty,
+    );
+  });
+
   test('doneMem and undoneMem update state', () async {
     final saved = await insertMem('open');
     await notifier().loadMemList();
@@ -252,7 +315,7 @@ void main() {
     await notifier().unarchive(child.id);
     expect(parentIds(), {parent.id});
 
-    await notifier().removeAsync([child.id]);
+    await notifier().removeMem(child.id, []);
     expect(parentIds(), isEmpty);
   });
 }
