@@ -58,7 +58,6 @@ Future<void> _pumpAndSettle(
 }
 
 // FIXME 手間が多すぎる
-//   MemStoreに統合することで解消する
 //   そもそもRepositoryは集約するべきなのに、テーブルごとに実装したのが誤り
 @GenerateMocks([
   MemClient,

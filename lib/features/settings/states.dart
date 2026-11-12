@@ -1,5 +1,5 @@
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/settings/setting_store.dart';
+import 'package:mem/features/settings/setting_entities.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'preference/repository.dart';
@@ -14,8 +14,8 @@ class Preference<T> extends _$Preference<T> {
   @override
   T build(PreferenceKey<T> key) => v(
         () {
-          ref.read(settingStoreProvider.notifier).serveOneBy(key);
-          final settings = ref.watch(settingStoreProvider);
+          ref.read(settingEntitiesProvider.notifier).serveOneBy(key);
+          final settings = ref.watch(settingEntitiesProvider);
           return (settings[key] ?? defaultPreferences[key]) as T;
         },
         {"key": key},
@@ -23,7 +23,7 @@ class Preference<T> extends _$Preference<T> {
 
   Future<void> replace(T updating) => v(
         () async {
-          ref.read(settingStoreProvider.notifier).put(key, updating);
+          ref.read(settingEntitiesProvider.notifier).put(key, updating);
           await PreferenceRepository().receive(PreferenceEntity(key, updating));
         },
         {
@@ -34,7 +34,7 @@ class Preference<T> extends _$Preference<T> {
   Future<void> remove() => v(
         () async {
           final defaultValue = defaultPreferences[key] as T;
-          ref.read(settingStoreProvider.notifier).put(key, defaultValue);
+          ref.read(settingEntitiesProvider.notifier).put(key, defaultValue);
           await PreferenceRepository().discard(key);
         },
         {"key": key},
