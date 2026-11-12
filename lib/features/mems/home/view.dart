@@ -16,6 +16,7 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) => v(
         () => ListView(
           controller: _scrollController,
+          padding: cardListPadding,
           physics: const AlwaysScrollableScrollPhysics(),
           children: const [
             OverdueMemsView(),
@@ -62,7 +63,7 @@ class _HomeMemsCard extends StatelessWidget {
     }
 
     return Card(
-      margin: defaultPadding,
+      margin: cardMargin,
       color: _color,
       clipBehavior: Clip.antiAlias,
       semanticContainer: false,

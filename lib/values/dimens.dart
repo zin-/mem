@@ -21,4 +21,12 @@ const defaultNavigationBarHeight = 80.0;
 
 const defaultComponentPadding = 4.0;
 
+const cardMargin = EdgeInsets.symmetric(
+  horizontal: _pagePaddingValue,
+  vertical: defaultComponentPadding,
+);
+const cardListPadding = EdgeInsets.symmetric(
+  vertical: _pagePaddingValue - defaultComponentPadding,
+);
+
 const memSelectDialogContentHeightFactor = 1 / 2;
