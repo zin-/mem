@@ -104,6 +104,13 @@ void main() {
             .toList(),
         ['Mem 2', 'Mem 4', 'Mem 1'],
       );
+      expect(find.byType(Card), findsOneWidget);
+      for (final name in ['Mem 2', 'Mem 4', 'Mem 1']) {
+        expect(
+          find.descendant(of: find.byType(Card), matching: find.text(name)),
+          findsOneWidget,
+        );
+      }
 
       await tester.tap(find.text(l10n.memListDestinationLabel));
       await tester.pumpAndSettle();
@@ -168,14 +175,27 @@ void main() {
         ],
       );
 
-      final card = find.byType(Card);
-      expect(card, findsOneWidget);
+      expect(find.byType(Card), findsNWidgets(2));
+
+      Card cardOf(String name) => tester.widget<Card>(
+            find.ancestor(
+              of: find.text(name),
+              matching: find.byType(Card),
+            ),
+          );
+
+      final overdueCard = cardOf('Mem 20');
       expect(
-        tester.widget<Card>(card).color,
+        overdueCard.color,
         warningSurfaceOn(
-          Theme.of(tester.element(card)).colorScheme.surface,
+          Theme.of(tester.element(find.byWidget(overdueCard)))
+              .colorScheme
+              .surface,
         ),
       );
+      final upcomingCard = cardOf('Mem 2');
+      expect(upcomingCard, isNot(same(overdueCard)));
+      expect(upcomingCard.color, isNull);
 
       ListTile tileOf(String name) => tester.widget<ListTile>(
             find.ancestor(
@@ -185,17 +205,11 @@ void main() {
           );
 
       for (final name in ['Mem 20', 'Mem 21', 'Mem 22', 'Mem 23']) {
-        expect(
-          find.descendant(of: card, matching: find.text(name)),
-          findsOneWidget,
-        );
+        expect(cardOf(name), same(overdueCard));
         expect(tileOf(name).tileColor, isNull);
       }
       for (final name in ['Mem 2', 'Mem 4', 'Mem 1']) {
-        expect(
-          find.descendant(of: card, matching: find.text(name)),
-          findsNothing,
-        );
+        expect(cardOf(name), same(upcomingCard));
         expect(tileOf(name).tileColor, isNull);
       }
     },

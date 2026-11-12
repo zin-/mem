@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/home/upcoming_mems.dart';
 import 'package:mem/features/mems/list/item/view.dart';
+import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/values/colors.dart';
 import 'package:mem/values/dimens.dart';
 
@@ -32,30 +33,10 @@ class OverdueMemsView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () {
-          final mems = ref.watch(overdueMemsProvider);
-          if (mems.isEmpty) {
-            return const SizedBox.shrink();
-          }
-
-          return Card(
-            margin: defaultPadding,
-            color: warningSurfaceOn(Theme.of(context).colorScheme.surface),
-            clipBehavior: Clip.antiAlias,
-            semanticContainer: false,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                for (final mem in mems)
-                  MemListItemView(
-                    mem.toDomain(),
-                    key: ValueKey(mem.id),
-                  ),
-              ],
-            ),
-          );
-        },
+        () => _HomeMemsCard(
+          ref.watch(overdueMemsProvider),
+          color: warningSurfaceOn(Theme.of(context).colorScheme.surface),
+        ),
       );
 }
 
@@ -64,19 +45,38 @@ class UpcomingMemsView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () {
-          final mems = ref.watch(upcomingMemsProvider);
-
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (final mem in mems)
-                MemListItemView(
-                  mem.toDomain(),
-                  key: ValueKey(mem.id),
-                ),
-            ],
-          );
-        },
+        () => _HomeMemsCard(ref.watch(upcomingMemsProvider)),
       );
+}
+
+class _HomeMemsCard extends StatelessWidget {
+  final List<MemEntity> _mems;
+  final Color? _color;
+
+  const _HomeMemsCard(this._mems, {Color? color}) : _color = color;
+
+  @override
+  Widget build(BuildContext context) {
+    if (_mems.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Card(
+      margin: defaultPadding,
+      color: _color,
+      clipBehavior: Clip.antiAlias,
+      semanticContainer: false,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (final mem in _mems)
+            MemListItemView(
+              mem.toDomain(),
+              key: ValueKey(mem.id),
+            ),
+        ],
+      ),
+    );
+  }
 }
