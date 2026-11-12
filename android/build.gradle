@@ -43,14 +43,13 @@ subprojects {
   }
 }
 subprojects { subproject ->
-  // file_picker 等は AGP 9+ で kotlin-android を適用しないが、builtInKotlin=false では src の .kt がコンパイルされない
-  subproject.beforeEvaluate {
+  subproject.plugins.withId("com.android.library") {
+    // file_picker は AGP 9 で kotlin-android を適用しない。builtInKotlin=false だと .kt がコンパイルされない
+    // com.android.library より前に適用すると、同じパッケージの他の .kt がコンパイル対象から落ちる
     if (!subproject.plugins.hasPlugin("org.jetbrains.kotlin.android")
         && !subproject.fileTree(dir: "${subproject.projectDir}/src", includes: ["**/*.kt"]).isEmpty()) {
       subproject.plugins.apply("org.jetbrains.kotlin.android")
     }
-  }
-  subproject.plugins.withId("com.android.library") {
     // 一部プラグイン（例: sentry_flutter）が compileSdk 34 のまま。依存は requiredCompileSdk 以上を要求する
     // afterEvaluate では変更が too late になるため finalizeDsl で引き上げる
     subproject.androidComponents.finalizeDsl { extension ->
