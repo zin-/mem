@@ -7,7 +7,6 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/values/constants.dart';
 
-import 'act_list_group.dart';
 import 'states.dart';
 
 class ActListAppBar extends ConsumerWidget {
@@ -67,7 +66,7 @@ class _ActListAppBar extends StatelessWidget {
               ),
               icon: Icon(_group.icon),
               itemBuilder: (context) => [
-                for (final unit in ActListGroup.units)
+                for (final unit in Period.values)
                   PopupMenuItem(
                     value: unit,
                     enabled: unit != _group,

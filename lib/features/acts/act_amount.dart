@@ -61,7 +61,7 @@ Future<ActAmount> viewedPeriodActAmount(
           actEntitiesProvider.select((acts) => revisionOfMemActs(acts, memId)),
         );
         final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
-        // all はグループを作れないので、期間なしでその mem の全体を取る
+        // all は境界が無い。期間を渡さないとその mem の全体になる
         final query = ActListGroup.of(
           unit: period,
           at: at,

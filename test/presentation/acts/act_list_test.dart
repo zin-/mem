@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/acts/list/act_list.dart';
-import 'package:mem/features/acts/list/act_list_group.dart';
 import 'package:mem/features/acts/list/item/total_act_time_item.dart';
 import 'package:mem/features/acts/list/states.dart';
 import 'package:mem/features/acts/states.dart';
@@ -206,6 +205,26 @@ void main() {
   );
 
   testWidgets(
+    'groups acts from different years into one total',
+    (tester) async {
+      await _pumpActList(
+        tester,
+        acts: [
+          _act(1, DateTime(2026, 6, 15, 10)),
+          _act(2, DateTime(2025, 6, 15, 10)),
+        ],
+        startOfDay: _fiveAm,
+        group: Period.all,
+      );
+
+      expect(find.text('all'), findsOneWidget);
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('2025'), findsNothing);
+      expect(find.text('2026'), findsNothing);
+    },
+  );
+
+  testWidgets(
     'selects a grouping unit from the menu',
     (tester) async {
       await _pumpActList(
@@ -220,10 +239,9 @@ void main() {
       await tester.tap(find.byIcon(Icons.calendar_view_day));
       await tester.pumpAndSettle();
 
-      for (final unit in ActListGroup.units) {
+      for (final unit in Period.values) {
         expect(find.text(unit.name), findsOneWidget);
       }
-      expect(find.text(Period.all.name), findsNothing);
 
       await tester.tap(find.text(Period.aYear.name));
       await tester.pumpAndSettle();

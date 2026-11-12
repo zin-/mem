@@ -98,13 +98,13 @@ class TotalActTimeListItem extends ConsumerWidget {
               memId,
               period,
               // 0時の日付だと開始時刻より前になり、前日の期間になる
-              _group.period.start,
+              _group.period!.start,
             ),
           )
           .value;
     }
     if (_group.unit == Period.aDay) {
-      return ref.watch(viewedDayActAmountProvider(memId, _group.start)).value;
+      return ref.watch(viewedDayActAmountProvider(memId, _group.start!)).value;
     }
     return groupAmount;
   }

@@ -5,17 +5,9 @@ import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
 
 class ActListGroup {
-  static const units = <Period>[
-    Period.aDay,
-    Period.aWeek,
-    Period.aMonth,
-    Period.threeMonth,
-    Period.aYear,
-  ];
-
   final Period unit;
-  final DateTime start;
-  final WithStartAndEnd period;
+  final DateTime? start;
+  final WithStartAndEnd? period;
 
   ActListGroup._(this.unit, this.start, this.period);
 
@@ -24,6 +16,9 @@ class ActListGroup {
     required DateTime at,
     required TimeOfDay startOfDay,
   }) {
+    if (unit == Period.all) {
+      return ActListGroup._(unit, null, null);
+    }
     final start = _bucketStart(unit, _logicalDay(at, startOfDay));
     if (start == null) return null;
     return ActListGroup._(
@@ -33,19 +28,26 @@ class ActListGroup {
     );
   }
 
-  bool contains(DateTime at) => period.includesStart(at);
+  bool contains(DateTime at) => period?.includesStart(at) ?? true;
 
   bool isCurrentDay(DateTime at) => unit == Period.aDay && contains(at);
 
-  String label(MaterialLocalizations localizations) => switch (unit) {
-        Period.aDay => localizations.formatCompactDate(start),
-        Period.aWeek ||
-        Period.threeMonth =>
-          period.formatCompactRange(localizations),
-        Period.aMonth => localizations.formatMonthYear(start),
-        Period.aYear => localizations.formatYear(start),
-        Period.all => localizations.formatYear(start),
-      };
+  String label(MaterialLocalizations localizations) {
+    final start = this.start;
+    final period = this.period;
+    if (start == null || period == null) {
+      return unit.name;
+    }
+    return switch (unit) {
+      Period.aDay => localizations.formatCompactDate(start),
+      Period.aWeek ||
+      Period.threeMonth =>
+        period.formatCompactRange(localizations),
+      Period.aMonth => localizations.formatMonthYear(start),
+      Period.aYear => localizations.formatYear(start),
+      Period.all => unit.name,
+    };
+  }
 
   @override
   bool operator ==(Object other) =>
