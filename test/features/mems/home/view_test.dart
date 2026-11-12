@@ -197,6 +197,34 @@ void main() {
       expect(upcomingCard, isNot(same(overdueCard)));
       expect(upcomingCard.color, isNull);
 
+      EdgeInsets resolved(EdgeInsetsGeometry insets) =>
+          insets.resolve(TextDirection.ltr);
+
+      final listPadding = resolved(
+        tester
+                .widget<ListView>(
+                  find.ancestor(
+                    of: find.byWidget(overdueCard),
+                    matching: find.byType(ListView),
+                  ),
+                )
+                .padding ??
+            EdgeInsets.zero,
+      );
+      final overdueMargin = resolved(overdueCard.margin!);
+      final upcomingMargin = resolved(upcomingCard.margin!);
+
+      void expectPageEdgeMargin(EdgeInsets margin) {
+        expect(margin.left, 16);
+        expect(margin.right, 16);
+      }
+
+      expect(overdueMargin.bottom + upcomingMargin.top, 8);
+      expectPageEdgeMargin(overdueMargin);
+      expectPageEdgeMargin(upcomingMargin);
+      expect(listPadding.top + overdueMargin.top, 16);
+      expect(listPadding.bottom + upcomingMargin.bottom, 16);
+
       ListTile tileOf(String name) => tester.widget<ListTile>(
             find.ancestor(
               of: find.text(name),
