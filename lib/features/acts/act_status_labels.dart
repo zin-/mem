@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:mem/features/acts/act.dart';
-import 'package:mem/features/acts/day_act_amount.dart';
+import 'package:mem/features/acts/act_amount.dart';
 import 'package:mem/features/acts/list/duration.dart';
 import 'package:mem/features/acts/target_progress_label.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -38,7 +38,7 @@ class StateElapsedTime extends StatelessWidget {
 
 class DayTargetLabel extends StatelessWidget {
   final Target _target;
-  final DayActAmount _amount;
+  final ActAmount _amount;
   final Act? _act;
   final String? _periodLabel;
 
@@ -83,7 +83,7 @@ class DayTargetLabel extends StatelessWidget {
 class ActStatusLabels extends StatelessWidget {
   final Act? _act;
   final Target? _target;
-  final DayActAmount? _amount;
+  final ActAmount? _amount;
   final Widget? _leading;
   final Widget? _time;
   final bool _centerTime;

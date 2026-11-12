@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/database.dart' hide Act, Mem, Target;
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
-import 'package:mem/features/acts/day_act_amount.dart';
+import 'package:mem/features/acts/act_amount.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/acts/list/act_list_group.dart';
 import 'package:mem/features/acts/list/item/total_act_time_item.dart';
@@ -182,7 +182,7 @@ void main() {
     _FakeActEntities? actEntities,
     List<SavedActEntityV1>? acts,
     Target? target,
-    DayActAmount? dayAmount,
+    ActAmount? dayAmount,
   }) async {
     await tester.binding.setSurfaceSize(const Size(390, 844));
     addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -717,7 +717,7 @@ void main() {
           3 * 60 * 60,
           period: Period.aDay,
         ),
-        dayAmount: const DayActAmount(1, Duration(minutes: 30)),
+        dayAmount: const ActAmount(1, Duration(minutes: 30)),
       );
 
       expect(find.text('0:30'), findsOneWidget);

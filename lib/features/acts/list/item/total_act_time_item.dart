@@ -6,7 +6,7 @@ import 'package:mem/framework/date_and_time/date_and_time_period_view.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_status_labels.dart';
-import 'package:mem/features/acts/day_act_amount.dart';
+import 'package:mem/features/acts/act_amount.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/acts/list/act_list_group.dart';
 import 'package:mem/features/acts/list/duration.dart';
@@ -85,7 +85,7 @@ class TotalActTimeListItem extends ConsumerWidget {
         (sum, act) => sum + (act.value.period?.duration ?? Duration.zero),
       );
 
-  DayActAmount? _amount(
+  ActAmount? _amount(
     WidgetRef ref,
     int memId,
     Target? target,
@@ -111,12 +111,12 @@ class TotalActTimeListItem extends ConsumerWidget {
     if (_group.unit == Period.aDay) {
       return ref.watch(viewedDayActAmountProvider(memId, _group.start)).value;
     }
-    return DayActAmount(_actList.length, recorded);
+    return ActAmount(_actList.length, recorded);
   }
 
   Widget _title(
     Act? statusAct,
-    DayActAmount? amount,
+    ActAmount? amount,
     String? periodLabel,
     Duration recorded,
   ) {
@@ -146,7 +146,7 @@ class TotalActTimeListItem extends ConsumerWidget {
   // 進捗がグループ合計そのもののときは、合計時間を重ねて出さない
   Widget? _groupDuration(
     Duration recorded,
-    DayActAmount? progress,
+    ActAmount? progress,
     Target? target,
   ) {
     if (_group.unit != Period.aDay &&

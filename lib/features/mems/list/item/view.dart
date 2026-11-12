@@ -4,7 +4,7 @@ import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_status_labels.dart';
-import 'package:mem/features/acts/day_act_amount.dart';
+import 'package:mem/features/acts/act_amount.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/acts/period_view.dart';
 import 'package:mem/features/acts/states.dart';
@@ -141,7 +141,7 @@ ListTile _render(
   void Function() closeAct,
   Iterable<MemNotificationEntityV1> memNotificationEntities,
   Target? target,
-  DayActAmount? amount,
+  ActAmount? amount,
   String? periodLabel,
   DateTime? listAt,
   bool hasUndoneChildren,
@@ -239,7 +239,7 @@ int? _periodCount(WidgetRef ref, int memId) {
   return counts.value![memId] ?? 0;
 }
 
-DayActAmount? _timeAmount(
+ActAmount? _timeAmount(
   WidgetRef ref,
   int memId,
   Target target,
@@ -262,7 +262,7 @@ DayActAmount? _timeAmount(
   return ref.watch(viewedDayActAmountProvider(memId, day)).value;
 }
 
-DayActAmount? _labelAmount(
+ActAmount? _labelAmount(
   WidgetRef ref,
   Mem mem,
   Target? target,
@@ -287,7 +287,7 @@ DayActAmount? _labelAmount(
     startOfToday: DateTimeExt.startOfToday(startOfDay),
     startOfDay: startOfDay,
   );
-  return DayActAmount(
+  return ActAmount(
     shown?.value ?? periodCount,
     Duration.zero,
   );
@@ -297,7 +297,7 @@ Widget _title(
   Mem mem,
   Act? latestAct,
   Target? target,
-  DayActAmount? amount,
+  ActAmount? amount,
   String? periodLabel,
 ) =>
     ActStatusLabels(

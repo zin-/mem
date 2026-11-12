@@ -5,7 +5,7 @@ import '../../entity_factories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
-import 'package:mem/features/acts/day_act_amount.dart';
+import 'package:mem/features/acts/act_amount.dart';
 import 'package:mem/features/acts/list/duration.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
@@ -1437,7 +1437,7 @@ void main() {
                 (ref) async => <int, int>{},
               ),
               viewedDayActAmountProvider(memId, day).overrideWith(
-                (ref) async => const DayActAmount(0, recorded),
+                (ref) async => const ActAmount(0, recorded),
               ),
             ],
             child: MaterialApp(
@@ -1490,11 +1490,11 @@ void main() {
                 (ref) async => <int, int>{},
               ),
               viewedDayActAmountProvider(memId, day).overrideWith(
-                (ref) async => const DayActAmount(0, todayRecorded),
+                (ref) async => const ActAmount(0, todayRecorded),
               ),
               viewedPeriodActAmountProvider(memId, Period.aWeek, at)
                   .overrideWith(
-                (ref) async => const DayActAmount(0, weekRecorded),
+                (ref) async => const ActAmount(0, weekRecorded),
               ),
             ],
             child: MaterialApp(

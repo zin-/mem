@@ -10,17 +10,17 @@ import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'day_act_amount.g.dart';
+part 'act_amount.g.dart';
 
-class DayActAmount {
+class ActAmount {
   final int count;
   final Duration recorded;
 
-  const DayActAmount(this.count, this.recorded);
+  const ActAmount(this.count, this.recorded);
 }
 
 @riverpod
-Future<DayActAmount> viewedDayActAmount(Ref ref, int memId, DateTime day) => v(
+Future<ActAmount> viewedDayActAmount(Ref ref, int memId, DateTime day) => v(
       () async {
         ref.watch(
           actEntitiesProvider.select((acts) => revisionOfMemActs(acts, memId)),
@@ -30,7 +30,7 @@ Future<DayActAmount> viewedDayActAmount(Ref ref, int memId, DateTime day) => v(
           memId,
           day.dayPeriod(startOfDay),
         );
-        return DayActAmount(amount.count, amount.recorded);
+        return ActAmount(amount.count, amount.recorded);
       },
       {
         'memId': memId,
@@ -39,7 +39,7 @@ Future<DayActAmount> viewedDayActAmount(Ref ref, int memId, DateTime day) => v(
     );
 
 @riverpod
-Future<DayActAmount> viewedPeriodActAmount(
+Future<ActAmount> viewedPeriodActAmount(
   Ref ref,
   int memId,
   Period period,
@@ -61,7 +61,7 @@ Future<DayActAmount> viewedPeriodActAmount(
           memId,
           query,
         );
-        return DayActAmount(amount.count, amount.recorded);
+        return ActAmount(amount.count, amount.recorded);
       },
       {
         'memId': memId,

@@ -2,7 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_status_labels.dart';
-import 'package:mem/features/acts/day_act_amount.dart';
+import 'package:mem/features/acts/act_amount.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
@@ -27,7 +27,7 @@ void main() {
     WidgetTester tester, {
     Act? act,
     Target? goal,
-    DayActAmount? amount,
+    ActAmount? amount,
   }) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -71,7 +71,7 @@ void main() {
       tester,
       act: ActiveAct(memId, DateAndTime(2026, 10, 30, 10)),
       goal: target(unit: TargetUnit.count, value: 4),
-      amount: const DayActAmount(2, Duration.zero),
+      amount: const ActAmount(2, Duration.zero),
     );
 
     expect(find.text('2'), findsOneWidget);
@@ -104,7 +104,7 @@ void main() {
     await pump(
       tester,
       goal: target(unit: TargetUnit.count, value: 0),
-      amount: const DayActAmount(2, Duration.zero),
+      amount: const ActAmount(2, Duration.zero),
     );
 
     expect(find.text(' / '), findsNothing);
@@ -115,7 +115,7 @@ void main() {
     await pump(
       tester,
       goal: target(unit: TargetUnit.time, value: 2 * 60 * 60),
-      amount: const DayActAmount(1, Duration(minutes: 30)),
+      amount: const ActAmount(1, Duration(minutes: 30)),
     );
 
     expect(find.text('0:30'), findsOneWidget);
@@ -134,7 +134,7 @@ void main() {
         DateAndTime.from(runningSince, timeOfDay: runningSince),
       ),
       goal: target(unit: TargetUnit.time, value: 60 * 60),
-      amount: const DayActAmount(1, Duration.zero),
+      amount: const ActAmount(1, Duration.zero),
     );
 
     expect(find.text('0:02'), findsOneWidget);
@@ -148,7 +148,7 @@ void main() {
         DateTime.now().subtract(const Duration(minutes: 10)),
       ),
       goal: target(unit: TargetUnit.time, value: 2 * 60 * 60),
-      amount: const DayActAmount(1, Duration(hours: 1)),
+      amount: const ActAmount(1, Duration(hours: 1)),
     );
 
     expect(find.text('1:00'), findsOneWidget);
