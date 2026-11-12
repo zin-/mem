@@ -19,6 +19,19 @@ enum Period {
         Period.aDay || Period.aWeek || Period.all => null,
       };
 
+  static const _weeksInMonth = 4;
+  static const _weeksInYear = 52;
+
+  // 目標の換算は暦の月や年ではなく、週数を固定した日数で行う
+  int? get fixedDays => switch (this) {
+        Period.aDay => 1,
+        Period.aWeek => DateTime.daysPerWeek,
+        Period.aMonth => _weeksInMonth * DateTime.daysPerWeek,
+        Period.threeMonth => 3 * _weeksInMonth * DateTime.daysPerWeek,
+        Period.aYear => _weeksInYear * DateTime.daysPerWeek,
+        Period.all => null,
+      };
+
   DateAndTime exclusiveEnd(DateTime start) {
     final day = DateAndTime(start.year, start.month, start.day);
     return switch (this) {

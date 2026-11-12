@@ -90,6 +90,17 @@ void main() {
     });
   });
 
+  group('Period.fixedDays', () {
+    test('uses a fixed number of weeks', () {
+      expect(Period.aDay.fixedDays, 1);
+      expect(Period.aWeek.fixedDays, 7);
+      expect(Period.aMonth.fixedDays, 28);
+      expect(Period.threeMonth.fixedDays, 84);
+      expect(Period.aYear.fixedDays, 364);
+      expect(Period.all.fixedDays, isNull);
+    });
+  });
+
   group('Period.isLongerThan', () {
     test('a later declared period is longer', () {
       const order = [
