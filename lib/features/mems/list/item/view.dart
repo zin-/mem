@@ -229,25 +229,11 @@ int? _periodCount(WidgetRef ref, int memId) {
   return counts.value![memId] ?? 0;
 }
 
-ActAmount? _timeAmount(
+ActAmount? _dayAmount(
   WidgetRef ref,
   int memId,
-  Target target,
   TimeOfDay startOfDay,
 ) {
-  // まとめ単位より長い目標は、行に載っていない期間を問い合わせる
-  if (target.period.isLongerThan(Period.aDay)) {
-    return ref
-        .watch(
-          viewedPeriodActAmountProvider(
-            memId,
-            target.period,
-            // 0時の日付だと開始時刻より前になり、前日の期間になる
-            DateTimeExt.startOfToday(startOfDay),
-          ),
-        )
-        .value;
-  }
   final day = DateAndTime.now().logicalDay(startOfDay);
   return ref.watch(viewedDayActAmountProvider(memId, day)).value;
 }
@@ -262,25 +248,31 @@ ActAmount? _labelAmount(
   if (!TargetProgressLabel.shows(target)) {
     return null;
   }
+  final memId = mem.id as int;
   if (target!.targetUnit == TargetUnit.time) {
-    return _timeAmount(ref, mem.id as int, target, startOfDay);
+    return _dayAmount(ref, memId, startOfDay);
   }
-  if (target.targetUnit != TargetUnit.count || periodCount == null) {
+  if (target.targetUnit != TargetUnit.count) {
     return null;
   }
-
-  final shown = ListFrameCount.of(
-    target: target,
-    periodCount: periodCount,
-    latestAct: mem.latestAct,
-    scheduleAnchorAct: mem.scheduleAnchorAct,
-    startOfToday: DateTimeExt.startOfToday(startOfDay),
-    startOfDay: startOfDay,
-  );
-  return ActAmount(
-    shown?.value ?? periodCount,
-    Duration.zero,
-  );
+  if (target.period == Period.aDay) {
+    if (periodCount == null) return null;
+    final shown = ListFrameCount.of(
+      target: target,
+      periodCount: periodCount,
+      latestAct: mem.latestAct,
+      scheduleAnchorAct: mem.scheduleAnchorAct,
+      startOfToday: DateTimeExt.startOfToday(startOfDay),
+      startOfDay: startOfDay,
+    );
+    return ActAmount(
+      shown?.value ?? periodCount,
+      Duration.zero,
+    );
+  }
+  final day = _dayAmount(ref, memId, startOfDay);
+  if (day == null) return null;
+  return ActAmount(day.count, Duration.zero);
 }
 
 Widget _title(

@@ -81,20 +81,6 @@ class TotalActTimeListItem extends ConsumerWidget {
     if (!TargetProgressLabel.shows(target)) {
       return null;
     }
-    final period = target!.period;
-    // まとめ単位より長い目標は、行に載っていない期間を問い合わせる
-    if (period.isLongerThan(_group.unit)) {
-      return ref
-          .watch(
-            viewedPeriodActAmountProvider(
-              memId,
-              period,
-              // 0時の日付だと開始時刻より前になり、前日の期間になる
-              _group.period!.start,
-            ),
-          )
-          .value;
-    }
     if (_group.unit == Period.aDay) {
       return ref.watch(viewedDayActAmountProvider(memId, _group.start!)).value;
     }

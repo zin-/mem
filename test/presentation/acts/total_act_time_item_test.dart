@@ -619,9 +619,11 @@ void main() {
       expect(find.byType(LiveElapsedTimeText), findsOneWidget);
     });
 
-    testWidgets('shows the month count and unit to the right of the total',
+    testWidgets(
+        'shows that day count and the month unit to the right of the total',
         (tester) async {
       const monthCount = 2;
+      const dayCount = 1;
       final onTheDay = DateTime(2024, 6, 1, 10);
       // 6/1 で終わる直近1ヶ月の外で、暦月の中
       final laterInCalendarMonth = DateTime(2024, 6, 20, 10);
@@ -646,8 +648,8 @@ void main() {
         acts: [_finishedAct(onTheDay)],
       );
 
-      expect(find.text('$monthCount'), findsOneWidget);
-      expect(find.text('1'), findsNothing);
+      expect(find.text('$dayCount'), findsOneWidget);
+      expect(find.text('$monthCount'), findsNothing);
       expect(find.text(' / '), findsNWidgets(2));
       expect(find.text('5'), findsOneWidget);
       expect(find.text('m'), findsOneWidget);
@@ -668,8 +670,10 @@ void main() {
       );
     });
 
-    testWidgets('shows the week count and unit on a day row', (tester) async {
+    testWidgets('shows that day count and the week unit on a day row',
+        (tester) async {
       const weekCount = 2;
+      const dayCount = 1;
       const targetValue = 3;
       final onTheDay = DateTime(2024, 6, 1, 10);
       // 月曜始まりの同じ週。6/1 で終わる直近7日の外
@@ -699,8 +703,8 @@ void main() {
         acts: [_finishedAct(onTheDay)],
       );
 
-      expect(find.text('$weekCount'), findsOneWidget);
-      expect(find.text('1'), findsNothing);
+      expect(find.text('$dayCount'), findsOneWidget);
+      expect(find.text('$weekCount'), findsNothing);
       expect(find.text(' / '), findsNWidgets(2));
       expect(find.text('$targetValue'), findsOneWidget);
       expect(find.text('w'), findsOneWidget);
@@ -739,6 +743,26 @@ void main() {
       expect(find.text('1:00'), findsOneWidget);
       expect(find.text('3:00'), findsOneWidget);
       expect(find.text('0:30'), findsNothing);
+    });
+
+    testWidgets(
+        'shows the group amount when the target period is longer than the group',
+        (tester) async {
+      await pumpItem(
+        tester,
+        mem,
+        groupDate: DateTime(2024, 6, 1),
+        group: Period.aMonth,
+        target: _target(
+          TargetUnit.time,
+          3 * 60 * 60,
+          period: Period.aYear,
+        ),
+      );
+
+      expect(find.text('1:00'), findsOneWidget);
+      expect(find.text('3:00'), findsOneWidget);
+      expect(find.text('y'), findsOneWidget);
     });
   });
 }
