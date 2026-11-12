@@ -1,0 +1,31 @@
+---
+description: レビューが付いたブランチへ別ブランチを取り込むときは merge を使う
+alwaysApply: true
+---
+
+# レビューが付いたブランチへの取り込み
+
+レビュー（インラインコメントを含む）がすでに付いているブランチへ、別ブランチ（`main` を含む）を取り込むときは merge を使う。
+
+レビューはコミット SHA に紐づく。rebase は SHA を変えるので、既存の指摘が元のコミットから外れる。
+
+レビューが無いブランチでは rebase してよい。
+
+## Example(具体例)
+
+**❌ レビューが付いたブランチへ rebase する:**
+
+```bash
+git rebase origin/main
+```
+
+**✅ レビューが付いたブランチへ merge する:**
+
+```bash
+git merge origin/main
+```
+
+## Relations(関連)
+
+- `safety-guardrails`（push などの外部書き込みはしない）
+- `workflow_branch`
