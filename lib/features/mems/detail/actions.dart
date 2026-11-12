@@ -63,29 +63,31 @@ final saveMem =
           memId,
         ));
 
-final removeMem = Provider.autoDispose.family<Future<bool> Function(), int?>(
-  (ref, memId) => () => v(
-        () async {
-          if (memId != null) {
-            final removedMemEntities = await ref
-                .read(memEntitiesProvider.notifier)
-                .removeAsync([memId]);
+final removeMem = Provider.autoDispose.family<Future<bool>, int>(
+  (ref, memId) => v(
+    () async {
+      final link = ref.keepAlive();
+      try {
+        final removedMemEntities =
+            await ref.read(memEntitiesProvider.notifier).removeAsync([memId]);
 
-            for (var e in removedMemEntities) {
-              ref
-                  .read(removedMemProvider(e.id).notifier)
-                  .updatedBy(MemViewData.fromEntityV2(e));
-              ref.read(removedMemItemsProvider(e.id).notifier).updatedBy(
-                    ref.read(memItemsByMemIdProvider(e.id)),
-                  );
-              // TODO mem notificationsにも同様の処理が必要では？
-            }
+        if (!ref.mounted) return true;
 
-            return true;
-          }
+        for (var e in removedMemEntities) {
+          ref
+              .read(removedMemProvider(e.id).notifier)
+              .updatedBy(MemViewData.fromEntityV2(e));
+          ref.read(removedMemItemsProvider(e.id).notifier).updatedBy(
+                ref.read(memItemsByMemIdProvider(e.id)),
+              );
+          // TODO mem notificationsにも同様の処理が必要では？
+        }
 
-          return false;
-        },
-        memId,
-      ),
+        return true;
+      } finally {
+        link.close();
+      }
+    },
+    memId,
+  ),
 );

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/framework/view/app_bar_actions_builder.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/mems/detail/actions.dart';
-import 'package:mem/features/mems/states.dart';
 
 const keyRemoveMem = Key("remove-mem");
 
@@ -23,15 +22,13 @@ class RemoveMemAction extends AppBarActionBuilder {
     String Function()? name,
     VoidCallback Function()? onPressed,
   }) =>
-      Consumer(
-        builder: (context, ref, child) => super.popupMenuItemChildBuilder(
+      Builder(
+        builder: (context) => super.popupMenuItemChildBuilder(
           name: () => buildL10n(context).removeAction,
           onPressed: () => () {
             showDialog(
               context: context,
-              builder: (context) => _RemoveMemAlertDialog(
-                ref.read(removeMem(ref.watch(memByMemIdProvider(_memId))!.id)),
-              ),
+              builder: (context) => _RemoveMemAlertDialog(_memId),
             );
           },
         ),
@@ -41,13 +38,13 @@ class RemoveMemAction extends AppBarActionBuilder {
 const keyOk = Key("ok");
 const keyCancel = Key("cancel");
 
-class _RemoveMemAlertDialog extends StatelessWidget {
-  final Future<bool> Function() _removeMem;
+class _RemoveMemAlertDialog extends ConsumerWidget {
+  final int _memId;
 
-  const _RemoveMemAlertDialog(this._removeMem);
+  const _RemoveMemAlertDialog(this._memId);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = buildL10n(context);
 
     return AlertDialog(
@@ -59,7 +56,7 @@ class _RemoveMemAlertDialog extends StatelessWidget {
             ElevatedButton(
               key: keyOk,
               onPressed: () async {
-                if (await _removeMem()) {
+                if (await ref.read(removeMem(_memId))) {
                   if (context.mounted) {
                     Navigator.of(context)
                       ..pop()
