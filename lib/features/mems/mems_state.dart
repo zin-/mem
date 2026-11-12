@@ -47,12 +47,14 @@ class MemEntities extends _$MemEntities
         },
       );
 
-  Future<MemEntity> loadByMemId(int memId) => v(
+  Future<MemEntity?> loadByMemId(int memId) => v(
         () async {
-          final mem = await MemRepository().shipById(
+          final mem = await _shipOne(
+            MemRepository(),
             memId,
             loadLatestAct: true,
           );
+          if (mem == null) return null;
 
           upsert([mem]);
 
@@ -80,12 +82,13 @@ class MemEntities extends _$MemEntities
 
   Future<void> refreshLatestActForMem(int memId) => v(
         () async {
-          final rows = await MemRepository().ship(
-            id: memId,
+          final mem = await _shipOne(
+            MemRepository(),
+            memId,
             loadLatestAct: true,
           );
-          if (rows.isEmpty) return;
-          upsert([rows.single]);
+          if (mem == null) return;
+          upsert([mem]);
         },
         {'memId': memId},
       );
@@ -189,9 +192,33 @@ class MemEntities extends _$MemEntities
         },
       );
 
+  Future<MemEntity?> _shipOne(
+    MemRepository repository,
+    int memId, {
+    bool loadLatestAct = false,
+  }) async {
+    final rows = await repository.ship(
+      id: memId,
+      loadLatestAct: loadLatestAct,
+    );
+    if (rows.isEmpty) return null;
+    return rows.single;
+  }
+
   Future<void> _fetchDetail(int memId) async {
     final repository = MemRepository();
-    final mem = await repository.shipById(memId, loadLatestAct: true);
+    final mem = await _shipOne(
+      repository,
+      memId,
+      loadLatestAct: true,
+    );
+    if (mem == null) {
+      final cached = _entity(memId);
+      if (cached != null && !cached.parentsLoaded) {
+        upsert([cached.updatedWith(parentsLoaded: () => true)]);
+      }
+      return;
+    }
     final parent = await repository.shipParentByMemId(memId);
     final children = await repository.shipChildrenByParentMemId(memId);
 
@@ -202,7 +229,9 @@ class MemEntities extends _$MemEntities
     final missing = <MemEntity>[];
     for (final id in relatedIds) {
       if (id == memId || _entity(id) != null) continue;
-      missing.add(await repository.shipById(id));
+      final related = await _shipOne(repository, id);
+      if (related == null) continue;
+      missing.add(related);
     }
     final toInsert = [
       for (final entity in missing)

@@ -452,22 +452,29 @@ void main() {
       const testMemName = 'Test Mem';
 
       setUp(() {
+        final saved = MemEntity(
+          _TestConstants.testMemId,
+          testMemName,
+          null,
+          null,
+          null,
+          DateTime.now(),
+          null,
+          null,
+          target: null,
+        );
+        when(mockMemRepository.ship(
+          id: _TestConstants.testMemId,
+          archived: anyNamed('archived'),
+          done: anyNamed('done'),
+          offset: anyNamed('offset'),
+          limit: anyNamed('limit'),
+          loadLatestAct: anyNamed('loadLatestAct'),
+        )).thenAnswer((_) async => [saved]);
         when(mockMemRepository.shipById(
           _TestConstants.testMemId,
           loadLatestAct: anyNamed('loadLatestAct'),
-        )).thenAnswer(
-          (_) async => MemEntity(
-            _TestConstants.testMemId,
-            testMemName,
-            null,
-            null,
-            null,
-            DateTime.now(),
-            null,
-            null,
-            target: null,
-          ),
-        );
+        )).thenAnswer((_) async => saved);
         when(mockMemNotificationRepository.ship(
           memId: _TestConstants.testMemId,
         )).thenAnswer((_) async => [

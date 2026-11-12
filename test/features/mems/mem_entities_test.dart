@@ -64,6 +64,13 @@ void main() {
   Future<MemEntity> insertMem(String name) =>
       MemRepository().receive(Mem(null, name, null, null));
 
+  Future<void> deleteMemRow(int id) async {
+    final db = DriftDatabaseAccessor().driftDatabase;
+    await db.customStatement('PRAGMA foreign_keys = OFF');
+    await (db.delete(db.mems)..where((t) => t.id.equals(id))).go();
+    await db.customStatement('PRAGMA foreign_keys = ON');
+  }
+
   test(
       'default reload keeps active mems, later reloads grow the cache, and the list follows the filter',
       () async {
@@ -229,6 +236,44 @@ void main() {
     expect(cachedMem(child.id).parentsLoaded, isTrue);
     expect(cachedMem(child.id).parentMemId, isNull);
     expect(cachedMem(child.id).childMemIds, [other.id]);
+  });
+
+  test('loadByMemId and loadDetail leave state empty when the mem is gone',
+      () async {
+    expect(await notifier().loadByMemId(1), isNull);
+    expect(container.read(memEntitiesProvider), isEmpty);
+
+    await notifier().loadDetail(1);
+    expect(container.read(memEntitiesProvider), isEmpty);
+  });
+
+  test('loadDetail stops when a cached mem row is already gone', () async {
+    final saved = await insertMem('gone');
+    notifier().upsert([saved]);
+    await deleteMemRow(saved.id);
+
+    await notifier().loadDetail(saved.id);
+
+    expect(cachedMem(saved.id).parentsLoaded, isTrue);
+  });
+
+  test('loadDetail skips a parent mem that is already gone', () async {
+    final parent = await insertMem('Parent');
+    final child = await insertMem('Child');
+    await MemRepository().receiveParent(
+      MemParent(memId: child.id, parentMemId: parent.id),
+    );
+    await deleteMemRow(parent.id);
+
+    await notifier().loadDetail(child.id);
+
+    final loadedChild = cachedMem(child.id);
+    expect(loadedChild.parentsLoaded, isTrue);
+    expect(loadedChild.parentMemId, parent.id);
+    expect(
+      container.read(memEntitiesProvider).where((e) => e.id == parent.id),
+      isEmpty,
+    );
   });
 
   test('doneMem and undoneMem update state', () async {
