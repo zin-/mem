@@ -50,7 +50,7 @@ class TotalActTimeListItem extends ConsumerWidget {
               : (leading: null, trailing: null);
           final statusAct = _group.isCurrentDay(now) ? latestAct : null;
           final target = _target;
-          final recorded = _recorded();
+          final groupAmount = ActAmount.of(_actList.map((act) => act.value));
           String? periodLabel;
           if (DayTargetLabel.shows(target)) {
             final period = target!.period;
@@ -58,7 +58,7 @@ class TotalActTimeListItem extends ConsumerWidget {
               periodLabel = period.shortLabel;
             }
           }
-          final amount = _amount(ref, memId, target, recorded);
+          final amount = _amount(ref, memId, target, groupAmount);
 
           return ListTile(
             leading: actions.leading,
@@ -66,7 +66,7 @@ class TotalActTimeListItem extends ConsumerWidget {
               statusAct,
               amount,
               periodLabel,
-              recorded,
+              groupAmount,
             ),
             subtitle: _mem == null ? null : Text(_mem.name),
             trailing: actions.trailing,
@@ -80,16 +80,11 @@ class TotalActTimeListItem extends ConsumerWidget {
         },
       );
 
-  Duration _recorded() => _actList.fold<Duration>(
-        Duration.zero,
-        (sum, act) => sum + (act.value.period?.duration ?? Duration.zero),
-      );
-
   ActAmount? _amount(
     WidgetRef ref,
     int memId,
     Target? target,
-    Duration recorded,
+    ActAmount groupAmount,
   ) {
     if (!DayTargetLabel.shows(target)) {
       return null;
@@ -111,14 +106,14 @@ class TotalActTimeListItem extends ConsumerWidget {
     if (_group.unit == Period.aDay) {
       return ref.watch(viewedDayActAmountProvider(memId, _group.start)).value;
     }
-    return ActAmount(_actList.length, recorded);
+    return groupAmount;
   }
 
   Widget _title(
     Act? statusAct,
     ActAmount? amount,
     String? periodLabel,
-    Duration recorded,
+    ActAmount groupAmount,
   ) {
     final range = _actListRange(_actList.map((act) => act.value));
 
@@ -131,7 +126,7 @@ class TotalActTimeListItem extends ConsumerWidget {
           _target,
           amount,
           periodLabel: periodLabel,
-          time: _groupDuration(recorded, amount, _target),
+          time: _groupDuration(groupAmount, amount, _target),
           centerTime: false,
         ),
         if (range != null)
@@ -145,18 +140,18 @@ class TotalActTimeListItem extends ConsumerWidget {
 
   // 進捗がグループ合計そのもののときは、合計時間を重ねて出さない
   Widget? _groupDuration(
-    Duration recorded,
+    ActAmount groupAmount,
     ActAmount? progress,
     Target? target,
   ) {
     if (_group.unit != Period.aDay &&
         progress != null &&
-        progress.recorded == recorded &&
+        progress.recorded == groupAmount.recorded &&
         target != null &&
         target.targetUnit == TargetUnit.time) {
       return null;
     }
-    return Text(recorded.formatHHmm());
+    return Text(groupAmount.recorded.formatHHmm());
   }
 
   ({Widget? leading, Widget? trailing}) _actions(

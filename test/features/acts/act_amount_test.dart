@@ -3,11 +3,13 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/database.dart' hide Act;
+import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_amount.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/preference/preference_key.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:mem/framework/database/accessor.dart';
+import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/singleton.dart';
 
 class _FakePreference extends Preference<TimeOfDay> {
@@ -20,6 +22,32 @@ class _FakePreference extends Preference<TimeOfDay> {
 }
 
 void main() {
+  group('ActAmount.of', () {
+    test('counts each act and sums recorded durations', () {
+      final amount = ActAmount.of([
+        FinishedAct(
+          1,
+          DateAndTime(2026, 10, 2, 10),
+          DateAndTime(2026, 10, 2, 11, 2, 3),
+        ),
+        PausedAct(1, DateTime(2026, 10, 2, 12)),
+      ]);
+
+      expect(amount.count, 2);
+      expect(
+        amount.recorded,
+        const Duration(hours: 1, minutes: 2, seconds: 3),
+      );
+    });
+
+    test('is zero when there are no acts', () {
+      final amount = ActAmount.of(const <Act>[]);
+
+      expect(amount.count, 0);
+      expect(amount.recorded, Duration.zero);
+    });
+  });
+
   group('viewedDayActAmount', () {
     late AppDatabase db;
 

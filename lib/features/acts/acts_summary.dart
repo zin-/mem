@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/acts/act_amount.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
@@ -44,15 +45,12 @@ class ActsSummary extends SummaryStatistics {
 
   @override
   double getValue(List<dynamic> items) {
-    final acts = items as List<Act>;
+    final amount = ActAmount.of(items as List<Act>);
     switch (_aggregationType) {
       case AggregationType.count:
-        return acts.length.toDouble();
+        return amount.count.toDouble();
       case AggregationType.sum:
-        return acts
-            .map((act) => act.period?.duration.inSeconds ?? 0)
-            .fold(0, (sum, duration) => sum + duration)
-            .toDouble();
+        return amount.recorded.inSeconds.toDouble();
     }
   }
 

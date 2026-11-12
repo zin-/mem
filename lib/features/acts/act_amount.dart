@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
+import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
@@ -17,6 +18,16 @@ class ActAmount {
   final Duration recorded;
 
   const ActAmount(this.count, this.recorded);
+
+  static ActAmount of(Iterable<Act> acts) {
+    var count = 0;
+    var recorded = Duration.zero;
+    for (final act in acts) {
+      count += 1;
+      recorded += act.period?.duration ?? Duration.zero;
+    }
+    return ActAmount(count, recorded);
+  }
 }
 
 @riverpod
@@ -26,11 +37,10 @@ Future<ActAmount> viewedDayActAmount(Ref ref, int memId, DateTime day) => v(
           actEntitiesProvider.select((acts) => revisionOfMemActs(acts, memId)),
         );
         final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
-        final amount = await ActQueryService().amountByMemIdAndPeriod(
+        return ActQueryService().amountByMemIdAndPeriod(
           memId,
           day.dayPeriod(startOfDay),
         );
-        return ActAmount(amount.count, amount.recorded);
       },
       {
         'memId': memId,
@@ -57,11 +67,10 @@ Future<ActAmount> viewedPeriodActAmount(
           at: at,
           startOfDay: startOfDay,
         )?.period;
-        final amount = await ActQueryService().amountByMemIdAndPeriod(
+        return ActQueryService().amountByMemIdAndPeriod(
           memId,
           query,
         );
-        return ActAmount(amount.count, amount.recorded);
       },
       {
         'memId': memId,
