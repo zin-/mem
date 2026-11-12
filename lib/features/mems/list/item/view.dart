@@ -6,8 +6,8 @@ import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_status_labels.dart';
 import 'package:mem/features/acts/act_amount.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
-import 'package:mem/features/acts/period_view.dart';
 import 'package:mem/features/acts/states.dart';
+import 'package:mem/features/acts/target_progress_label.dart';
 import 'package:mem/features/mems/count_target.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mems_state.dart';
@@ -48,13 +48,6 @@ class MemListItemView extends ConsumerWidget {
               ref.watch(memNotificationsByMemIdProvider(_mem.id as int));
           final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
           final periodCount = _periodCount(ref, _mem.id as int);
-          String? periodLabel;
-          if (DayTargetLabel.shows(target)) {
-            final period = target!.period;
-            if (period != Period.aDay) {
-              periodLabel = period.shortLabel;
-            }
-          }
           final amount = _labelAmount(
             ref,
             _mem,
@@ -116,7 +109,6 @@ class MemListItemView extends ConsumerWidget {
             notifications,
             target,
             amount,
-            periodLabel,
             listAt,
             hasUndoneChildren,
           );
@@ -142,7 +134,6 @@ ListTile _render(
   Iterable<MemNotificationEntityV1> memNotificationEntities,
   Target? target,
   ActAmount? amount,
-  String? periodLabel,
   DateTime? listAt,
   bool hasUndoneChildren,
 ) =>
@@ -192,7 +183,7 @@ ListTile _render(
         );
 
         return ListTile(
-          title: _title(mem, latestActByMem, target, amount, periodLabel),
+          title: _title(mem, latestActByMem, target, amount),
           onTap: onTap,
           leading: hasEnableMemNotifications
               ? hasActiveAct
@@ -225,7 +216,6 @@ ListTile _render(
         'memNotificationEntities': memNotificationEntities,
         'target': target,
         'amount': amount,
-        'periodLabel': periodLabel,
         'listAt': listAt,
         'hasUndoneChildren': hasUndoneChildren,
       },
@@ -269,7 +259,7 @@ ActAmount? _labelAmount(
   int? periodCount,
   TimeOfDay startOfDay,
 ) {
-  if (!DayTargetLabel.shows(target)) {
+  if (!TargetProgressLabel.shows(target)) {
     return null;
   }
   if (target!.targetUnit == TargetUnit.time) {
@@ -298,12 +288,11 @@ Widget _title(
   Act? latestAct,
   Target? target,
   ActAmount? amount,
-  String? periodLabel,
 ) =>
     ActStatusLabels(
       latestAct,
       target,
       amount,
       leading: MemNameText(mem.id),
-      periodLabel: periodLabel,
+      shownIn: Period.aDay,
     );

@@ -32,7 +32,12 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: ActStatusLabels(act, goal, amount),
+          body: ActStatusLabels(
+            act,
+            goal,
+            amount,
+            shownIn: Period.aWeek,
+          ),
         ),
       ),
     );

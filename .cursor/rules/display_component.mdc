@@ -8,7 +8,7 @@ alwaysApply: true
 
 その表示の Widget を一つ定義し、出す場所はすべてそれを使う。回数も時間も、` / ` と期間の短い表示を出すのはその Widget だけ。
 
-期間の短い表示は `PeriodView.shortLabel` を渡す。Widget はその文字列を描く。`periodLabel == null` なら `0 / 5`、あるなら `0 / 5 / w`。
+`TargetProgressLabel` は `ActAmount` と `Target` と、行の期間 `shownIn` を受ける。回数なら整数、時間なら `formatHHmm`。`target.period != shownIn` のときだけ `PeriodView.shortLabel` を付ける。同じなら `0 / 5`、違うなら `0 / 5 / w`。
 
 ## Example(具体例)
 
@@ -44,15 +44,16 @@ Wrap(
 
 ```dart
 TargetProgressLabel(
-  current: count.toString(),
-  target: target.toString(),
-  periodLabel: periodLabel,
+  ActAmount(count, Duration.zero),
+  target,
+  shownIn: Period.aDay,
 )
 
 TargetProgressLabel(
-  current: current.formatHHmm(),
-  target: Duration(seconds: targetSeconds).formatHHmm(),
-  periodLabel: periodLabel,
+  amount,
+  target,
+  shownIn: shownIn,
+  act: act,
 )
 ```
 
@@ -61,3 +62,5 @@ TargetProgressLabel(
 - Dry（同じ表示を一箇所にまとめる）
 - `PeriodView.shortLabel`
 - `TargetProgressLabel`
+- `ActAmount`
+- `Target`

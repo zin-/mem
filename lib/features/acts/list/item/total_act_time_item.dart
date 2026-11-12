@@ -10,8 +10,8 @@ import 'package:mem/features/acts/act_amount.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/acts/list/act_list_group.dart';
 import 'package:mem/features/acts/list/duration.dart';
-import 'package:mem/features/acts/period_view.dart';
 import 'package:mem/features/acts/states.dart';
+import 'package:mem/features/acts/target_progress_label.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/states.dart';
@@ -51,13 +51,6 @@ class TotalActTimeListItem extends ConsumerWidget {
           final statusAct = _group.isCurrentDay(now) ? latestAct : null;
           final target = _target;
           final groupAmount = ActAmount.of(_actList.map((act) => act.value));
-          String? periodLabel;
-          if (DayTargetLabel.shows(target)) {
-            final period = target!.period;
-            if (period != _group.unit) {
-              periodLabel = period.shortLabel;
-            }
-          }
           final amount = _amount(ref, memId, target, groupAmount);
 
           return ListTile(
@@ -65,7 +58,6 @@ class TotalActTimeListItem extends ConsumerWidget {
             title: _title(
               statusAct,
               amount,
-              periodLabel,
               groupAmount,
             ),
             subtitle: _mem == null ? null : Text(_mem.name),
@@ -86,7 +78,7 @@ class TotalActTimeListItem extends ConsumerWidget {
     Target? target,
     ActAmount groupAmount,
   ) {
-    if (!DayTargetLabel.shows(target)) {
+    if (!TargetProgressLabel.shows(target)) {
       return null;
     }
     final period = target!.period;
@@ -112,7 +104,6 @@ class TotalActTimeListItem extends ConsumerWidget {
   Widget _title(
     Act? statusAct,
     ActAmount? amount,
-    String? periodLabel,
     ActAmount groupAmount,
   ) {
     final range = _actListRange(_actList.map((act) => act.value));
@@ -125,7 +116,7 @@ class TotalActTimeListItem extends ConsumerWidget {
           statusAct,
           _target,
           amount,
-          periodLabel: periodLabel,
+          shownIn: _group.unit,
           time: _groupDuration(groupAmount, amount, _target),
           centerTime: false,
         ),
