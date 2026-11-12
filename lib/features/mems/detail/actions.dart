@@ -39,7 +39,7 @@ final saveMem =
 
               ref
                   .read(editingMemByMemIdProvider(memId).notifier)
-                  .updatedBy(MemViewData.fromEntityV2(memEntityV2));
+                  .updatedBy(MemViewData.fromEntity(memEntityV2));
 
               ref.read(memItemsByMemIdProvider(memId).notifier).updatedBy(
                     List<MemItemEntityV1>.of(savedMemItems),

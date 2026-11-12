@@ -102,7 +102,7 @@ class MemEntities extends _$MemEntities
           for (final entity in removed) {
             ref
                 .read(removedMemProvider(entity.id).notifier)
-                .updatedBy(MemViewData.fromEntityV2(entity));
+                .updatedBy(MemViewData.fromEntity(entity));
             ref
                 .read(removedMemItemsProvider(entity.id).notifier)
                 .updatedBy(items);

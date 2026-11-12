@@ -141,7 +141,7 @@ void main() {
     });
 
     test('MemViewData updatedWith updates period', () {
-      final viewData = MemViewData.fromEntityV2(
+      final viewData = MemViewData.fromEntity(
         savedMem(
           id: 11,
           name: 'period-mem',

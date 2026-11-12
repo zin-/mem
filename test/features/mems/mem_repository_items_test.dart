@@ -227,7 +227,7 @@ void main() {
       ) as SavedMemItemEntityV1;
 
       final (savedItems, _, _, _, savedMem) = await MemService().save((
-        MemViewData.fromEntityV2(created),
+        MemViewData.fromEntity(created),
         [edited],
         null,
         null,
@@ -247,7 +247,7 @@ void main() {
       final created = await repository.receive(Mem(null, 'saved', null, null));
 
       final (savedItems, _, _, _, savedMem) = await MemService().save((
-        MemViewData.fromEntityV2(created),
+        MemViewData.fromEntity(created),
         [MemItemEntityV1(MemItem(null, MemItemType.memo, 'added'))],
         null,
         null,
@@ -272,7 +272,7 @@ void main() {
 
       final (savedItems, _, _, _, savedMem) = await MemService().save(
         (
-          MemViewData.fromEntityV2(created),
+          MemViewData.fromEntity(created),
           [SavedMemItemEntityV1.fromEntityV2(created.items!.single)],
           null,
           null,
