@@ -90,20 +90,12 @@ class MemEntities extends _$MemEntities
         {'memId': memId},
       );
 
-  Future<Iterable<MemEntity>> removeAsync(Iterable<int> ids) => v(
-        () async {
-          await Future.wait(ids.map((id) => MemClient().remove(id)));
-
-          final removed = remove(ids);
-          await _refreshParentMemIdsWithUndoneChildren();
-          return removed;
-        },
-        {'ids': ids},
-      );
-
   Future<void> removeMem(int memId, List<MemItemEntityV1> items) => v(
         () async {
-          final removed = await removeAsync([memId]);
+          await MemClient().remove(memId);
+
+          final removed = remove([memId]);
+          await _refreshParentMemIdsWithUndoneChildren();
           for (final entity in removed) {
             ref
                 .read(removedMemProvider(entity.id).notifier)

@@ -136,7 +136,7 @@ void main() {
     expect(container.read(memEntitiesProvider).single.name, 'reloaded');
   });
 
-  test('removeAsync drops the mem and undoRemove puts it back', () async {
+  test('undoRemove puts the mem back and removeMem drops it', () async {
     final saved = await insertMem('gone');
     await notifier().loadMemList();
 
@@ -146,8 +146,7 @@ void main() {
     await notifier().undoRemove(saved.id);
     expect(container.read(memEntitiesProvider).single.name, 'back');
 
-    final removed = await notifier().removeAsync([saved.id]);
-    expect(removed.map((mem) => mem.id), [saved.id]);
+    await notifier().removeMem(saved.id, []);
     expect(container.read(memEntitiesProvider), isEmpty);
   });
 
@@ -271,7 +270,7 @@ void main() {
     await notifier().unarchive(child.id);
     expect(parentIds(), {parent.id});
 
-    await notifier().removeAsync([child.id]);
+    await notifier().removeMem(child.id, []);
     expect(parentIds(), isEmpty);
   });
 }
