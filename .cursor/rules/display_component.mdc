@@ -40,16 +40,16 @@ Wrap(
 )
 ```
 
-**✅ `TargetRatioLabel` に渡す:**
+**✅ `TargetProgressLabel` に渡す:**
 
 ```dart
-TargetRatioLabel(
+TargetProgressLabel(
   current: count.toString(),
   target: target.toString(),
   periodLabel: periodLabel,
 )
 
-TargetRatioLabel(
+TargetProgressLabel(
   current: current.formatHHmm(),
   target: Duration(seconds: targetSeconds).formatHHmm(),
   periodLabel: periodLabel,
@@ -60,4 +60,4 @@ TargetRatioLabel(
 
 - Dry（同じ表示を一箇所にまとめる）
 - `PeriodView.shortLabel`
-- `TargetRatioLabel`
+- `TargetProgressLabel`

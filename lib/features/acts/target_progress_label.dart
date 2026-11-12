@@ -1,12 +1,12 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:mem/features/logger/log_service.dart';
 
-class TargetRatioLabel extends StatelessWidget {
+class TargetProgressLabel extends StatelessWidget {
   final String _current;
   final String _target;
   final String? _periodLabel;
 
-  const TargetRatioLabel({
+  const TargetProgressLabel({
     required String current,
     required String target,
     String? periodLabel,

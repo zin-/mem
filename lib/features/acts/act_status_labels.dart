@@ -4,7 +4,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/day_act_amount.dart';
 import 'package:mem/features/acts/list/duration.dart';
-import 'package:mem/features/acts/target_ratio_label.dart';
+import 'package:mem/features/acts/target_progress_label.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/modules/live_elapsed_time_text.dart';
@@ -57,7 +57,7 @@ class DayTargetLabel extends StatelessWidget {
         () {
           final act = _act;
           return switch (_target.targetUnit) {
-            TargetUnit.count => TargetRatioLabel(
+            TargetUnit.count => TargetProgressLabel(
                 current: _amount.count.toString(),
                 target: _target.value.toString(),
                 periodLabel: _periodLabel,
@@ -249,7 +249,7 @@ class _TimeTargetLabelState extends State<_TimeTargetLabel> {
               (since == null
                   ? Duration.zero
                   : DateTime.now().difference(since));
-          return TargetRatioLabel(
+          return TargetProgressLabel(
             current: current.formatHHmm(),
             target: Duration(seconds: widget._targetSeconds).formatHHmm(),
             periodLabel: widget._periodLabel,

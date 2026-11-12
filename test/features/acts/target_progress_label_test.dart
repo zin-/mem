@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/features/acts/target_ratio_label.dart';
+import 'package:mem/features/acts/target_progress_label.dart';
 
 void main() {
   Future<void> pump(
@@ -10,7 +10,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: TargetRatioLabel(
+          body: TargetProgressLabel(
             current: '0',
             target: '5',
             periodLabel: periodLabel,
@@ -20,7 +20,7 @@ void main() {
     );
   }
 
-  testWidgets('shows the period label after the ratio', (tester) async {
+  testWidgets('shows the period label after the progress', (tester) async {
     await pump(tester, periodLabel: 'w');
 
     expect(find.text('0'), findsOneWidget);
