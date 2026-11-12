@@ -67,7 +67,7 @@ Future<void> _pumpActList(
         preferenceProvider(startOfDayKey).overrideWith(
           () => _FakePreference(startOfDay),
         ),
-        dateViewProvider.overrideWith(
+        actListGroupUnitProvider.overrideWith(
           (ref) => ValueStateNotifier(group),
         ),
         memEntitiesProvider.overrideWith(

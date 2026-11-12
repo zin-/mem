@@ -70,7 +70,7 @@ class _ActListState extends ConsumerState<ActList> {
 
           return _ActList(
             memId,
-            ref.watch(dateViewProvider),
+            ref.watch(actListGroupUnitProvider),
             ref.watch(timeViewProvider),
             ref.watch(preferenceProvider(startOfDayKey)),
             ref.watch(actListProvider(memId)),
