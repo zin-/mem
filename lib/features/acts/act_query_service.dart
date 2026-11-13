@@ -187,6 +187,31 @@ class ActQueryService {
         table.start.isSmallerThanValue(period.end);
   }
 
+  Future<List<ActEntity>> fetchFinishedStartedAround({
+    required DateTime since,
+    required DateTime until,
+  }) =>
+      v(
+        () async {
+          final rows = await (_db.select(_db.acts)
+                ..where(
+                  (t) =>
+                      t.actKind.equals(ActKind.finished.name) &
+                      (t.startIsAllDay.isNull() |
+                          t.startIsAllDay.equals(false)) &
+                      t.start.isBiggerOrEqualValue(since) &
+                      t.start.isSmallerOrEqualValue(until),
+                )
+                ..orderBy([(t) => OrderingTerm.desc(t.end)]))
+              .get();
+          return rows.map(ActEntity.fromTuple).toList();
+        },
+        {
+          'since': since,
+          'until': until,
+        },
+      );
+
   Future<Act?> resolveScheduleAnchorForNotifications({
     required int memId,
     required Act? latestAct,

@@ -30,11 +30,13 @@ import 'subtitle.dart';
 
 class MemListItemView extends ConsumerWidget {
   final Mem _mem;
+  final Widget? _subtitle;
 
   const MemListItemView(
     this._mem, {
+    Widget? subtitle,
     super.key,
-  });
+  }) : _subtitle = subtitle;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
@@ -114,6 +116,7 @@ class MemListItemView extends ConsumerWidget {
             amount,
             listAt,
             hasUndoneChildren,
+            _subtitle,
           );
         },
         {
@@ -139,6 +142,7 @@ ListTile _render(
   ActAmount? amount,
   DateTime? listAt,
   bool hasUndoneChildren,
+  Widget? subtitle,
 ) =>
     v(
       () {
@@ -206,11 +210,15 @@ ListTile _render(
                   ? stopIconButton
                   : startIconButton
               : null,
-          subtitle:
-              mem.period == null && !hasEnableMemNotifications && listAt == null
+          subtitle: subtitle ??
+              (mem.period == null &&
+                      !hasEnableMemNotifications &&
+                      listAt == null
                   ? null
-                  : MemListItemSubtitle(mem.id as int, listAt),
-          isThreeLine: mem.period != null && hasEnableMemNotifications,
+                  : MemListItemSubtitle(mem.id as int, listAt)),
+          isThreeLine: subtitle == null &&
+              mem.period != null &&
+              hasEnableMemNotifications,
         );
       },
       {

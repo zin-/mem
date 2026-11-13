@@ -425,6 +425,71 @@ void main() {
       expect(count, 2);
     });
 
+    test(
+        'fetchFinishedStartedAround returns finished non-all-day acts whose start is between since and until',
+        () async {
+      final memId = await insertMem();
+      final otherMemId = await insertMem();
+      final since = DateTime(2026, 1, 2);
+      final until = DateTime(2026, 1, 30, 14, 30);
+
+      Set<DateTime> startedAt(Iterable<ActEntity> rows) => {
+            for (final row in rows)
+              DateTime(
+                row.start!.year,
+                row.start!.month,
+                row.start!.day,
+                row.start!.hour,
+                row.start!.minute,
+              ),
+          };
+
+      Future<void> finished(int id, DateTime start) => insertAct(
+            memId: id,
+            start: start,
+            actKind: 'finished',
+          );
+
+      await finished(memId, until);
+      await finished(memId, since);
+      await finished(otherMemId, DateTime(2026, 1, 15, 3, 15));
+      await finished(memId, DateTime(2026, 1, 20, 23, 59));
+      await finished(memId, since.subtract(const Duration(minutes: 1)));
+      await finished(memId, until.add(const Duration(minutes: 1)));
+      await insertAct(
+        memId: memId,
+        start: DateTime(2026, 1, 10, 14),
+        actKind: 'skipped',
+      );
+      await insertAct(memId: memId, start: DateTime(2026, 1, 11, 14));
+      await db.into(db.acts).insert(
+            ActsCompanion.insert(
+              memId: memId,
+              createdAt: DateTime.now(),
+              start: Value(DateTime(2026, 1, 12, 14, 30)),
+              startIsAllDay: const Value(true),
+              end: Value(DateTime(2026, 1, 12, 15, 30)),
+              actKind: const Value('finished'),
+            ),
+          );
+
+      final rows = await query.fetchFinishedStartedAround(
+        since: since,
+        until: until,
+      );
+
+      expect(rows.map((row) => row.memId).toSet(), {memId, otherMemId});
+      expect(
+        startedAt(rows),
+        {
+          until,
+          since,
+          DateTime(2026, 1, 15, 3, 15),
+          DateTime(2026, 1, 20, 23, 59),
+        },
+      );
+    });
+
     test('listPeriodCountsByMemId skips a mem when the period is null',
         () async {
       final memId = await insertMem();
