@@ -7,14 +7,17 @@ class HomeMemsCard extends StatelessWidget {
   final List<MemEntity> _mems;
   final Color? _color;
   final IconData? _icon;
+  final Widget Function(MemEntity mem)? _subtitle;
 
   const HomeMemsCard(
     this._mems, {
     super.key,
     Color? color,
     IconData? icon,
+    Widget Function(MemEntity mem)? subtitle,
   })  : _color = color,
-        _icon = icon;
+        _icon = icon,
+        _subtitle = subtitle;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +26,7 @@ class HomeMemsCard extends StatelessWidget {
     }
 
     final icon = _icon;
+    final subtitle = _subtitle;
     final theme = Theme.of(context);
 
     return Card(
@@ -49,6 +53,7 @@ class HomeMemsCard extends StatelessWidget {
             MemListItemView(
               mem.toDomain(),
               key: ValueKey(mem.id),
+              subtitle: subtitle?.call(mem),
             ),
         ],
       ),
