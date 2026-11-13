@@ -202,7 +202,8 @@ class ActQueryService {
                     timeRadius: timeRadius,
                     lookback: lookback,
                   ),
-                ))
+                )
+                ..orderBy([(t) => OrderingTerm.desc(t.end)]))
               .get();
           return rows.map(ActEntity.fromTuple).toList();
         },

@@ -22,30 +22,32 @@ class HabitualMems {
     Iterable<MemEntity> mems, {
     required DateTime now,
   }) {
-    DateTime? earliest;
-    for (final act in acts) {
-      final start = act.period?.start;
-      if (start == null) continue;
-      if (earliest == null || start.isBefore(earliest)) earliest = start;
-    }
-    final windows = earliest == null
-        ? const <DateAndTimePeriod>[]
-        : _dayWindows(now, earliest);
+    final ordered = acts.toList()
+      ..sort((a, b) {
+        final aEnd = a.period?.end;
+        final bEnd = b.period?.end;
+        if (aEnd == null) return 1;
+        if (bEnd == null) return -1;
+        return bEnd.compareTo(aEnd);
+      });
 
-    bool hits(DateAndTimePeriod? period) {
-      if (period == null || period.start == null || period.end == null) {
-        return false;
+    var day = DateTime(now.year, now.month, now.day);
+    final windows = <DateAndTimePeriod>[_window(now, day)];
+    final actsByMemId = <int, List<Act>>{};
+    for (final act in ordered) {
+      final period = act.period;
+      final end = period?.end;
+      if (period == null || period.start == null || end == null) continue;
+      while (end.isBefore(windows.last.start!)) {
+        day = DateTime(day.year, day.month, day.day - 1);
+        windows.add(_window(now, day));
+        if (windows.length == 3) windows.removeAt(0);
       }
       for (final window in windows) {
-        if (period.overlaps(window)) return true;
+        if (!period.overlaps(window)) continue;
+        (actsByMemId[act.memId] ??= []).add(act);
+        break;
       }
-      return false;
-    }
-
-    final actsByMemId = <int, List<Act>>{};
-    for (final act in acts) {
-      if (!hits(act.period)) continue;
-      (actsByMemId[act.memId] ??= []).add(act);
     }
 
     final ranked = <({MemEntity mem, Duration time, int score})>[];
@@ -70,30 +72,21 @@ class HabitualMems {
     return HabitualMems._(ranked.map((entry) => entry.mem).toList());
   }
 
-  static List<DateAndTimePeriod> _dayWindows(DateTime now, DateTime earliest) {
-    final windows = <DateAndTimePeriod>[];
-    final last = DateTime(now.year, now.month, now.day);
-    for (var day = DateTime(earliest.year, earliest.month, earliest.day - 1);
-        !day.isAfter(last);
-        day = DateTime(day.year, day.month, day.day + 1)) {
-      final center = DateTime(
-        day.year,
-        day.month,
-        day.day,
-        now.hour,
-        now.minute,
-        now.second,
-        now.millisecond,
-        now.microsecond,
-      );
-      windows.add(
-        DateAndTimePeriod(
-          start: _time(center.subtract(timeRadius)),
-          end: _time(center.add(timeRadius)),
-        ),
-      );
-    }
-    return windows;
+  static DateAndTimePeriod _window(DateTime now, DateTime day) {
+    final center = DateTime(
+      day.year,
+      day.month,
+      day.day,
+      now.hour,
+      now.minute,
+      now.second,
+      now.millisecond,
+      now.microsecond,
+    );
+    return DateAndTimePeriod(
+      start: _time(center.subtract(timeRadius)),
+      end: _time(center.add(timeRadius)),
+    );
   }
 
   static DateAndTime _time(DateTime value) => DateAndTime(
