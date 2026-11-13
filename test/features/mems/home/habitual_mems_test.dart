@@ -11,10 +11,8 @@ void main() {
   final createdAt = DateTime(2026, 6, 1);
 
   final friday = DateTime(2026, 11, 13, 14);
-  final previousFriday = DateTime(2026, 11, 6, 14);
   final thursday = DateTime(2026, 11, 12, 14);
   final wednesday = DateTime(2026, 11, 11, 14);
-  final tuesday = DateTime(2026, 11, 10, 14);
 
   Act spanning(int memId, DateTime at, Duration length) {
     final end = at.add(length);
@@ -85,14 +83,14 @@ void main() {
       );
     });
 
-    test('places longer total time above more acts', () {
+    test(
+        'places longer same-weekday time above a longer total on another weekday',
+        () {
       expect(
         ids(
           [
-            spanning(1, thursday, const Duration(hours: 3)),
-            spanning(2, thursday, const Duration(minutes: 10)),
-            spanning(2, wednesday, const Duration(minutes: 10)),
-            spanning(2, tuesday, const Duration(minutes: 10)),
+            spanning(1, friday, const Duration(hours: 1)),
+            spanning(2, thursday, const Duration(hours: 3)),
           ],
           [mem(2), mem(1)],
         ),
@@ -100,15 +98,80 @@ void main() {
       );
     });
 
-    test('places the higher score above when total time matches', () {
+    test(
+        'places the higher same-weekday count first when same-weekday time is within half',
+        () {
       expect(
         ids(
           [
-            spanning(1, friday, const Duration(minutes: 15)),
-            spanning(1, previousFriday, const Duration(minutes: 15)),
-            spanning(2, thursday, const Duration(minutes: 10)),
-            spanning(2, wednesday, const Duration(minutes: 10)),
-            spanning(2, tuesday, const Duration(minutes: 10)),
+            spanning(1, friday, const Duration(minutes: 100)),
+            spanning(2, friday, const Duration(minutes: 30)),
+            spanning(2, friday, const Duration(minutes: 30)),
+            spanning(2, friday, const Duration(minutes: 30)),
+          ],
+          [mem(1), mem(2)],
+        ),
+        [2, 1],
+      );
+    });
+
+    test(
+        'places longer total time first when same-weekday metrics are within half',
+        () {
+      expect(
+        ids(
+          [
+            spanning(1, friday, const Duration(minutes: 60)),
+            spanning(2, friday, const Duration(minutes: 40)),
+            spanning(2, thursday, const Duration(hours: 2)),
+          ],
+          [mem(1), mem(2)],
+        ),
+        [2, 1],
+      );
+    });
+
+    test('places the higher total count first when time is within half', () {
+      expect(
+        ids(
+          [
+            spanning(1, friday, const Duration(minutes: 60)),
+            spanning(2, friday, const Duration(minutes: 40)),
+            spanning(2, thursday, const Duration(minutes: 5)),
+            spanning(2, wednesday, const Duration(minutes: 5)),
+          ],
+          [mem(1), mem(2)],
+        ),
+        [2, 1],
+      );
+    });
+
+    // 90分と45分の差はちょうど半分なので、同じ曜日の件数で決まる
+    test('continues to the next metric when the difference is exactly half',
+        () {
+      expect(
+        ids(
+          [
+            spanning(1, friday, const Duration(minutes: 90)),
+            spanning(2, friday, const Duration(minutes: 15)),
+            spanning(2, friday, const Duration(minutes: 15)),
+            spanning(2, friday, const Duration(minutes: 15)),
+          ],
+          [mem(1), mem(2)],
+        ),
+        [2, 1],
+      );
+    });
+
+    // 100分と49分の差は半分を超えるので、同じ曜日の時間で決まる
+    test('decides by that metric when the difference is more than half', () {
+      expect(
+        ids(
+          [
+            spanning(1, friday, const Duration(minutes: 100)),
+            spanning(2, friday, const Duration(minutes: 17)),
+            spanning(2, friday, const Duration(minutes: 16)),
+            spanning(2, friday, const Duration(minutes: 16)),
           ],
           [mem(2), mem(1)],
         ),
@@ -116,12 +179,16 @@ void main() {
       );
     });
 
-    test('places the lower id first when total time and score match', () {
+    test('places the lower id first when every metric is within half', () {
       expect(
         ids(
           [
-            started(4, thursday),
-            started(1, wednesday),
+            spanning(1, friday, const Duration(minutes: 20)),
+            spanning(1, friday, const Duration(minutes: 20)),
+            spanning(4, friday, const Duration(minutes: 20)),
+            spanning(4, friday, const Duration(minutes: 20)),
+            spanning(4, friday, const Duration(minutes: 20)),
+            spanning(4, thursday, const Duration(minutes: 10)),
           ],
           [mem(4), mem(1)],
         ),
@@ -185,7 +252,9 @@ void main() {
       );
     });
 
-    test('includes acts that overlap a window across midnight', () {
+    test(
+        'places a Friday start first among acts that overlap a window across midnight',
+        () {
       final at = DateTime(2026, 11, 13, 0, 30);
       expect(
         ids(
