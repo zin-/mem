@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/detail/states.dart';
+import 'package:mem/features/mems/home/habitual_mems.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mems_state.dart';
@@ -77,6 +78,7 @@ void main() {
               memNotificationsByMemIdProvider(mem.id).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
               ),
+            habitualMemsProvider.overrideWith((ref) async => []),
           ],
           child: MaterialApp(
             home: HomeScreen(),
@@ -149,6 +151,7 @@ void main() {
               memNotificationsByMemIdProvider(mem.id).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
               ),
+            habitualMemsProvider.overrideWith((ref) async => []),
           ],
           child: MaterialApp(
             home: HomeScreen(),
@@ -240,6 +243,110 @@ void main() {
         expect(cardOf(name), same(upcomingCard));
         expect(tileOf(name).tileColor, isNull);
       }
+    },
+  );
+
+  testWidgets(
+    'shows an often-this-hour card without mems already on overdue or upcoming',
+    (tester) async {
+      final overdueEarly = at(20, DateTime(2020, 1, 1, 10));
+      final overdueLate = at(21, DateTime(2020, 1, 2, 10));
+      final upcomingFirst = at(2, DateTime(2099, 1, 1, 10));
+      final upcomingSecond = at(4, DateTime(2099, 1, 2, 10));
+      final upcomingThird = at(1, DateTime(2099, 1, 3, 10));
+      final upcomingFourth = at(3, DateTime(2099, 1, 4, 10));
+      final onlyHabitual = savedMem(
+        id: 30,
+        name: 'Mem 30',
+        createdAt: createdAt,
+        updatedAt: createdAt,
+      );
+      final mems = [
+        upcomingThird,
+        upcomingFirst,
+        upcomingFourth,
+        upcomingSecond,
+        overdueEarly,
+        overdueLate,
+        onlyHabitual,
+      ];
+      final l10n = buildL10n();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            preferenceProvider(startOfDayKey).overrideWith(
+              () => _FakePreference(),
+            ),
+            memEntitiesProvider.overrideWith(() => _FakeMemEntities(mems)),
+            savedMemNotificationsProvider.overrideWith(
+              (ref) => ListValueStateNotifier<SavedMemNotificationEntityV1>([]),
+            ),
+            for (final mem in mems)
+              memNotificationsByMemIdProvider(mem.id).overrideWith(
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
+              ),
+            habitualMemsProvider.overrideWith(
+              (ref) async => [
+                overdueEarly,
+                upcomingFirst,
+                onlyHabitual,
+                upcomingFourth,
+              ],
+            ),
+          ],
+          child: MaterialApp(
+            home: HomeScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        tester
+            .widgetList<Text>(find.byType(Text))
+            .map((text) => text.data)
+            .whereType<String>()
+            .where(
+              (data) =>
+                  data.startsWith('Mem ') || data == l10n.habitualMemsTitle,
+            )
+            .toList(),
+        [
+          'Mem 20',
+          'Mem 21',
+          l10n.habitualMemsTitle,
+          'Mem 30',
+          'Mem 3',
+          'Mem 2',
+          'Mem 4',
+          'Mem 1',
+        ],
+      );
+      expect(find.byType(Card), findsNWidgets(3));
+
+      final habitualCard = find.ancestor(
+        of: find.text(l10n.habitualMemsTitle),
+        matching: find.byType(Card),
+      );
+      expect(
+        find.descendant(of: habitualCard, matching: find.text('Mem 30')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: habitualCard, matching: find.text('Mem 3')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: habitualCard, matching: find.text('Mem 20')),
+        findsNothing,
+      );
+      expect(
+        find.descendant(of: habitualCard, matching: find.text('Mem 2')),
+        findsNothing,
+      );
+      expect(find.text('Mem 20'), findsOneWidget);
+      expect(find.text('Mem 2'), findsOneWidget);
     },
   );
 }

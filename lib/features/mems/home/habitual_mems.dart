@@ -1,5 +1,10 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/acts/act_query_service.dart';
+import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mems/mems_state.dart';
 
 class HabitualMems {
   static const timeRadius = Duration(hours: 1);
@@ -46,3 +51,28 @@ class HabitualMems {
   static int _rank(Iterable<Act> acts, DateTime now) =>
       acts.where((act) => act.period?.start?.weekday == now.weekday).length;
 }
+
+final habitualMemsProvider = FutureProvider.autoDispose<List<MemEntity>>((ref) {
+  ref.listen(loadMemListProvider, (_, __) {});
+
+  final mems = ref.watch(memEntitiesProvider);
+  final now = DateTime.now();
+  return v(
+    () async {
+      final acts = await ActQueryService().fetchFinishedStartedAround(
+        now: now,
+        timeRadius: HabitualMems.timeRadius,
+        lookback: HabitualMems.lookback,
+      );
+      return HabitualMems.of(
+        acts.map((act) => act.toDomain()),
+        mems,
+        now: now,
+      ).mems;
+    },
+    {
+      'mems': mems,
+      'now': now,
+    },
+  );
+});

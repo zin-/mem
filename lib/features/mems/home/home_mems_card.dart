@@ -6,18 +6,24 @@ import 'package:mem/values/dimens.dart';
 class HomeMemsCard extends StatelessWidget {
   final List<MemEntity> _mems;
   final Color? _color;
+  final String? _title;
 
   const HomeMemsCard(
     this._mems, {
     super.key,
     Color? color,
-  }) : _color = color;
+    String? title,
+  })  : _color = color,
+        _title = title;
 
   @override
   Widget build(BuildContext context) {
     if (_mems.isEmpty) {
       return const SizedBox.shrink();
     }
+
+    final title = _title;
+    final theme = Theme.of(context);
 
     return Card(
       margin: cardMargin,
@@ -28,6 +34,16 @@ class HomeMemsCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (title != null)
+            Padding(
+              padding: defaultPadding,
+              child: Text(
+                title,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
           for (final mem in _mems)
             MemListItemView(
               mem.toDomain(),

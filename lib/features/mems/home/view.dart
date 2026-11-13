@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/mems/home/habitual_mems_view.dart';
 import 'package:mem/features/mems/home/overdue_mems_view.dart';
 import 'package:mem/features/mems/home/upcoming_mems_view.dart';
 import 'package:mem/values/dimens.dart';
@@ -17,6 +18,7 @@ class HomeView extends StatelessWidget {
           physics: const AlwaysScrollableScrollPhysics(),
           children: const [
             OverdueMemsView(),
+            HabitualMemsView(),
             UpcomingMemsView(),
           ],
         ),
