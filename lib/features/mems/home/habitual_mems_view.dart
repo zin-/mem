@@ -6,7 +6,6 @@ import 'package:mem/features/mems/home/home_mems_card.dart';
 import 'package:mem/features/mems/home/overdue_mems.dart';
 import 'package:mem/features/mems/home/upcoming_mems.dart';
 import 'package:mem/features/mems/mem_entity.dart';
-import 'package:mem/l10n/l10n.dart';
 
 class HabitualMemsView extends ConsumerWidget {
   const HabitualMemsView({super.key});
@@ -25,7 +24,7 @@ class HabitualMemsView extends ConsumerWidget {
           ];
           return HomeMemsCard(
             mems,
-            title: buildL10n(context).habitualMemsTitle,
+            icon: Icons.schedule,
           );
         },
       );

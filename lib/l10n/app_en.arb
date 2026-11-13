@@ -160,7 +160,5 @@
   "addRelationTitle": "Add Relation",
   "addAction": "Add",
   "searchMemHint": "Search mem...",
-  "loadError": "Error",
-
-  "habitualMemsTitle": "Often this hour"
+  "loadError": "Error"
 }

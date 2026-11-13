@@ -18,8 +18,8 @@ class HomeView extends StatelessWidget {
           physics: const AlwaysScrollableScrollPhysics(),
           children: const [
             OverdueMemsView(),
-            HabitualMemsView(),
             UpcomingMemsView(),
+            HabitualMemsView(),
           ],
         ),
         {

@@ -270,7 +270,6 @@ void main() {
         overdueLate,
         onlyHabitual,
       ];
-      final l10n = buildL10n();
 
       await tester.pumpWidget(
         ProviderScope(
@@ -307,26 +306,23 @@ void main() {
             .widgetList<Text>(find.byType(Text))
             .map((text) => text.data)
             .whereType<String>()
-            .where(
-              (data) =>
-                  data.startsWith('Mem ') || data == l10n.habitualMemsTitle,
-            )
+            .where((data) => data.startsWith('Mem '))
             .toList(),
         [
           'Mem 20',
           'Mem 21',
-          l10n.habitualMemsTitle,
-          'Mem 30',
-          'Mem 3',
           'Mem 2',
           'Mem 4',
           'Mem 1',
+          'Mem 30',
+          'Mem 3',
         ],
       );
       expect(find.byType(Card), findsNWidgets(3));
+      expect(find.byIcon(Icons.schedule), findsOneWidget);
 
       final habitualCard = find.ancestor(
-        of: find.text(l10n.habitualMemsTitle),
+        of: find.byIcon(Icons.schedule),
         matching: find.byType(Card),
       );
       expect(
