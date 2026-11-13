@@ -7,6 +7,7 @@ import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mems_state.dart';
 
 class HabitualMems {
+  // TODO settingsから持ってきたい https://github.com/zin-/mem/issues/752
   static const timeRadius = Duration(hours: 1);
   static const lookback = Duration(days: 28);
   static const minCount = 2;
