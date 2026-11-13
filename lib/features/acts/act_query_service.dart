@@ -188,75 +188,29 @@ class ActQueryService {
   }
 
   Future<List<ActEntity>> fetchFinishedStartedAround({
-    required DateTime now,
-    required Duration timeRadius,
-    required Duration lookback,
+    required DateTime since,
+    required DateTime until,
   }) =>
       v(
         () async {
           final rows = await (_db.select(_db.acts)
                 ..where(
-                  (t) => _finishedStartedAround(
-                    t,
-                    now: now,
-                    timeRadius: timeRadius,
-                    lookback: lookback,
-                  ),
+                  (t) =>
+                      t.actKind.equals(ActKind.finished.name) &
+                      (t.startIsAllDay.isNull() |
+                          t.startIsAllDay.equals(false)) &
+                      t.start.isBiggerOrEqualValue(since) &
+                      t.start.isSmallerOrEqualValue(until),
                 )
                 ..orderBy([(t) => OrderingTerm.desc(t.end)]))
               .get();
           return rows.map(ActEntity.fromTuple).toList();
         },
         {
-          'now': now,
-          'timeRadius': timeRadius,
-          'lookback': lookback,
+          'since': since,
+          'until': until,
         },
       );
-
-  Expression<bool> _finishedStartedAround(
-    Acts table, {
-    required DateTime now,
-    required Duration timeRadius,
-    required Duration lookback,
-  }) =>
-      table.actKind.equals(ActKind.finished.name) &
-      (table.startIsAllDay.isNull() | table.startIsAllDay.equals(false)) &
-      table.start.isBiggerOrEqualValue(now.subtract(lookback)) &
-      table.start.isSmallerOrEqualValue(now) &
-      _localStartMinuteWithin(table.start, now, timeRadius);
-
-  Expression<bool> _localStartMinuteWithin(
-    Expression<DateTime> start,
-    DateTime now,
-    Duration timeRadius,
-  ) {
-    Expression<int> localMinuteOfDay() {
-      final local = start.modify(const DateTimeModifier.localTime());
-      return local.hour * Constant(Duration(hours: 1).inMinutes) + local.minute;
-    }
-
-    final dayMinutes = Duration(days: 1).inMinutes;
-    final radiusMinutes = timeRadius.inMinutes;
-    final coversEveryMinute = radiusMinutes * 2 >= dayMinutes;
-    if (coversEveryMinute) {
-      return const Constant(true);
-    }
-
-    final nowMinutes = Duration(hours: now.hour, minutes: now.minute).inMinutes;
-    final lower = nowMinutes - radiusMinutes;
-    final upper = nowMinutes + radiusMinutes;
-    final minute = localMinuteOfDay();
-    if (lower < 0) {
-      return minute.isBiggerOrEqualValue(lower + dayMinutes) |
-          minute.isSmallerOrEqualValue(upper);
-    }
-    if (upper >= dayMinutes) {
-      return minute.isBiggerOrEqualValue(lower) |
-          minute.isSmallerOrEqualValue(upper - dayMinutes);
-    }
-    return minute.isBetweenValues(lower, upper);
-  }
 
   Future<Act?> resolveScheduleAnchorForNotifications({
     required int memId,

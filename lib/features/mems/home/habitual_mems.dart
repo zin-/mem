@@ -128,9 +128,8 @@ final habitualMemsProvider = FutureProvider.autoDispose<List<MemEntity>>((ref) {
   return v(
     () async {
       final acts = await ActQueryService().fetchFinishedStartedAround(
-        now: now,
-        timeRadius: HabitualMems.timeRadius,
-        lookback: HabitualMems.lookback,
+        since: now.subtract(HabitualMems.lookback),
+        until: now,
       );
       return HabitualMems.of(
         acts.map((act) => act.toDomain()),
