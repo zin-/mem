@@ -8,12 +8,81 @@ import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 
+class HabitualMem {
+  final MemEntity mem;
+  final HabitualRank rank;
+
+  HabitualMem._(this.mem, this.rank);
+
+  static HabitualMem of(MemEntity mem, HabitualRank rank) =>
+      HabitualMem._(mem, rank);
+}
+
+class HabitualRank {
+  static const _halfDifference = 0.5;
+
+  final Duration sameWeekdayTime;
+  final int sameWeekdayCount;
+  final Duration totalTime;
+  final int totalCount;
+
+  HabitualRank._(
+    this.sameWeekdayTime,
+    this.sameWeekdayCount,
+    this.totalTime,
+    this.totalCount,
+  );
+
+  static HabitualRank of({
+    required Duration sameWeekdayTime,
+    required int sameWeekdayCount,
+    required Duration totalTime,
+    required int totalCount,
+  }) =>
+      HabitualRank._(
+        sameWeekdayTime,
+        sameWeekdayCount,
+        totalTime,
+        totalCount,
+      );
+
+  int compareTo(HabitualRank other) {
+    int byMagnitude(int value, int otherValue) {
+      final larger = value > otherValue ? value : otherValue;
+      if (larger == 0) return 0;
+      final difference = (value - otherValue).abs() / larger;
+      if (difference <= _halfDifference) return 0;
+      return value.compareTo(otherValue);
+    }
+
+    final bySameWeekdayTime = byMagnitude(
+      sameWeekdayTime.inMicroseconds,
+      other.sameWeekdayTime.inMicroseconds,
+    );
+    if (bySameWeekdayTime != 0) return bySameWeekdayTime;
+
+    final bySameWeekdayCount = byMagnitude(
+      sameWeekdayCount,
+      other.sameWeekdayCount,
+    );
+    if (bySameWeekdayCount != 0) return bySameWeekdayCount;
+
+    final byTotalTime = byMagnitude(
+      totalTime.inMicroseconds,
+      other.totalTime.inMicroseconds,
+    );
+    if (byTotalTime != 0) return byTotalTime;
+
+    return byMagnitude(totalCount, other.totalCount);
+  }
+}
+
 class HabitualMems {
   // TODO settingsから持ってきたい https://github.com/zin-/mem/issues/752
   static const timeRadius = Duration(hours: 1);
   static const lookback = Duration(days: 28);
 
-  final List<MemEntity> mems;
+  final List<HabitualMem> mems;
 
   HabitualMems._(this.mems);
 
@@ -50,14 +119,11 @@ class HabitualMems {
       }
     }
 
-    final ranked = <({MemEntity mem, _HabitualRank rank})>[];
+    final ranked = <HabitualMem>[];
     for (final mem in mems) {
       final matched = actsByMemId[mem.id];
       if (matched == null) continue;
-      ranked.add((
-        mem: mem,
-        rank: _HabitualRank.of(matched, now: now),
-      ));
+      ranked.add(HabitualMem.of(mem, _rank(matched, now: now)));
     }
 
     ranked.sort((a, b) {
@@ -66,7 +132,32 @@ class HabitualMems {
       return a.mem.id.compareTo(b.mem.id);
     });
 
-    return HabitualMems._(ranked.map((entry) => entry.mem).toList());
+    return HabitualMems._(ranked);
+  }
+
+  static HabitualRank _rank(
+    Iterable<Act> acts, {
+    required DateTime now,
+  }) {
+    var sameWeekdayTime = Duration.zero;
+    var sameWeekdayCount = 0;
+    var totalTime = Duration.zero;
+    var totalCount = 0;
+    for (final act in acts) {
+      final duration = act.period?.duration ?? Duration.zero;
+      totalTime += duration;
+      totalCount += 1;
+      if (act.period?.start?.weekday == now.weekday) {
+        sameWeekdayTime += duration;
+        sameWeekdayCount += 1;
+      }
+    }
+    return HabitualRank.of(
+      sameWeekdayTime: sameWeekdayTime,
+      sameWeekdayCount: sameWeekdayCount,
+      totalTime: totalTime,
+      totalCount: totalCount,
+    );
   }
 
   static DateAndTimePeriod _window(DateTime now, DateTime day) {
@@ -98,78 +189,8 @@ class HabitualMems {
       );
 }
 
-class _HabitualRank {
-  static const _halfDifference = 0.5;
-
-  final Duration sameWeekdayTime;
-  final int sameWeekdayCount;
-  final Duration totalTime;
-  final int totalCount;
-
-  _HabitualRank._(
-    this.sameWeekdayTime,
-    this.sameWeekdayCount,
-    this.totalTime,
-    this.totalCount,
-  );
-
-  static _HabitualRank of(
-    Iterable<Act> acts, {
-    required DateTime now,
-  }) {
-    var sameWeekdayTime = Duration.zero;
-    var sameWeekdayCount = 0;
-    var totalTime = Duration.zero;
-    var totalCount = 0;
-    for (final act in acts) {
-      final duration = act.period?.duration ?? Duration.zero;
-      totalTime += duration;
-      totalCount += 1;
-      if (act.period?.start?.weekday == now.weekday) {
-        sameWeekdayTime += duration;
-        sameWeekdayCount += 1;
-      }
-    }
-    return _HabitualRank._(
-      sameWeekdayTime,
-      sameWeekdayCount,
-      totalTime,
-      totalCount,
-    );
-  }
-
-  int compareTo(_HabitualRank other) {
-    int byMagnitude(int value, int otherValue) {
-      final larger = value > otherValue ? value : otherValue;
-      if (larger == 0) return 0;
-      final difference = (value - otherValue).abs() / larger;
-      if (difference <= _halfDifference) return 0;
-      return value.compareTo(otherValue);
-    }
-
-    final bySameWeekdayTime = byMagnitude(
-      sameWeekdayTime.inMicroseconds,
-      other.sameWeekdayTime.inMicroseconds,
-    );
-    if (bySameWeekdayTime != 0) return bySameWeekdayTime;
-
-    final bySameWeekdayCount = byMagnitude(
-      sameWeekdayCount,
-      other.sameWeekdayCount,
-    );
-    if (bySameWeekdayCount != 0) return bySameWeekdayCount;
-
-    final byTotalTime = byMagnitude(
-      totalTime.inMicroseconds,
-      other.totalTime.inMicroseconds,
-    );
-    if (byTotalTime != 0) return byTotalTime;
-
-    return byMagnitude(totalCount, other.totalCount);
-  }
-}
-
-final habitualMemsProvider = FutureProvider.autoDispose<List<MemEntity>>((ref) {
+final habitualMemsProvider =
+    FutureProvider.autoDispose<List<HabitualMem>>((ref) {
   ref.listen(loadMemListProvider, (_, __) {});
 
   final mems = ref.watch(memEntitiesProvider);

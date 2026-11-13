@@ -5,7 +5,6 @@ import 'package:mem/features/mems/home/habitual_mems.dart';
 import 'package:mem/features/mems/home/home_mems_card.dart';
 import 'package:mem/features/mems/home/overdue_mems.dart';
 import 'package:mem/features/mems/home/upcoming_mems.dart';
-import 'package:mem/features/mems/mem_entity.dart';
 
 class HabitualMemsView extends ConsumerWidget {
   const HabitualMemsView({super.key});
@@ -18,9 +17,9 @@ class HabitualMemsView extends ConsumerWidget {
             for (final mem in ref.watch(upcomingMemsProvider)) mem.id,
           };
           final mems = [
-            for (final mem
-                in ref.watch(habitualMemsProvider).value ?? const <MemEntity>[])
-              if (!shownIds.contains(mem.id)) mem,
+            for (final habitual in ref.watch(habitualMemsProvider).value ??
+                const <HabitualMem>[])
+              if (!shownIds.contains(habitual.mem.id)) habitual.mem,
           ];
           return HomeMemsCard(
             mems,

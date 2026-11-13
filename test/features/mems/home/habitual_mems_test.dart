@@ -55,7 +55,7 @@ void main() {
         acts,
         mems,
         now: at ?? now,
-      ).mems.map((mem) => mem.id).toList();
+      ).mems.map((habitualMem) => habitualMem.mem.id).toList();
 
   group('HabitualMems', () {
     test('includes a mem with one act in the window', () {
@@ -63,6 +63,26 @@ void main() {
         ids([started(1, friday)], [mem(1)]),
         [1],
       );
+    });
+
+    test('keeps same-weekday and total amounts on the mem', () {
+      final habitualMem = HabitualMems.of(
+        [
+          spanning(1, friday, const Duration(hours: 1)),
+          spanning(1, thursday, const Duration(minutes: 30)),
+        ],
+        [mem(1)],
+        now: now,
+      ).mems.single;
+
+      expect(habitualMem.mem.id, 1);
+      expect(habitualMem.rank.sameWeekdayTime, const Duration(hours: 1));
+      expect(habitualMem.rank.sameWeekdayCount, 1);
+      expect(
+        habitualMem.rank.totalTime,
+        const Duration(hours: 1, minutes: 30),
+      );
+      expect(habitualMem.rank.totalCount, 2);
     });
 
     test('includes archived and done mems', () {
