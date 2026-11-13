@@ -50,22 +50,19 @@ class HabitualMems {
       }
     }
 
-    final ranked = <({MemEntity mem, Duration time, int score})>[];
+    final ranked = <({MemEntity mem, _HabitualRank rank})>[];
     for (final mem in mems) {
       final matched = actsByMemId[mem.id];
       if (matched == null) continue;
       ranked.add((
         mem: mem,
-        time: _totalTime(matched),
-        score: _points(matched, now),
+        rank: _HabitualRank.of(matched, now: now),
       ));
     }
 
     ranked.sort((a, b) {
-      final byTime = b.time.compareTo(a.time);
-      if (byTime != 0) return byTime;
-      final byScore = b.score.compareTo(a.score);
-      if (byScore != 0) return byScore;
+      final byRank = b.rank.compareTo(a.rank);
+      if (byRank != 0) return byRank;
       return a.mem.id.compareTo(b.mem.id);
     });
 
@@ -99,24 +96,76 @@ class HabitualMems {
         value.millisecond,
         value.microsecond,
       );
+}
 
-  static Duration _totalTime(Iterable<Act> acts) {
-    var total = Duration.zero;
-    for (final act in acts) {
-      total += act.period?.duration ?? Duration.zero;
-    }
-    return total;
-  }
+class _HabitualRank {
+  static const _halfDifference = 0.5;
 
-  static int _points(Iterable<Act> acts, DateTime now) {
-    var points = 0;
+  final Duration sameWeekdayTime;
+  final int sameWeekdayCount;
+  final Duration totalTime;
+  final int totalCount;
+
+  _HabitualRank._(
+    this.sameWeekdayTime,
+    this.sameWeekdayCount,
+    this.totalTime,
+    this.totalCount,
+  );
+
+  static _HabitualRank of(
+    Iterable<Act> acts, {
+    required DateTime now,
+  }) {
+    var sameWeekdayTime = Duration.zero;
+    var sameWeekdayCount = 0;
+    var totalTime = Duration.zero;
+    var totalCount = 0;
     for (final act in acts) {
-      points += 1;
+      final duration = act.period?.duration ?? Duration.zero;
+      totalTime += duration;
+      totalCount += 1;
       if (act.period?.start?.weekday == now.weekday) {
-        points += 1;
+        sameWeekdayTime += duration;
+        sameWeekdayCount += 1;
       }
     }
-    return points;
+    return _HabitualRank._(
+      sameWeekdayTime,
+      sameWeekdayCount,
+      totalTime,
+      totalCount,
+    );
+  }
+
+  int compareTo(_HabitualRank other) {
+    int byMagnitude(int value, int otherValue) {
+      final larger = value > otherValue ? value : otherValue;
+      if (larger == 0) return 0;
+      final difference = (value - otherValue).abs() / larger;
+      if (difference <= _halfDifference) return 0;
+      return value.compareTo(otherValue);
+    }
+
+    final bySameWeekdayTime = byMagnitude(
+      sameWeekdayTime.inMicroseconds,
+      other.sameWeekdayTime.inMicroseconds,
+    );
+    if (bySameWeekdayTime != 0) return bySameWeekdayTime;
+
+    final bySameWeekdayCount = byMagnitude(
+      sameWeekdayCount,
+      other.sameWeekdayCount,
+    );
+    if (bySameWeekdayCount != 0) return bySameWeekdayCount;
+
+    final byTotalTime = byMagnitude(
+      totalTime.inMicroseconds,
+      other.totalTime.inMicroseconds,
+    );
+    if (byTotalTime != 0) return byTotalTime;
+
+    return byMagnitude(totalCount, other.totalCount);
   }
 }
 
