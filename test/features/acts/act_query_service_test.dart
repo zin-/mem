@@ -5,6 +5,7 @@ import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/acts/acts_summary.dart';
+import 'package:mem/features/mems/home/habitual_mems.dart';
 import 'package:mem/framework/date_and_time/period.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/framework/database/accessor.dart';
@@ -423,6 +424,106 @@ void main() {
       );
 
       expect(count, 2);
+    });
+
+    test(
+        'fetchFinishedStartedAround returns other weekdays inside the hour, drops outside and older than lookback, and wraps midnight',
+        () async {
+      final memId = await insertMem();
+      final otherMemId = await insertMem();
+      final now = DateTime(2026, 1, 30, 14, 30);
+      final earliest = now.subtract(HabitualMems.lookback);
+
+      Set<DateTime> startedAt(Iterable<ActEntity> rows) => {
+            for (final row in rows)
+              DateTime(
+                row.start!.year,
+                row.start!.month,
+                row.start!.day,
+                row.start!.hour,
+                row.start!.minute,
+              ),
+          };
+
+      Future<void> finished(int id, DateTime start) => insertAct(
+            memId: id,
+            start: start,
+            actKind: 'finished',
+          );
+
+      await finished(memId, now);
+      await finished(memId, DateTime(2026, 1, 29, 13, 30));
+      await finished(otherMemId, DateTime(2026, 1, 28, 15, 30));
+      await finished(memId, earliest);
+      await finished(memId, DateTime(2026, 1, 29, 13, 29));
+      await finished(memId, DateTime(2026, 1, 28, 15, 31));
+      await finished(memId, earliest.subtract(const Duration(minutes: 1)));
+      await finished(memId, DateTime(2026, 1, 30, 15));
+      await insertAct(
+        memId: memId,
+        start: DateTime(2026, 1, 29, 14),
+        actKind: 'skipped',
+      );
+      await insertAct(memId: memId, start: DateTime(2026, 1, 28, 14));
+      await db.into(db.acts).insert(
+            ActsCompanion.insert(
+              memId: memId,
+              createdAt: DateTime.now(),
+              start: Value(DateTime(2026, 1, 27, 14, 30)),
+              startIsAllDay: const Value(true),
+              end: Value(DateTime(2026, 1, 27, 15, 30)),
+              actKind: const Value('finished'),
+            ),
+          );
+      await db.into(db.acts).insert(
+            ActsCompanion.insert(
+              memId: memId,
+              createdAt: DateTime.now(),
+              start: Value(DateTime(2026, 1, 26, 14, 30)),
+            ),
+          );
+
+      final withinHour = await query.fetchFinishedStartedAround(
+        now: now,
+        timeRadius: HabitualMems.timeRadius,
+        lookback: HabitualMems.lookback,
+      );
+
+      expect(withinHour.map((row) => row.memId).toSet(), {memId, otherMemId});
+      expect(
+        startedAt(withinHour),
+        {
+          now,
+          DateTime(2026, 1, 29, 13, 30),
+          DateTime(2026, 1, 28, 15, 30),
+          earliest,
+        },
+      );
+
+      final midnight = DateTime(2026, 1, 30, 0, 30);
+      await finished(memId, DateTime(2026, 1, 29, 23, 30));
+      await finished(otherMemId, DateTime(2026, 1, 28, 1, 30));
+      await finished(memId, DateTime(2026, 1, 30, 0));
+      await finished(memId, midnight);
+      await finished(memId, DateTime(2026, 1, 29, 23, 29));
+      await finished(memId, DateTime(2026, 1, 28, 1, 31));
+      await finished(memId, DateTime(2026, 1, 30, 1));
+
+      final acrossMidnight = await query.fetchFinishedStartedAround(
+        now: midnight,
+        timeRadius: HabitualMems.timeRadius,
+        lookback: HabitualMems.lookback,
+      );
+
+      expect(
+        startedAt(acrossMidnight),
+        {
+          DateTime(2026, 1, 29, 23, 30),
+          DateTime(2026, 1, 28, 1, 30),
+          DateTime(2026, 1, 30, 0),
+          midnight,
+        },
+      );
     });
 
     test('listPeriodCountsByMemId skips a mem when the period is null',
