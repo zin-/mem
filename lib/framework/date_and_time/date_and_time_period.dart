@@ -56,6 +56,21 @@ abstract class DateAndTimePeriod implements Comparable<DateAndTimePeriod> {
     }
     return !value.isBefore(periodStart) && value.isBefore(periodEnd);
   }
+
+  // 端が同じ瞬間でも重なる。includesStart は end を含まない
+  bool overlaps(DateAndTimePeriod other) {
+    final periodStart = start;
+    final periodEnd = end;
+    final otherStart = other.start;
+    final otherEnd = other.end;
+    if (periodStart == null ||
+        periodEnd == null ||
+        otherStart == null ||
+        otherEnd == null) {
+      return false;
+    }
+    return !periodStart.isAfter(otherEnd) && !otherStart.isAfter(periodEnd);
+  }
 }
 
 class _WithStartOnly extends DateAndTimePeriod

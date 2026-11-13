@@ -325,7 +325,8 @@ void main() {
     final end = DateAndTime(2024, 1, 2, 3);
     final later = DateTime(2024, 1, 3);
 
-    test('start only treats null as equal and otherwise compares the start', () {
+    test('start only treats null as equal and otherwise compares the start',
+        () {
       final period = DateAndTimePeriod(start: start);
 
       expect(period.compareWithDateAndTime(null), 0);
@@ -364,6 +365,68 @@ void main() {
       expect(
         DateAndTimePeriod(start: DateAndTime(2026, 10, 7, 5))
             .includesStart(DateAndTime(2026, 10, 7, 5)),
+        isFalse,
+      );
+    });
+  });
+
+  group('overlaps', () {
+    final period = DateAndTimePeriod(
+      start: DateAndTime(2026, 11, 13, 13, 30),
+      end: DateAndTime(2026, 11, 13, 15, 30),
+    );
+
+    test('is true when the intervals share any instant', () {
+      expect(
+        period.overlaps(
+          DateAndTimePeriod(
+            start: DateAndTime(2026, 11, 13, 12),
+            end: DateAndTime(2026, 11, 13, 13, 30),
+          ),
+        ),
+        isTrue,
+      );
+      expect(
+        period.overlaps(
+          DateAndTimePeriod(
+            start: DateAndTime(2026, 11, 13, 15, 30),
+            end: DateAndTime(2026, 11, 13, 16),
+          ),
+        ),
+        isTrue,
+      );
+      expect(
+        period.overlaps(
+          DateAndTimePeriod(
+            start: DateAndTime(2026, 11, 13, 12),
+            end: DateAndTime(2026, 11, 13, 16),
+          ),
+        ),
+        isTrue,
+      );
+    });
+
+    test('is false when the intervals do not meet', () {
+      expect(
+        period.overlaps(
+          DateAndTimePeriod(
+            start: DateAndTime(2026, 11, 13, 10),
+            end: DateAndTime(2026, 11, 13, 13, 29),
+          ),
+        ),
+        isFalse,
+      );
+    });
+
+    test('is false when either bound is missing', () {
+      expect(
+        period.overlaps(
+          DateAndTimePeriod(start: DateAndTime(2026, 11, 13, 14)),
+        ),
+        isFalse,
+      );
+      expect(
+        DateAndTimePeriod(end: DateAndTime(2026, 11, 13, 14)).overlaps(period),
         isFalse,
       );
     });
