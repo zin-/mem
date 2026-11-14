@@ -39,13 +39,11 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
 
     return ListValueStateNotifier(
       v(
-        () => savedMemEntities.where(filter.includes).where((mem) {
-          // FIXME searchTextがある場合、Memの状態に関わらずsearchTextだけでフィルターした方が良いかも
+        () => savedMemEntities.where((mem) {
           if (searchText == null || searchText.isEmpty) {
-            return true;
-          } else {
-            return mem.name.contains(searchText);
+            return filter.includes(mem);
           }
+          return mem.name.contains(searchText);
         }).toList(),
         {
           'savedMemEntities': savedMemEntities,
@@ -59,13 +57,18 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
 
 final loadMemListProvider = FutureProvider.autoDispose<void>((ref) {
   final filter = ref.watch(memListFilterStateProvider);
+  final searchOpen =
+      ref.watch(searchTextProvider.select((text) => text != null));
 
   return v(
     () => ref.read(memEntitiesProvider.notifier).loadMemList(
-          archived: filter.archived,
-          done: filter.done,
+          archived: searchOpen ? null : filter.archived,
+          done: searchOpen ? null : filter.done,
         ),
-    {'filter': filter},
+    {
+      'filter': filter,
+      'searchOpen': searchOpen,
+    },
   );
 });
 
