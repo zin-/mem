@@ -57,13 +57,18 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
 
 final loadMemListProvider = FutureProvider.autoDispose<void>((ref) {
   final filter = ref.watch(memListFilterStateProvider);
+  final searchOpen =
+      ref.watch(searchTextProvider.select((text) => text != null));
 
   return v(
     () => ref.read(memEntitiesProvider.notifier).loadMemList(
-          archived: filter.archived,
-          done: filter.done,
+          archived: searchOpen ? null : filter.archived,
+          done: searchOpen ? null : filter.done,
         ),
-    {'filter': filter},
+    {
+      'filter': filter,
+      'searchOpen': searchOpen,
+    },
   );
 });
 

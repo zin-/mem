@@ -132,6 +132,61 @@ void main() {
       )).called(1);
     });
 
+    test('ships without archived or done while search is open', () async {
+      when(mockMemRepository.ship(
+        archived: false,
+        done: false,
+        loadLatestAct: true,
+      )).thenAnswer((_) async => []);
+      when(mockMemRepository.ship(
+        loadLatestAct: true,
+      )).thenAnswer((_) async => []);
+      when(mockMemNotificationRepository.ship(
+        memId: anyNamed('memId'),
+        memIdsIn: anyNamed('memIdsIn'),
+      )).thenAnswer((_) async => []);
+
+      final container = ProviderContainer(
+        overrides: [
+          memEntitiesProvider.overrideWith(() => FakeMemEntities()),
+          preferenceProvider(startOfDayKey)
+              .overrideWith(() => FakeStartOfDayPreference()),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      container.listen(memListProvider, (_, __) {});
+      await container.read(loadMemListProvider.future);
+
+      verify(mockMemRepository.ship(
+        archived: false,
+        done: false,
+        loadLatestAct: true,
+      )).called(1);
+
+      container.read(searchTextProvider.notifier).updatedBy('');
+      await container.pump();
+      await container.read(loadMemListProvider.future);
+
+      container.read(searchTextProvider.notifier).updatedBy('Alp');
+      await container.pump();
+      await container.read(loadMemListProvider.future);
+
+      verify(mockMemRepository.ship(
+        loadLatestAct: true,
+      )).called(1);
+
+      container.read(searchTextProvider.notifier).updatedBy(null);
+      await container.pump();
+      await container.read(loadMemListProvider.future);
+
+      verify(mockMemRepository.ship(
+        archived: false,
+        done: false,
+        loadLatestAct: true,
+      )).called(1);
+    });
+
     test('preloads saved notifications for notifyAt sort', () async {
       final fixedDate = DateTime(2024, 10, 1);
       final memA = savedMem(
