@@ -55,7 +55,7 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
       v(
         () => savedMemEntities.where((mem) {
           if (searchText == null || searchText.isEmpty) {
-            return filter.includes(mem);
+            return filter.matches(mem);
           }
           return matchesSearch(mem, searchText);
         }).toList(),

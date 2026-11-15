@@ -17,8 +17,11 @@ class MemListFilterValue {
 
   bool? get done => showNotDone == showDone ? null : showDone;
 
-  bool includes(MemEntity mem) =>
+  bool matches(MemEntity mem) =>
       _matches(archived, mem.isArchived) && _matches(done, mem.doneAt != null);
+
+  static bool _matches(bool? expected, bool actual) =>
+      expected == null || expected == actual;
 
   MemListFilterValue copyWith({
     bool? showNotArchived,
@@ -57,6 +60,3 @@ class MemListFilterValue {
         'showDone': showDone,
       }.toString();
 }
-
-bool _matches(bool? expected, bool actual) =>
-    expected == null || expected == actual;
