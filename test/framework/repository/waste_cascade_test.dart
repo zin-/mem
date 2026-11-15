@@ -2,7 +2,6 @@ import 'package:drift/drift.dart' show Migrator, Value;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/database.dart' hide Mem;
 import 'package:mem/features/mem_notifications/mem_notification.dart';
-import 'package:mem/features/mem_relations/mem_relation.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/framework/date_and_time/period.dart';
 import 'package:mem/features/targets/target.dart';
@@ -66,13 +65,12 @@ void main() {
               memId: m1.id,
             ),
           );
-      await db.into(db.memRelations).insert(
-            MemRelationsCompanion.insert(
+      await db.into(db.memPrePosts).insert(
+            MemPrePostsCompanion.insert(
               createdAt: now,
               sourceMemId: m1.id,
               targetMemId: m2.id,
-              type: MemRelationType.prePost.name,
-              value: const Value(0),
+              minutes: const Value(0),
             ),
           );
 
@@ -85,7 +83,7 @@ void main() {
       expect(await db.select(db.acts).get(), isEmpty);
       expect(await db.select(db.memRepeatedNotifications).get(), isEmpty);
       expect(await db.select(db.targets).get(), isEmpty);
-      expect(await db.select(db.memRelations).get(), isEmpty);
+      expect(await db.select(db.memPrePosts).get(), isEmpty);
     });
   });
 }

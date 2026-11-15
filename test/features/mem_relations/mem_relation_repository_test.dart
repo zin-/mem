@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/databases/database.dart' hide Mem, MemRelation;
+import 'package:mem/databases/database.dart' hide Mem;
 import 'package:mem/features/mem_relations/mem_relation.dart';
 import 'package:mem/features/mem_relations/mem_relation_repository.dart';
 import 'package:mem/features/mems/mem.dart';

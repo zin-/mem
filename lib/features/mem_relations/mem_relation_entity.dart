@@ -129,10 +129,8 @@ class MemRelationEntity implements Entity<int> {
   factory MemRelationEntity.fromTuple(dynamic row) => MemRelationEntity(
         row.sourceMemId,
         row.targetMemId,
-        MemRelationType.values.firstWhere(
-          (element) => element.name == row.type,
-        ),
-        row.value,
+        MemRelationType.prePost,
+        row.minutes ?? 0,
         row.id,
         row.createdAt,
         row.updatedAt,
@@ -140,24 +138,22 @@ class MemRelationEntity implements Entity<int> {
       );
 }
 
-drift_database.MemRelationsCompanion convertIntoMemRelationsInsertable(
+drift_database.MemPrePostsCompanion convertIntoMemRelationsInsertable(
   MemRelation entity,
 ) =>
-    drift_database.MemRelationsCompanion(
+    drift_database.MemPrePostsCompanion(
       sourceMemId: Value(entity.sourceMemId),
       targetMemId: Value(entity.targetMemId),
-      type: Value(entity.type.name),
-      value: Value(entity.value),
+      minutes: Value(entity.value),
       createdAt: Value(DateTime.now()),
     );
-drift_database.MemRelationsCompanion convertIntoMemRelationsUpdateable(
+drift_database.MemPrePostsCompanion convertIntoMemRelationsUpdateable(
   MemRelationEntity entity,
 ) =>
-    drift_database.MemRelationsCompanion(
+    drift_database.MemPrePostsCompanion(
       sourceMemId: Value(entity.sourceMemId ?? 0),
       targetMemId: Value(entity.targetMemId ?? 0),
-      type: Value(entity.type.name),
-      value: Value(entity.value),
+      minutes: Value(entity.value),
       updatedAt: Value(DateTime.now()),
       archivedAt: Value(entity.archivedAt),
     );

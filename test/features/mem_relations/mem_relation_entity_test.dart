@@ -63,8 +63,7 @@ void main() {
           id: 4,
           sourceMemId: 31,
           targetMemId: 32,
-          type: MemRelationType.prePost.name,
-          value: 33,
+          minutes: 33,
           createdAt: now,
           updatedAt: now,
           archivedAt: null,
@@ -81,8 +80,7 @@ void main() {
       );
       expect(insertable.sourceMemId.value, 1);
       expect(insertable.targetMemId.value, 2);
-      expect(insertable.type.value, MemRelationType.prePost.name);
-      expect(insertable.value.value, 3);
+      expect(insertable.minutes.value, 3);
       expect(insertable.createdAt.value, isNotNull);
 
       final updateable = convertIntoMemRelationsUpdateable(
@@ -99,8 +97,7 @@ void main() {
       );
       expect(updateable.sourceMemId.value, 0);
       expect(updateable.targetMemId.value, 0);
-      expect(updateable.type.value, MemRelationType.prePost.name);
-      expect(updateable.value.value, 5);
+      expect(updateable.minutes.value, 5);
       expect(updateable.archivedAt.value, DateTime(2024, 3, 2));
       expect(updateable.updatedAt.value, isNotNull);
     });
@@ -111,8 +108,7 @@ class _FakeRow {
   final int id;
   final int sourceMemId;
   final int targetMemId;
-  final String type;
-  final int value;
+  final int minutes;
   final DateTime createdAt;
   final DateTime? updatedAt;
   final DateTime? archivedAt;
@@ -121,8 +117,7 @@ class _FakeRow {
     required this.id,
     required this.sourceMemId,
     required this.targetMemId,
-    required this.type,
-    required this.value,
+    required this.minutes,
     required this.createdAt,
     required this.updatedAt,
     required this.archivedAt,

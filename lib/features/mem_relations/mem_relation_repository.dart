@@ -9,7 +9,7 @@ class MemRelationRepository extends DriftRepository {
   Future<List<MemRelationEntity>> shipBySourceMemId(int? sourceMemId) => v(
         () async {
           if (sourceMemId == null) return [];
-          final rows = await (driftDb.select(driftDb.memRelations)
+          final rows = await (driftDb.select(driftDb.memPrePosts)
                 ..where((t) => t.sourceMemId.equals(sourceMemId)))
               .get();
           return rows.map(MemRelationEntity.fromTuple).toList();

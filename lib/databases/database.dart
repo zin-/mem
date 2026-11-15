@@ -6,7 +6,7 @@ import 'package:mem/features/acts/act.dart';
 import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mem_parents.dart';
-import 'package:mem/databases/table_definitions/mem_relations.dart';
+import 'package:mem/databases/table_definitions/mem_preposts.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/features/targets/target_table.dart';
 import 'package:path_provider/path_provider.dart';
@@ -21,7 +21,7 @@ part 'database.g.dart';
   Acts,
   MemRepeatedNotifications,
   Targets,
-  MemRelations,
+  MemPrePosts,
   MemParents,
 ])
 class AppDatabase extends _$AppDatabase {
@@ -31,7 +31,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.memory() : super(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration {
@@ -49,6 +49,36 @@ class AppDatabase extends _$AppDatabase {
         }
         if (from < 4) {
           await m.createTable(memParents);
+        }
+        if (from < 5) {
+          await m.createTable(memPrePosts);
+          final relations = await customSelect(
+            "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'mem_relations'",
+          ).get();
+          if (relations.isNotEmpty) {
+            await customStatement('''
+INSERT INTO mem_preposts (
+  id,
+  source_mem_id,
+  target_mem_id,
+  minutes,
+  created_at,
+  updated_at,
+  archived_at
+)
+SELECT
+  id,
+  source_mem_id,
+  target_mem_id,
+  value,
+  created_at,
+  updated_at,
+  archived_at
+FROM mem_relations
+WHERE type = 'prePost'
+''');
+            await customStatement('DROP TABLE mem_relations');
+          }
         }
       },
     );

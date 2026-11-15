@@ -225,7 +225,7 @@ class MemRepository extends DriftRepository {
   Future<MemRelationEntity> receiveRelation(MemRelation domain) => v(
         () async {
           final inserted =
-              await driftDb.into(driftDb.memRelations).insertReturning(
+              await driftDb.into(driftDb.memPrePosts).insertReturning(
                     convertIntoMemRelationsInsertable(domain),
                   );
           return MemRelationEntity.fromTuple(inserted);
@@ -235,7 +235,7 @@ class MemRepository extends DriftRepository {
 
   Future<MemRelationEntity> replaceRelation(MemRelationEntity entity) => v(
         () async {
-          final updated = await (driftDb.update(driftDb.memRelations)
+          final updated = await (driftDb.update(driftDb.memPrePosts)
                 ..where((t) => t.id.equals(entity.id)))
               .writeReturning(convertIntoMemRelationsUpdateable(entity));
           return MemRelationEntity.fromTuple(updated.single);
@@ -245,7 +245,7 @@ class MemRepository extends DriftRepository {
 
   Future<List<MemRelationEntity>> wasteRelations({int? sourceMemId}) => v(
         () async {
-          var query = driftDb.delete(driftDb.memRelations);
+          var query = driftDb.delete(driftDb.memPrePosts);
           if (sourceMemId != null) {
             query = query..where((t) => t.sourceMemId.equals(sourceMemId));
           }
@@ -261,7 +261,7 @@ class MemRepository extends DriftRepository {
   }) =>
       v(
         () async {
-          var query = driftDb.select(driftDb.memRelations);
+          var query = driftDb.select(driftDb.memPrePosts);
           if (relatedMemId != null) {
             query = query
               ..where(
@@ -302,7 +302,7 @@ class MemRepository extends DriftRepository {
   }) =>
       v(
         () async {
-          var query = driftDb.select(driftDb.memRelations);
+          var query = driftDb.select(driftDb.memPrePosts);
           if (relatedMemId != null) {
             query = query
               ..where(
@@ -550,7 +550,7 @@ class MemRepository extends DriftRepository {
     for (var i = 0; i < list.length; i += _latestActPerMemChunkSize) {
       final end = math.min(i + _latestActPerMemChunkSize, list.length);
       final chunk = list.sublist(i, end);
-      final rows = await (driftDb.select(driftDb.memRelations)
+      final rows = await (driftDb.select(driftDb.memPrePosts)
             ..where((t) => t.sourceMemId.isIn(chunk)))
           .get();
       for (final row in rows) {
