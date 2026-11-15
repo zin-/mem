@@ -696,6 +696,9 @@ WHERE r._rn = 1
   factory MemRepository({MemRepository? mock}) {
     if (mock != null) {
       Singleton.override<MemRepository>(mock);
+      mem_prepost_source.bindShipPrePostsBySourceMemId(
+        mock.shipPrePostsBySourceMemId,
+      );
       return mock;
     }
     return Singleton.of(() => MemRepository._());
