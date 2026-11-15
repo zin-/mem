@@ -5,9 +5,7 @@ import 'package:mem/framework/date_and_time/period.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
-import 'package:mem/features/mem_relations/mem_relation.dart';
-import 'package:mem/features/mem_relations/mem_relation_entity.dart';
-import 'package:mem/features/mem_relations/mem_relation_repository.dart';
+import 'package:mem/features/mem_preposts/mem_prepost_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_entity.dart';
@@ -74,19 +72,16 @@ Future<void> _pumpAndSettle(
   MemRepository,
   MemNotificationRepository,
   TargetRepository,
-  MemRelationRepository,
 ])
 void main() {
   final mockMemClient = MockMemClient();
   final mockMemRepository = MockMemRepository();
   final mockMemNotificationRepository = MockMemNotificationRepository();
-  final mockMemRelationRepository = MockMemRelationRepository();
   final mockTargetRepository = MockTargetRepository();
 
   MemClient(mock: mockMemClient);
   MemRepository(mock: mockMemRepository);
   MemNotificationRepository(mock: mockMemNotificationRepository);
-  MemRelationRepository(mock: mockMemRelationRepository);
   TargetRepository(mock: mockTargetRepository);
 
   setUp(() {
@@ -102,7 +97,7 @@ void main() {
       memId: anyNamed('memId'),
       memIdsIn: anyNamed('memIdsIn'),
     )).thenAnswer((_) async => []);
-    when(mockMemRelationRepository.shipBySourceMemId(any))
+    when(mockMemRepository.shipPrePostsBySourceMemId(any))
         .thenAnswer((_) async => []);
     when(mockMemRepository.shipParentByMemId(any))
         .thenAnswer((_) async => null);
@@ -133,7 +128,6 @@ void main() {
     reset(mockMemClient);
     reset(mockMemRepository);
     reset(mockMemNotificationRepository);
-    reset(mockMemRelationRepository);
     reset(mockTargetRepository);
   });
 
@@ -210,13 +204,12 @@ void main() {
                   ),
                 ]);
 
-        when(mockMemRelationRepository
-                .shipBySourceMemId(_TestConstants.testMemId))
+        when(mockMemRepository
+                .shipPrePostsBySourceMemId(_TestConstants.testMemId))
             .thenAnswer((_) async => [
-                  MemRelationEntity(
+                  MemPrePostEntity(
                     _TestConstants.testMemId,
                     _TestConstants.testMemId,
-                    MemRelationType.prePost,
                     10,
                     _TestConstants.testMemId,
                     DateTime.now(),
@@ -505,13 +498,12 @@ void main() {
                   ),
                 ]);
 
-        when(mockMemRelationRepository
-                .shipBySourceMemId(_TestConstants.testMemId))
+        when(mockMemRepository
+                .shipPrePostsBySourceMemId(_TestConstants.testMemId))
             .thenAnswer((_) async => [
-                  MemRelationEntity(
+                  MemPrePostEntity(
                     _TestConstants.testMemId,
                     _TestConstants.testMemId,
-                    MemRelationType.prePost,
                     10,
                     _TestConstants.testMemId,
                     DateTime.now(),

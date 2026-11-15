@@ -17,8 +17,8 @@ import 'package:mem/framework/date_and_time/date_and_time_view.dart';
 import 'package:mem/framework/singleton.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
-import 'package:mem/features/mem_relations/mem_relation_entity.dart';
-import 'package:mem/features/mem_relations/mem_relation_state.dart';
+import 'package:mem/features/mem_preposts/mem_prepost_entity.dart';
+import 'package:mem/features/mem_preposts/mem_prepost_state.dart';
 import 'package:mem/features/mems/detail/page.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/mem.dart';
@@ -79,9 +79,9 @@ class _FakeTargetState extends TargetState {
       );
 }
 
-class _FakeMemRelationEntitiesByMemId extends MemRelationEntitiesByMemId {
+class _FakeMemPrePostEntitiesByMemId extends MemPrePostEntitiesByMemId {
   @override
-  Future<Iterable<MemRelationEntityV1>> build(int? memId) async => [];
+  Future<Iterable<MemPrePostEntityV1>> build(int? memId) async => [];
 }
 
 class _FakePreference extends Preference<TimeOfDay> {
@@ -165,8 +165,8 @@ void main() {
           (ref) => ListValueStateNotifier<MemItemEntityV1>([]),
         ),
         targetStateProvider(_memId).overrideWith(() => _FakeTargetState()),
-        memRelationEntitiesByMemIdProvider(_memId).overrideWith(
-          () => _FakeMemRelationEntitiesByMemId(),
+        memPrePostEntitiesByMemIdProvider(_memId).overrideWith(
+          () => _FakeMemPrePostEntitiesByMemId(),
         ),
         preferenceProvider(startOfDayKey).overrideWith(() => _FakePreference()),
         if (actEntities != null)

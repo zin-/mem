@@ -9,7 +9,6 @@ import 'package:mem/features/logger/log_repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/features/mem_parents/mem_parent.dart';
-import 'package:mem/features/mem_relations/mem_relation_repository.dart';
 import 'package:mem/features/mems/detail/body.dart';
 import 'package:mem/features/mems/detail/page.dart';
 import 'package:mem/features/mems/mem.dart';
@@ -82,7 +81,6 @@ void main() {
     await DriftRepository.close();
     Singleton.reset<MemRepository>();
     Singleton.reset<MemNotificationRepository>();
-    Singleton.reset<MemRelationRepository>();
     Singleton.reset<TargetRepository>();
   });
 

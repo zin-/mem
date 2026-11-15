@@ -5,7 +5,6 @@ import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/features/mem_parents/mem_parent.dart';
-import 'package:mem/features/mem_relations/mem_relation_repository.dart';
 import 'package:mem/features/mems/list/filter_value.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'list/helpers.dart';
@@ -36,7 +35,6 @@ void main() {
     MemService.resetSingleton();
     Singleton.reset<MemRepository>();
     Singleton.reset<MemNotificationRepository>();
-    Singleton.reset<MemRelationRepository>();
     Singleton.reset<TargetRepository>();
     Singleton.override<DriftDatabaseAccessor>(
       DriftDatabaseAccessor.withDatabase(AppDatabase.memory()),
@@ -51,7 +49,6 @@ void main() {
     await DriftRepository.close();
     Singleton.reset<MemRepository>();
     Singleton.reset<MemNotificationRepository>();
-    Singleton.reset<MemRelationRepository>();
     Singleton.reset<TargetRepository>();
   });
 

@@ -3,7 +3,7 @@ import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/framework/notifications/notification_client.dart';
-import 'package:mem/features/mem_relations/mem_relation_entity.dart';
+import 'package:mem/features/mem_preposts/mem_prepost_entity.dart';
 
 import 'mem_entity.dart';
 import 'mem_service.dart';
@@ -19,7 +19,7 @@ class MemClient {
           List<MemItemEntityV1>,
           List<MemNotificationEntity>?,
           TargetEntityV1?,
-          List<MemRelationEntityV1>?,
+          List<MemPrePostEntityV1>?,
           MemEntity,
         ),
         DateTime?
@@ -28,7 +28,7 @@ class MemClient {
     List<MemItemEntityV1> memItemList,
     List<MemNotificationEntityV1> memNotificationList,
     TargetEntityV1? target,
-    List<MemRelationEntityV1>? memRelations,
+    List<MemPrePostEntityV1>? memPrePosts,
   ) =>
       v(
         () async {
@@ -36,7 +36,7 @@ class MemClient {
             savedMemItems,
             savedMemNotifications,
             savedTarget,
-            savedMemRelations,
+            savedMemPrePosts,
             memEntityV2
           ) = await _memService.save(
             (
@@ -44,7 +44,7 @@ class MemClient {
               memItemList,
               memNotificationList,
               target,
-              memRelations,
+              memPrePosts,
             ),
           );
 
@@ -56,7 +56,7 @@ class MemClient {
               savedMemItems,
               savedMemNotifications,
               savedTarget,
-              savedMemRelations,
+              savedMemPrePosts,
               memEntityV2
             ),
             nextNotifyAt
@@ -67,7 +67,7 @@ class MemClient {
           "memItemList": memItemList,
           "memNotificationList": memNotificationList,
           "target": target,
-          "memRelations": memRelations,
+          "memPrePosts": memPrePosts,
         },
       );
 

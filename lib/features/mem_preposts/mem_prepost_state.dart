@@ -1,38 +1,37 @@
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/mem_relations/mem_relation_entity.dart';
-import 'package:mem/features/mem_relations/mem_relation_repository.dart';
+import 'package:mem/features/mem_preposts/mem_prepost_entity.dart';
+import 'package:mem/features/mem_preposts/mem_prepost_source.dart';
 import 'package:mem/shared/entities_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'mem_relation_state.g.dart';
+part 'mem_prepost_state.g.dart';
 
 @riverpod
-class MemRelationEntities extends _$MemRelationEntities
-    with EntitiesStateMixinV1<SavedMemRelationEntityV1, int> {
+class MemPrePostEntities extends _$MemPrePostEntities
+    with EntitiesStateMixinV1<SavedMemPrePostEntityV1, int> {
   @override
-  Iterable<SavedMemRelationEntityV1> build() => v(() => []);
+  Iterable<SavedMemPrePostEntityV1> build() => v(() => []);
 }
 
 @riverpod
-class MemRelationEntitiesByMemId extends _$MemRelationEntitiesByMemId {
+class MemPrePostEntitiesByMemId extends _$MemPrePostEntitiesByMemId {
   @override
-  Future<Iterable<MemRelationEntityV1>> build(int? memId) => v(
+  Future<Iterable<MemPrePostEntityV1>> build(int? memId) => v(
         () async {
           if (memId == null) {
             return [];
           }
 
-          final currentEntities = ref.watch(memRelationEntitiesProvider);
-          final fetchedEntities = (await MemRelationRepository()
-                  .shipBySourceMemId(memId))
-              .map((e) => SavedMemRelationEntityV1.fromEntityV2(e))
+          final currentEntities = ref.watch(memPrePostEntitiesProvider);
+          final fetchedEntities = (await shipPrePostsBySourceMemId(memId))
+              .map(SavedMemPrePostEntityV1.fromEntityV2)
               .toList();
 
           if (fetchedEntities.isNotEmpty &&
               !currentEntities
                   .every((e) => fetchedEntities.any((ee) => ee.id == e.id))) {
             ref
-                .watch(memRelationEntitiesProvider.notifier)
+                .watch(memPrePostEntitiesProvider.notifier)
                 .upsert(fetchedEntities);
           }
 
@@ -41,8 +40,8 @@ class MemRelationEntitiesByMemId extends _$MemRelationEntitiesByMemId {
         {'memId': memId},
       );
 
-  Future<Iterable<MemRelationEntityV1>> upsert(
-    Iterable<MemRelationEntityV1> entities,
+  Future<Iterable<MemPrePostEntityV1>> upsert(
+    Iterable<MemPrePostEntityV1> entities,
   ) async =>
       v(
         () async {

@@ -62,7 +62,7 @@ class MemViewData with EntityV1<Mem> implements Identifiable<int> {
         latestAct: value.latestAct,
         scheduleAnchorAct: value.scheduleAnchorAct,
         repeatedNotifications: null,
-        memRelations: null,
+        memPrePosts: null,
       );
 
   @override

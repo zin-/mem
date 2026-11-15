@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:mem/features/mem_relations/mem_relation_state.dart';
+import 'package:mem/features/mem_preposts/mem_prepost_state.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/targets/target_states.dart';
@@ -14,7 +14,7 @@ import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/features/targets/target_entity.dart';
-import 'package:mem/features/mem_relations/mem_relation_entity.dart';
+import 'package:mem/features/mem_preposts/mem_prepost_entity.dart';
 
 bool isSameSavedMemNotification(
   MemNotificationEntityV1 current,
@@ -91,14 +91,14 @@ final removedMemDetailProvider = StateNotifierProvider.autoDispose.family<
           List<MemItemEntityV1>,
           List<MemNotificationEntityV1>?,
           TargetEntityV1?,
-          List<MemRelationEntityV1>?
+          List<MemPrePostEntityV1>?
         )?>,
     (
       MemViewData,
       List<MemItemEntityV1>,
       List<MemNotificationEntityV1>?,
       TargetEntityV1?,
-      List<MemRelationEntityV1>?
+      List<MemPrePostEntityV1>?
     )?,
     int>(
   (ref, memId) => v(
@@ -108,8 +108,8 @@ final removedMemDetailProvider = StateNotifierProvider.autoDispose.family<
       final removedMemNotifications =
           ref.watch(memNotificationsByMemIdProvider(memId));
       final target = ref.watch(targetStateProvider(memId)).value;
-      final removedMemRelations =
-          ref.watch(memRelationEntitiesByMemIdProvider(memId)).value;
+      final removedMemPrePosts =
+          ref.watch(memPrePostEntitiesByMemIdProvider(memId)).value;
 
       return ValueStateNotifier(
         removedMem != null
@@ -118,7 +118,7 @@ final removedMemDetailProvider = StateNotifierProvider.autoDispose.family<
                 removedMemItems ?? [],
                 removedMemNotifications,
                 target,
-                removedMemRelations?.toList(),
+                removedMemPrePosts?.toList(),
               )
             : null,
       );

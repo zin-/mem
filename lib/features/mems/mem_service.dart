@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:mem/features/mem_relations/mem_relation.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/targets/target_repository.dart';
@@ -11,7 +10,7 @@ import 'package:mem/features/mems/mem_view_data.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
-import 'package:mem/features/mem_relations/mem_relation_entity.dart';
+import 'package:mem/features/mem_preposts/mem_prepost_entity.dart';
 
 class MemService {
   final MemRepository _memRepository;
@@ -22,7 +21,7 @@ class MemService {
         List<MemItemEntityV1>,
         List<MemNotificationEntity>?,
         TargetEntityV1?,
-        List<MemRelationEntityV1>?,
+        List<MemPrePostEntityV1>?,
         MemEntity,
       )> save(
     (
@@ -30,7 +29,7 @@ class MemService {
       List<MemItemEntityV1>,
       List<MemNotificationEntityV1>?,
       TargetEntityV1?,
-      List<MemRelationEntityV1>?,
+      List<MemPrePostEntityV1>?,
     ) memDetail, {
     bool undo = false,
   }) =>
@@ -171,31 +170,28 @@ class MemService {
                 .then((v) => SavedTargetEntityV1.fromEntityV2(v));
           }
 
-          final memRelations = memDetail.$5;
-          final returnMemRelations =
-              List<SavedMemRelationEntityV1?>.empty(growable: true);
-          if (memRelations != null) {
-            if (memRelations.isEmpty) {
-              await _memRepository.wasteRelations(
+          final memPrePosts = memDetail.$5;
+          final returnMemPrePosts =
+              List<SavedMemPrePostEntityV1?>.empty(growable: true);
+          if (memPrePosts != null) {
+            if (memPrePosts.isEmpty) {
+              await _memRepository.wastePrePosts(
                 sourceMemId: savedMemEntity.id,
               );
             } else {
-              final saved = await Future.wait(memRelations
-                  .map((e) => e.updatedWith((v) => MemRelation.by(
-                        savedMemEntity.id,
-                        v.targetMemId,
-                        v.type,
-                        v.value,
-                      )))
+              final saved = await Future.wait(memPrePosts
+                  .map((e) => e.updatedWith(
+                        (v) => v.withSourceMemId(savedMemEntity.id),
+                      ))
                   .map((e) async {
-                if (e is SavedMemRelationEntityV1 && !undo) {
-                  return await _memRepository.replaceRelation(e.toEntityV2());
+                if (e is SavedMemPrePostEntityV1 && !undo) {
+                  return await _memRepository.replacePrePost(e.toEntityV2());
                 } else {
-                  return await _memRepository.receiveRelation(e.value);
+                  return await _memRepository.receivePrePost(e.value);
                 }
               }));
-              returnMemRelations.addAll(
-                  saved.map((e) => SavedMemRelationEntityV1.fromEntityV2(e)));
+              returnMemPrePosts.addAll(
+                  saved.map((e) => SavedMemPrePostEntityV1.fromEntityV2(e)));
             }
           }
 
@@ -205,7 +201,7 @@ class MemService {
                 .toList(),
             returnMemNotifications.nonNulls.toList(growable: false),
             savedTarget,
-            returnMemRelations.nonNulls.toList(growable: false),
+            returnMemPrePosts.nonNulls.toList(growable: false),
             savedMemEntity.updatedWith(
               target: () => savedTarget?.value,
             ),
@@ -291,7 +287,7 @@ class MemService {
           );
 
           await _memRepository.archiveItems(archivedMem.id);
-          await _memRepository.archiveRelations(relatedMemId: archivedMem.id);
+          await _memRepository.archivePrePosts(relatedMemId: archivedMem.id);
 
           return await _memRepository.shipById(
             archivedMem.id,
@@ -314,7 +310,7 @@ class MemService {
           );
 
           await _memRepository.unarchiveItems(unarchivedMem.id);
-          await _memRepository.unarchiveRelations(
+          await _memRepository.unarchivePrePosts(
             relatedMemId: unarchivedMem.id,
           );
 
