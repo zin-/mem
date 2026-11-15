@@ -32,10 +32,10 @@ void main() {
       expect(filter.showDone, isFalse);
       expect(filter.archived, isFalse);
       expect(filter.done, isFalse);
-      expect(filter.includes(active), isTrue);
-      expect(filter.includes(archived), isFalse);
-      expect(filter.includes(done), isFalse);
-      expect(filter.includes(archivedDone), isFalse);
+      expect(filter.matches(active), isTrue);
+      expect(filter.matches(archived), isFalse);
+      expect(filter.matches(done), isFalse);
+      expect(filter.matches(archivedDone), isFalse);
     });
 
     test('same switches leave that axis unfiltered', () {
@@ -62,21 +62,21 @@ void main() {
       expect(archivesOff.archived, isNull);
       expect(archivesOn, isNot(archivesOff));
       expect(archivesOn.toString(), isNot(archivesOff.toString()));
-      expect(archivesOn.includes(active), isTrue);
-      expect(archivesOn.includes(archived), isTrue);
-      expect(archivesOn.includes(done), isFalse);
+      expect(archivesOn.matches(active), isTrue);
+      expect(archivesOn.matches(archived), isTrue);
+      expect(archivesOn.matches(done), isFalse);
 
       expect(donesOn.done, isNull);
-      expect(donesOn.includes(active), isTrue);
-      expect(donesOn.includes(done), isTrue);
-      expect(donesOn.includes(archived), isFalse);
+      expect(donesOn.matches(active), isTrue);
+      expect(donesOn.matches(done), isTrue);
+      expect(donesOn.matches(archived), isFalse);
 
       expect(open.archived, isNull);
       expect(open.done, isNull);
-      expect(open.includes(active), isTrue);
-      expect(open.includes(archived), isTrue);
-      expect(open.includes(done), isTrue);
-      expect(open.includes(archivedDone), isTrue);
+      expect(open.matches(active), isTrue);
+      expect(open.matches(archived), isTrue);
+      expect(open.matches(done), isTrue);
+      expect(open.matches(archivedDone), isTrue);
     });
 
     test('shown side selects archived or done mems', () {
@@ -96,19 +96,19 @@ void main() {
       );
 
       expect(archivedOnly.archived, isTrue);
-      expect(archivedOnly.includes(archived), isTrue);
-      expect(archivedOnly.includes(active), isFalse);
-      expect(archivedOnly.includes(archivedDone), isFalse);
+      expect(archivedOnly.matches(archived), isTrue);
+      expect(archivedOnly.matches(active), isFalse);
+      expect(archivedOnly.matches(archivedDone), isFalse);
 
       expect(doneOnly.done, isTrue);
-      expect(doneOnly.includes(done), isTrue);
-      expect(doneOnly.includes(active), isFalse);
-      expect(doneOnly.includes(archived), isFalse);
+      expect(doneOnly.matches(done), isTrue);
+      expect(doneOnly.matches(active), isFalse);
+      expect(doneOnly.matches(archived), isFalse);
 
-      expect(archivedAndDone.includes(archivedDone), isTrue);
-      expect(archivedAndDone.includes(archived), isFalse);
-      expect(archivedAndDone.includes(done), isFalse);
-      expect(archivedAndDone.includes(active), isFalse);
+      expect(archivedAndDone.matches(archivedDone), isTrue);
+      expect(archivedAndDone.matches(archived), isFalse);
+      expect(archivedAndDone.matches(done), isFalse);
+      expect(archivedAndDone.matches(active), isFalse);
     });
 
     test('copyWith keeps unspecified fields and toString follows them', () {

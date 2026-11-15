@@ -4,6 +4,8 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/framework/date_and_time/period.dart';
+import 'package:mem/features/mem_items/mem_item.dart';
+import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/list/filter_value.dart';
@@ -259,6 +261,101 @@ void main() {
 
       container.read(searchTextProvider.notifier).updatedBy('Alp');
       expect(sortedMemIds(container), [alpha.id]);
+    });
+
+    test(
+        'shows matching done and archived mems and hides them when search is empty or closed',
+        () {
+      final active = savedMem(
+        id: 1,
+        name: 'Alpha',
+        createdAt: DateTime(2024, 6, 1),
+        updatedAt: DateTime(2024, 6, 1),
+      );
+      final done = savedMem(
+        id: 2,
+        name: 'Alpha done',
+        createdAt: DateTime(2024, 6, 1),
+        updatedAt: DateTime(2024, 6, 1),
+        doneAt: DateTime(2024, 6, 3),
+      );
+      final archived = savedMem(
+        id: 3,
+        name: 'Alpha archived',
+        createdAt: DateTime(2024, 6, 1),
+        updatedAt: DateTime(2024, 6, 1),
+        archivedAt: DateTime(2024, 6, 2),
+      );
+      final other = savedMem(
+        id: 4,
+        name: 'Beta',
+        createdAt: DateTime(2024, 6, 1),
+        updatedAt: DateTime(2024, 6, 1),
+      );
+      final container = memListTestContainer([archived, done, active, other]);
+      addTearDown(container.dispose);
+      final subscription = container.listen(memListProvider, (_, __) {});
+      addTearDown(subscription.close);
+
+      expect(sortedMemIds(container), [active.id, other.id]);
+
+      container.read(searchTextProvider.notifier).updatedBy('');
+      expect(sortedMemIds(container), [active.id, other.id]);
+
+      container.read(searchTextProvider.notifier).updatedBy('Alp');
+      expect(sortedMemIds(container), [active.id, done.id, archived.id]);
+
+      container.read(searchTextProvider.notifier).updatedBy(null);
+      expect(sortedMemIds(container), [active.id, other.id]);
+    });
+
+    test('keeps a mem when only its memo matches', () {
+      final createdAt = DateTime(2024, 6, 1);
+      final memoOnly = savedMem(
+        id: 1,
+        name: 'Beta',
+        createdAt: createdAt,
+        updatedAt: createdAt,
+      ).updatedWith(
+        items: () => [
+          MemItemEntity(
+            1,
+            MemItemType.memo,
+            'Alpha note',
+            1,
+            createdAt,
+            createdAt,
+            null,
+          ),
+        ],
+      );
+      final neither = savedMem(
+        id: 2,
+        name: 'Gamma',
+        createdAt: createdAt,
+        updatedAt: createdAt,
+      ).updatedWith(
+        items: () => [
+          MemItemEntity(
+            2,
+            MemItemType.memo,
+            'unrelated',
+            2,
+            createdAt,
+            createdAt,
+            null,
+          ),
+        ],
+      );
+      final container = memListTestContainer([neither, memoOnly]);
+      addTearDown(container.dispose);
+      final subscription = container.listen(memListProvider, (_, __) {});
+      addTearDown(subscription.close);
+
+      expect(sortedMemIds(container), [memoOnly.id, neither.id]);
+
+      container.read(searchTextProvider.notifier).updatedBy('Alp');
+      expect(sortedMemIds(container), [memoOnly.id]);
     });
   });
 
