@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_query_service.dart';
+import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
@@ -37,13 +38,26 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
     final filter = ref.watch(memListFilterStateProvider);
     final searchText = ref.watch(searchTextProvider);
 
+    bool matchesSearch(MemEntity mem, String text) {
+      if (mem.name.contains(text)) {
+        return true;
+      }
+      final items = mem.items;
+      if (items == null) {
+        return false;
+      }
+      return items.any(
+        (item) => item.type == MemItemType.memo && item.value.contains(text),
+      );
+    }
+
     return ListValueStateNotifier(
       v(
         () => savedMemEntities.where((mem) {
           if (searchText == null || searchText.isEmpty) {
             return filter.includes(mem);
           }
-          return mem.name.contains(searchText);
+          return matchesSearch(mem, searchText);
         }).toList(),
         {
           'savedMemEntities': savedMemEntities,

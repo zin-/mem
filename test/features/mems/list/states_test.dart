@@ -4,6 +4,8 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/framework/date_and_time/period.dart';
+import 'package:mem/features/mem_items/mem_item.dart';
+import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/list/filter_value.dart';
@@ -305,6 +307,55 @@ void main() {
 
       container.read(searchTextProvider.notifier).updatedBy(null);
       expect(sortedMemIds(container), [active.id, other.id]);
+    });
+
+    test('keeps a mem when only its memo matches', () {
+      final createdAt = DateTime(2024, 6, 1);
+      final memoOnly = savedMem(
+        id: 1,
+        name: 'Beta',
+        createdAt: createdAt,
+        updatedAt: createdAt,
+      ).updatedWith(
+        items: () => [
+          MemItemEntity(
+            1,
+            MemItemType.memo,
+            'Alpha note',
+            1,
+            createdAt,
+            createdAt,
+            null,
+          ),
+        ],
+      );
+      final neither = savedMem(
+        id: 2,
+        name: 'Gamma',
+        createdAt: createdAt,
+        updatedAt: createdAt,
+      ).updatedWith(
+        items: () => [
+          MemItemEntity(
+            2,
+            MemItemType.memo,
+            'unrelated',
+            2,
+            createdAt,
+            createdAt,
+            null,
+          ),
+        ],
+      );
+      final container = memListTestContainer([neither, memoOnly]);
+      addTearDown(container.dispose);
+      final subscription = container.listen(memListProvider, (_, __) {});
+      addTearDown(subscription.close);
+
+      expect(sortedMemIds(container), [memoOnly.id, neither.id]);
+
+      container.read(searchTextProvider.notifier).updatedBy('Alp');
+      expect(sortedMemIds(container), [memoOnly.id]);
     });
   });
 
