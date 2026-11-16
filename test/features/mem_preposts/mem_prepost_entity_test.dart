@@ -33,14 +33,14 @@ void main() {
       expect(entity.toMap['minutes'], 15);
     });
 
-    test('SavedMemPrePostEntityV1 map fallback and toEntityV2', () {
+    test('SavedMemPrePostEntityV1 map and toEntityV2', () {
       final createdAt = DateTime(2024, 1, 1);
       final updatedAt = DateTime(2024, 1, 2);
       final archivedAt = DateTime(2024, 1, 3);
       final saved = SavedMemPrePostEntityV1({
         'id': 9,
-        'source_mems_id': 10,
-        'target_mems_id': 11,
+        'sourceMemId': 10,
+        'targetMemId': 11,
         'minutes': 12,
         'createdAt': createdAt,
         'updatedAt': updatedAt,

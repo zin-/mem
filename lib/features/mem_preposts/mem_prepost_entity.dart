@@ -47,8 +47,8 @@ class SavedMemPrePostEntityV1 extends MemPrePostEntityV1
   }
 
   static MemPrePost _prePostFromMap(Map<String, dynamic> map) => MemPrePost.of(
-        sourceMemId: map['sourceMemId'] ?? map['source_mems_id'],
-        targetMemId: map['targetMemId'] ?? map['target_mems_id'],
+        sourceMemId: map['sourceMemId'],
+        targetMemId: map['targetMemId'],
         minutes: map['minutes'] ?? 0,
       )!;
 
@@ -62,7 +62,7 @@ class SavedMemPrePostEntityV1 extends MemPrePostEntityV1
   SavedMemPrePostEntityV1 updatedWith(
     MemPrePost Function(MemPrePost v) update,
   ) =>
-      SavedMemPrePostEntityV1(_savedRowFrom(this, update(value)));
+      SavedMemPrePostEntityV1(_savedRowFrom(update(value)));
 
   factory SavedMemPrePostEntityV1.fromEntityV2(MemPrePostEntity entity) =>
       SavedMemPrePostEntityV1.fromRow(_MemPrePostEntityRow(entity));
@@ -76,21 +76,17 @@ class SavedMemPrePostEntityV1 extends MemPrePostEntityV1
         updatedAt,
         archivedAt,
       );
-}
 
-Map<String, Object?> _savedRowFrom(
-  SavedMemPrePostEntityV1 saved,
-  MemPrePost value,
-) =>
-    {
-      'id': saved.id,
-      'sourceMemId': value.sourceMemId,
-      'targetMemId': value.targetMemId,
-      'minutes': value.minutes,
-      'createdAt': saved.createdAt,
-      'updatedAt': saved.updatedAt,
-      'archivedAt': saved.archivedAt,
-    };
+  Map<String, Object?> _savedRowFrom(MemPrePost value) => {
+        'id': id,
+        'sourceMemId': value.sourceMemId,
+        'targetMemId': value.targetMemId,
+        'minutes': value.minutes,
+        'createdAt': createdAt,
+        'updatedAt': updatedAt,
+        'archivedAt': archivedAt,
+      };
+}
 
 class MemPrePostEntity implements Entity<int> {
   final MemId sourceMemId;
