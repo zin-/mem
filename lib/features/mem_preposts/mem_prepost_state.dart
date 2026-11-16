@@ -1,17 +1,9 @@
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_preposts/mem_prepost_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
-import 'package:mem/shared/entities_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'mem_prepost_state.g.dart';
-
-@riverpod
-class MemPrePostEntities extends _$MemPrePostEntities
-    with EntitiesStateMixinV1<SavedMemPrePostEntityV1, int> {
-  @override
-  Iterable<SavedMemPrePostEntityV1> build() => v(() => []);
-}
 
 @riverpod
 class MemPrePostEntitiesByMemId extends _$MemPrePostEntitiesByMemId {
@@ -22,21 +14,8 @@ class MemPrePostEntitiesByMemId extends _$MemPrePostEntitiesByMemId {
             return [];
           }
 
-          final currentEntities = ref.watch(memPrePostEntitiesProvider);
-          final fetchedEntities =
-              (await MemRepository().shipPrePostsBySourceMemId(memId))
-                  .map(SavedMemPrePostEntityV1.fromEntityV2)
-                  .toList();
-
-          if (fetchedEntities.isNotEmpty &&
-              !currentEntities
-                  .every((e) => fetchedEntities.any((ee) => ee.id == e.id))) {
-            ref
-                .watch(memPrePostEntitiesProvider.notifier)
-                .upsert(fetchedEntities);
-          }
-
-          return [...currentEntities, ...fetchedEntities];
+          return (await MemRepository().shipPrePostsBySourceMemId(memId))
+              .map(SavedMemPrePostEntityV1.fromEntityV2);
         },
         {'memId': memId},
       );
