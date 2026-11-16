@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/settings/habitual_mems_count.dart';
 import 'package:mem/features/settings/notify_after_inactivity.dart';
 import 'package:settings_ui/settings_ui.dart';
 
@@ -41,6 +42,19 @@ class SettingsPage extends ConsumerWidget {
               'picked': picked,
             },
           ),
+          ref.watch(preferenceProvider(habitualMemsCountKey)),
+          (picked) => v(
+            () => picked == null
+                ? ref
+                    .read(preferenceProvider(habitualMemsCountKey).notifier)
+                    .remove()
+                : ref
+                    .read(preferenceProvider(habitualMemsCountKey).notifier)
+                    .replace(picked),
+            {
+              'picked': picked,
+            },
+          ),
         ),
       );
 }
@@ -50,12 +64,16 @@ class _SettingsPage extends StatelessWidget {
   final void Function(TimeOfDay? picked) _onStartOfDayChanged;
   final int? _notifyAfterInactivity;
   final void Function(int? picked) _onNotifyAfterInactivityChanged;
+  final int? _habitualMemsCount;
+  final void Function(int? picked) _onHabitualMemsCountChanged;
 
   const _SettingsPage(
     this._startOfDay,
     this._onStartOfDayChanged,
     this._notifyAfterInactivity,
     this._onNotifyAfterInactivityChanged,
+    this._habitualMemsCount,
+    this._onHabitualMemsCountChanged,
   );
 
   @override
@@ -83,6 +101,11 @@ class _SettingsPage extends StatelessWidget {
                         _notifyAfterInactivity,
                         _onNotifyAfterInactivityChanged,
                       ),
+                      buildHabitualMemsCount(
+                        context,
+                        _habitualMemsCount,
+                        _onHabitualMemsCountChanged,
+                      ),
                       _buildResetNotification(l10n.resetNotificationLabel),
                     ],
                   ),
@@ -95,6 +118,7 @@ class _SettingsPage extends StatelessWidget {
         {
           '_startOfDay': _startOfDay,
           '_notifyAfterInactivity': _notifyAfterInactivity,
+          '_habitualMemsCount': _habitualMemsCount,
         },
       );
 }
