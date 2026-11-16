@@ -13,8 +13,6 @@ import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_parents/mem_parent.dart';
 import 'package:mem/features/mem_preposts/mem_prepost.dart';
 import 'package:mem/features/mem_preposts/mem_prepost_entity.dart';
-import 'package:mem/features/mem_preposts/mem_prepost_source.dart'
-    as mem_prepost_source;
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/targets/target.dart';
@@ -227,7 +225,14 @@ class MemRepository extends DriftRepository {
   Future<List<MemPrePostEntity>> shipPrePostsBySourceMemId(
     int? sourceMemId,
   ) =>
-      mem_prepost_source.shipPrePostsBySourceMemId(sourceMemId);
+      v(
+        () async {
+          if (sourceMemId == null) return [];
+          final bySource = await _prePostsBySourceMemId([sourceMemId]);
+          return bySource[sourceMemId] ?? const <MemPrePostEntity>[];
+        },
+        {'sourceMemId': sourceMemId},
+      );
 
   Future<MemPrePostEntity> receivePrePost(MemPrePost domain) => v(
         () async {
@@ -696,9 +701,6 @@ WHERE r._rn = 1
   factory MemRepository({MemRepository? mock}) {
     if (mock != null) {
       Singleton.override<MemRepository>(mock);
-      mem_prepost_source.bindShipPrePostsBySourceMemId(
-        mock.shipPrePostsBySourceMemId,
-      );
       return mock;
     }
     return Singleton.of(() => MemRepository._());

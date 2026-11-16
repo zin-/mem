@@ -1,6 +1,6 @@
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_preposts/mem_prepost_entity.dart';
-import 'package:mem/features/mem_preposts/mem_prepost_source.dart';
+import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/shared/entities_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -23,9 +23,10 @@ class MemPrePostEntitiesByMemId extends _$MemPrePostEntitiesByMemId {
           }
 
           final currentEntities = ref.watch(memPrePostEntitiesProvider);
-          final fetchedEntities = (await shipPrePostsBySourceMemId(memId))
-              .map(SavedMemPrePostEntityV1.fromEntityV2)
-              .toList();
+          final fetchedEntities =
+              (await MemRepository().shipPrePostsBySourceMemId(memId))
+                  .map(SavedMemPrePostEntityV1.fromEntityV2)
+                  .toList();
 
           if (fetchedEntities.isNotEmpty &&
               !currentEntities
