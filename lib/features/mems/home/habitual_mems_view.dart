@@ -6,6 +6,8 @@ import 'package:mem/features/mems/home/habitual_rank_label.dart';
 import 'package:mem/features/mems/home/home_mems_card.dart';
 import 'package:mem/features/mems/home/overdue_mems.dart';
 import 'package:mem/features/mems/home/upcoming_mems.dart';
+import 'package:mem/features/settings/preference/keys.dart';
+import 'package:mem/features/settings/states.dart';
 
 class HabitualMemsView extends ConsumerWidget {
   const HabitualMemsView({super.key});
@@ -17,11 +19,12 @@ class HabitualMemsView extends ConsumerWidget {
             for (final mem in ref.watch(overdueMemsProvider)) mem.id,
             for (final mem in ref.watch(upcomingMemsProvider)) mem.id,
           };
+          final count = ref.watch(preferenceProvider(habitualMemsCountKey));
           final habitualMems = [
             for (final habitual in ref.watch(habitualMemsProvider).value ??
                 const <HabitualMem>[])
               if (!shownIds.contains(habitual.mem.id)) habitual,
-          ];
+          ].take(count).toList();
           final rankByMemId = {
             for (final habitual in habitualMems) habitual.mem.id: habitual.rank,
           };

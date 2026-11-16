@@ -101,6 +101,7 @@
 
   "startOfDayLabel": "Start of day",
   "notifyAfterInactivityLabel": "Notify after inactivity",
+  "habitualMemsCountLabel": "Habitual mems count",
   "backupLabel": "Backup",
   "createBackupLabel": "Create",
   "restoreBackupLabel": "Restore",

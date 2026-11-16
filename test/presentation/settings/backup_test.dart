@@ -38,6 +38,11 @@ void main() {
               notifyAfterInactivity,
               defaultNotifyAfterInactivity,
             ));
+    when(mockedPreferenceRepository.shipByKey(habitualMemsCountKey))
+        .thenAnswer((_) async => PreferenceEntity(
+              habitualMemsCountKey,
+              defaultHabitualMemsCount,
+            ));
 
     when(mockedPreferenceRepository.receive(any)).thenAnswer((_) async => true);
   });
