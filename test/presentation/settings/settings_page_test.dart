@@ -17,8 +17,13 @@ class _TestConstants {
   static const int startOfDayValueIndex = 1;
   static const int notifyAfterInactivityLabelIndex = 2;
   static const int notifyAfterInactivityValueIndex = 3;
-  static const int resetNotificationLabelIndex = 4;
-  static const int appBarTitleIndex = 8;
+  static const int habitualMemsCountLabelIndex = 4;
+  static const int habitualMemsCountValueIndex = 5;
+  static const int habitualMemsCountTileIndex = 2;
+  static const int habitualMemsCountMin = 1;
+  static const int selectedHabitualMemsCount = 5;
+  static const int resetNotificationLabelIndex = 6;
+  static const int appBarTitleIndex = 10;
 }
 
 Widget _createTestWidget() {
@@ -58,6 +63,11 @@ void main() {
               notifyAfterInactivity,
               defaultNotifyAfterInactivity,
             ));
+    when(mockedPreferenceRepository.shipByKey(habitualMemsCountKey))
+        .thenAnswer((_) async => PreferenceEntity(
+              habitualMemsCountKey,
+              defaultHabitualMemsCount,
+            ));
 
     when(mockedPreferenceRepository.receive(any)).thenAnswer((_) async => true);
   });
@@ -88,6 +98,14 @@ void main() {
         expect(
           tester
               .widget<Text>(
+                  textWidgets.at(_TestConstants.habitualMemsCountLabelIndex))
+              .data,
+          equals(l10n.habitualMemsCountLabel),
+        );
+
+        expect(
+          tester
+              .widget<Text>(
                   textWidgets.at(_TestConstants.resetNotificationLabelIndex))
               .data,
           equals(l10n.resetNotificationLabel),
@@ -103,6 +121,7 @@ void main() {
         _verifyMultipleTextWidgets(tester, [
           _TestConstants.startOfDayValueIndex,
           _TestConstants.notifyAfterInactivityValueIndex,
+          _TestConstants.habitualMemsCountValueIndex,
         ]);
       });
 
@@ -121,6 +140,15 @@ void main() {
                 textWidgets.at(_TestConstants.notifyAfterInactivityValueIndex))
             .data;
         expect(notifyAfterInactivityValue, equals('1 h 0 m'));
+
+        final habitualMemsCountValue = tester
+            .widget<Text>(
+                textWidgets.at(_TestConstants.habitualMemsCountValueIndex))
+            .data;
+        expect(
+          habitualMemsCountValue,
+          equals('$defaultHabitualMemsCount'),
+        );
       });
     });
 
@@ -164,6 +192,58 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.byType(BottomSheet), findsNothing);
+      });
+
+      testWidgets('habitual mems count value.', (tester) async {
+        await _pumpAndSettle(tester);
+
+        final textWidgets = find.byType(Text);
+        final habitualMemsCountValue = tester
+            .widget<Text>(
+                textWidgets.at(_TestConstants.habitualMemsCountValueIndex))
+            .data;
+        expect(
+          habitualMemsCountValue,
+          equals('$defaultHabitualMemsCount'),
+        );
+
+        await tester.tap(
+          find
+              .byType(SettingsTile)
+              .at(_TestConstants.habitualMemsCountTileIndex),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(BottomSheet), findsOneWidget);
+
+        final controller = tester
+            .widget<ListWheelScrollView>(find.byType(ListWheelScrollView))
+            .controller! as FixedExtentScrollController;
+        controller.jumpToItem(
+          _TestConstants.selectedHabitualMemsCount -
+              _TestConstants.habitualMemsCountMin,
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('OK'));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(BottomSheet), findsNothing);
+
+        final captured = verify(mockedPreferenceRepository.receive(captureAny))
+            .captured
+            .single as PreferenceEntity;
+        expect(captured.key, habitualMemsCountKey);
+        expect(captured.value, _TestConstants.selectedHabitualMemsCount);
+
+        expect(
+          tester
+              .widget<Text>(find
+                  .byType(Text)
+                  .at(_TestConstants.habitualMemsCountValueIndex))
+              .data,
+          equals('${_TestConstants.selectedHabitualMemsCount}'),
+        );
       });
     });
 
