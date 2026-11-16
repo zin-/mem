@@ -364,6 +364,86 @@ void main() {
   );
 
   testWidgets(
+    'shows only the next three habitual mems after excluding the overdue one',
+    (tester) async {
+      final overdue = at(20, DateTime(2020, 1, 1, 10));
+      MemEntity habitualOnly(int id) => savedMem(
+            id: id,
+            name: 'Mem $id',
+            createdAt: createdAt,
+            updatedAt: createdAt,
+          );
+      final second = habitualOnly(31);
+      final third = habitualOnly(32);
+      final fourth = habitualOnly(33);
+      final fifth = habitualOnly(34);
+      final mems = [overdue, second, third, fourth, fifth];
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            preferenceProvider(startOfDayKey).overrideWith(
+              () => _FakePreference(),
+            ),
+            memEntitiesProvider.overrideWith(() => _FakeMemEntities(mems)),
+            savedMemNotificationsProvider.overrideWith(
+              (ref) => ListValueStateNotifier<SavedMemNotificationEntityV1>([]),
+            ),
+            for (final mem in mems)
+              memNotificationsByMemIdProvider(mem.id).overrideWith(
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
+              ),
+            habitualMemsProvider.overrideWith(
+              (ref) async => [
+                habitualMem(overdue),
+                habitualMem(second),
+                habitualMem(third),
+                habitualMem(fourth),
+                habitualMem(fifth),
+              ],
+            ),
+          ],
+          child: MaterialApp(
+            home: HomeScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        tester
+            .widgetList<Text>(find.byType(Text))
+            .map((text) => text.data)
+            .whereType<String>()
+            .where((data) => data.startsWith('Mem '))
+            .toList(),
+        ['Mem 20', 'Mem 31', 'Mem 32', 'Mem 33'],
+      );
+
+      final habitualCard = find.ancestor(
+        of: find.byIcon(Icons.schedule),
+        matching: find.byType(Card),
+      );
+      for (final name in ['Mem 31', 'Mem 32', 'Mem 33']) {
+        expect(
+          find.descendant(of: habitualCard, matching: find.text(name)),
+          findsOneWidget,
+        );
+      }
+      expect(
+        find.descendant(of: habitualCard, matching: find.text('Mem 20')),
+        findsNothing,
+      );
+      expect(
+        find.descendant(of: habitualCard, matching: find.text('Mem 34')),
+        findsNothing,
+      );
+      expect(find.text('Mem 34'), findsNothing);
+      expect(find.text('Mem 20'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
     'shows same-weekday time, count / total time, total count on the habitual card only',
     (tester) async {
       final overdue = at(20, DateTime(2020, 1, 1, 10));
