@@ -20,16 +20,16 @@ import '../../../entity_factories.dart';
 
 class _FakeMemEntities extends MemEntities {
   final Iterable<MemEntity> _state;
-  int loadCount = 0;
+  final void Function()? _onLoad;
 
-  _FakeMemEntities(this._state);
+  _FakeMemEntities(this._state, {void Function()? onLoad}) : _onLoad = onLoad;
 
   @override
   Iterable<MemEntity> build() => _state;
 
   @override
   Future<void> loadMemList({bool? archived, bool? done}) async {
-    loadCount += 1;
+    _onLoad?.call();
   }
 }
 
@@ -84,7 +84,11 @@ void main() {
         at(3, DateTime(2099, 1, 4, 10)),
         at(4, DateTime(2099, 1, 2, 10)),
       ];
-      final memEntities = _FakeMemEntities(mems);
+      var loadCount = 0;
+      final memEntities = _FakeMemEntities(
+        mems,
+        onLoad: () => loadCount += 1,
+      );
       final l10n = buildL10n();
 
       await tester.pumpWidget(
@@ -110,7 +114,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(memEntities.loadCount, greaterThan(0));
+      expect(loadCount, greaterThan(0));
       expect(
         tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex,
         0,
