@@ -156,8 +156,8 @@
   "disconnectParentAction": "切断",
   "selectParentTitle": "親を選ぶ",
 
-  "relationsTitle": "関係",
-  "addRelationTitle": "関係を追加",
+  "relationsTitle": "前後",
+  "addRelationTitle": "前後を追加",
   "addAction": "追加",
   "searchMemHint": "memを検索...",
   "loadError": "エラー"

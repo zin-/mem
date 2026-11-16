@@ -30,3 +30,8 @@ const cardListPadding = EdgeInsets.symmetric(
 );
 
 const memSelectDialogContentHeightFactor = 1 / 2;
+
+const memPrePostListItemHeight = 60.0;
+const _memPrePostListMaxVisibleItemCount = 3;
+const memPrePostListMaxHeight =
+    memPrePostListItemHeight * _memPrePostListMaxVisibleItemCount;

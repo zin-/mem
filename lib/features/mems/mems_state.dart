@@ -122,7 +122,7 @@ class MemEntities extends _$MemEntities
                 _,
                 undoneRemovedMemNotifications,
                 undoneRemovedTarget,
-                undoneRemovedMemRelations,
+                undoneRemovedMemPrePosts,
                 undoneRemovedMemEntity,
               ),
               undoneRemovedMemEntityV2,

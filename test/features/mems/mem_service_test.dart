@@ -3,7 +3,7 @@ import '../../entity_factories.dart';
 import 'package:mem/framework/date_and_time/period.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
-import 'package:mem/features/mem_relations/mem_relation_entity.dart';
+import 'package:mem/features/mem_preposts/mem_prepost_entity.dart';
 import 'package:mem/features/mems/mem_view_data.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mems/mem_service.dart';
@@ -54,7 +54,7 @@ void main() {
             period: Period.aDay,
           ),
         );
-        final memRelations = <MemRelationEntityV1>[];
+        final memRelations = <MemPrePostEntityV1>[];
 
         final savedMemEntity = savedMem(
             id: testMemId, name: 'Test Mem', createdAt: DateTime.now());
@@ -79,7 +79,7 @@ void main() {
           memId: anyNamed('memId'),
           type: anyNamed('type'),
         )).thenAnswer((_) async => []);
-        when(mockMemRepository.wasteRelations(
+        when(mockMemRepository.wastePrePosts(
           sourceMemId: anyNamed('sourceMemId'),
         )).thenAnswer((_) async => []);
         when(mockTargetRepository.waste(memId: anyNamed('memId')))
@@ -88,7 +88,7 @@ void main() {
           memId: anyNamed('memId'),
           type: anyNamed('type'),
         )).thenAnswer((_) async => []);
-        when(mockMemRepository.wasteRelations(
+        when(mockMemRepository.wastePrePosts(
           sourceMemId: anyNamed('sourceMemId'),
         )).thenAnswer((_) async => []);
         when(mockTargetRepository.waste(memId: anyNamed('memId')))
@@ -128,7 +128,7 @@ void main() {
           memId: anyNamed('memId'),
           type: anyNamed('type'),
         )).thenAnswer((_) async => []);
-        when(mockMemRepository.wasteRelations(
+        when(mockMemRepository.wastePrePosts(
           sourceMemId: anyNamed('sourceMemId'),
         )).thenAnswer((_) async => []);
         when(mockTargetRepository.waste(memId: anyNamed('memId')))
@@ -162,7 +162,7 @@ void main() {
               secondsAfterLastAct: seconds,
             ),
           ),
-          <MemRelationEntityV1>[],
+          <MemPrePostEntityV1>[],
         ));
 
         final received = verify(mockTargetRepository.receive(captureAny))
@@ -180,7 +180,7 @@ void main() {
         final memItems = <MemItemEntityV1>[];
         final memNotifications = <MemNotificationEntityV1>[];
         final target = null;
-        final memRelations = <MemRelationEntityV1>[];
+        final memRelations = <MemPrePostEntityV1>[];
 
         final savedMemEntity = savedMem(
           id: testMemId,
@@ -203,7 +203,7 @@ void main() {
           memId: anyNamed('memId'),
           type: anyNamed('type'),
         )).thenAnswer((_) async => []);
-        when(mockMemRepository.wasteRelations(
+        when(mockMemRepository.wastePrePosts(
           sourceMemId: anyNamed('sourceMemId'),
         )).thenAnswer((_) async => []);
         when(mockTargetRepository.waste(memId: anyNamed('memId')))
@@ -238,7 +238,7 @@ void main() {
             period: Period.aDay,
           ),
         );
-        final memRelations = <MemRelationEntityV1>[];
+        final memRelations = <MemPrePostEntityV1>[];
 
         final savedMemEntity = savedMem(
           id: testMemId,
@@ -261,7 +261,7 @@ void main() {
           memId: anyNamed('memId'),
           type: anyNamed('type'),
         )).thenAnswer((_) async => []);
-        when(mockMemRepository.wasteRelations(
+        when(mockMemRepository.wastePrePosts(
           sourceMemId: anyNamed('sourceMemId'),
         )).thenAnswer((_) async => []);
         when(mockTargetRepository.waste(memId: anyNamed('memId')))

@@ -7,8 +7,8 @@ import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
-import 'package:mem/features/mem_relations/mem_relation_entity.dart';
-import 'package:mem/features/mem_relations/mem_relation_state.dart';
+import 'package:mem/features/mem_preposts/mem_prepost_entity.dart';
+import 'package:mem/features/mem_preposts/mem_prepost_state.dart';
 import 'package:mem/features/targets/target_repository.dart';
 import 'package:mem/features/mems/detail/actions.dart';
 import 'package:mem/features/mems/detail/states.dart';
@@ -49,13 +49,13 @@ class _FakeTargetState extends TargetState {
   Future<TargetEntityV1> build(int? memId) async => _entity;
 }
 
-class _FakeMemRelationEntitiesByMemId extends MemRelationEntitiesByMemId {
-  final Iterable<MemRelationEntityV1> _entities;
+class _FakeMemPrePostEntitiesByMemId extends MemPrePostEntitiesByMemId {
+  final Iterable<MemPrePostEntityV1> _entities;
 
-  _FakeMemRelationEntitiesByMemId(this._entities);
+  _FakeMemPrePostEntitiesByMemId(this._entities);
 
   @override
-  Future<Iterable<MemRelationEntityV1>> build(int? memId) async => _entities;
+  Future<Iterable<MemPrePostEntityV1>> build(int? memId) async => _entities;
 }
 
 MemEntity _savedMemEntityWithPeriod(
@@ -178,8 +178,8 @@ void main() {
             ),
           ),
         ),
-        memRelationEntitiesByMemIdProvider(memId).overrideWith(
-          () => _FakeMemRelationEntitiesByMemId([]),
+        memPrePostEntitiesByMemIdProvider(memId).overrideWith(
+          () => _FakeMemPrePostEntitiesByMemId([]),
         ),
       ],
     );
@@ -554,7 +554,7 @@ void main() {
     )).thenAnswer((_) async => []);
     when(mockTargetRepository.waste(memId: anyNamed('memId')))
         .thenAnswer((_) async => []);
-    when(mockMemRepository.wasteRelations(
+    when(mockMemRepository.wastePrePosts(
       sourceMemId: anyNamed('sourceMemId'),
     )).thenAnswer((_) async => []);
   }

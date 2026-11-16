@@ -3,19 +3,19 @@ import 'dart:math';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/mem_relations/mem_relation.dart';
-import 'package:mem/features/mem_relations/mem_relation_entity.dart';
-import 'package:mem/features/mem_relations/mem_relation_state.dart';
+import 'package:mem/features/mem_preposts/mem_prepost_entity.dart';
+import 'package:mem/features/mem_preposts/mem_prepost_state.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_select_dialog.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/framework/date_and_time/time_text_form_field.dart';
 import 'package:mem/l10n/l10n.dart';
+import 'package:mem/values/dimens.dart';
 
-class MemRelationList extends ConsumerWidget {
+class MemPrePostList extends ConsumerWidget {
   final int? sourceMemId;
 
-  const MemRelationList({
+  const MemPrePostList({
     super.key,
     required this.sourceMemId,
   });
@@ -24,9 +24,7 @@ class MemRelationList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
           final l10n = buildL10n(context);
-          return ref
-              .watch(memRelationEntitiesByMemIdProvider(sourceMemId))
-              .when(
+          return ref.watch(memPrePostEntitiesByMemIdProvider(sourceMemId)).when(
             data: (entities) {
               final selectedMemIds = entities.map((e) => e.value.targetMemId);
               final selectedMems = ref
@@ -36,20 +34,19 @@ class MemRelationList extends ConsumerWidget {
                   .map((e) => e.toDomain());
 
               void onChanged(int targetMemId, int value) => ref
-                      .watch(memRelationEntitiesByMemIdProvider(sourceMemId)
+                      .watch(memPrePostEntitiesByMemIdProvider(sourceMemId)
                           .notifier)
                       .upsert([
-                    MemRelationEntityV1.by(
+                    MemPrePostEntityV1.by(
                       sourceMemId,
                       targetMemId,
-                      MemRelationType.prePost,
                       value,
                     )
                   ]);
 
-              return _MemRelationList(
+              return _MemPrePostList(
                 selectedMems: selectedMems,
-                memRelationEntities: entities,
+                memPrePostEntities: entities,
                 showDialog: v(
                   () => () => showDialog(
                         context: context,
@@ -89,18 +86,15 @@ class MemRelationList extends ConsumerWidget {
       );
 }
 
-const itemHeight = 60.0;
-const maxHeight = itemHeight * 3;
-
-class _MemRelationList extends StatelessWidget {
+class _MemPrePostList extends StatelessWidget {
   final Iterable<Mem> selectedMems;
-  final Iterable<MemRelationEntityV1> memRelationEntities;
+  final Iterable<MemPrePostEntityV1> memPrePostEntities;
   final void Function() showDialog;
   final void Function(int targetMemId, int value) onChanged;
 
-  const _MemRelationList({
+  const _MemPrePostList({
     required this.selectedMems,
-    required this.memRelationEntities,
+    required this.memPrePostEntities,
     required this.showDialog,
     required this.onChanged,
   });
@@ -113,18 +107,21 @@ class _MemRelationList extends StatelessWidget {
             children: [
               Text(l10n.relationsTitle),
               SizedBox(
-                height: min(selectedMems.length * itemHeight, maxHeight),
+                height: min(
+                  selectedMems.length * memPrePostListItemHeight,
+                  memPrePostListMaxHeight,
+                ),
                 child: ListView.builder(
                   itemCount: selectedMems.length,
                   itemBuilder: (context, index) {
                     final mem = selectedMems.elementAt(index);
 
-                    return _MemRelationItem(
+                    return _MemPrePostItem(
                       mem: mem,
-                      value: memRelationEntities
+                      value: memPrePostEntities
                           .firstWhere((e) => e.value.targetMemId == mem.id)
                           .value
-                          .value,
+                          .minutes,
                       onChanged: (value) => onChanged(mem.id!, value ?? 0),
                     );
                   },
@@ -140,17 +137,17 @@ class _MemRelationList extends StatelessWidget {
         },
         {
           "selectedMemEntities": selectedMems,
-          "memRelationEntities": memRelationEntities,
+          "memPrePostEntities": memPrePostEntities,
         },
       );
 }
 
-class _MemRelationItem extends StatelessWidget {
+class _MemPrePostItem extends StatelessWidget {
   final Mem mem;
   final int? value;
   final void Function(int? value) onChanged;
 
-  const _MemRelationItem({
+  const _MemPrePostItem({
     required this.mem,
     required this.value,
     required this.onChanged,
@@ -160,16 +157,21 @@ class _MemRelationItem extends StatelessWidget {
   Widget build(BuildContext context) => v(
         () {
           return ListTile(
-            title: Text(mem.name),
-            trailing: SizedBox(
-              // FIXME 固定にすると画面サイズに依存してしまう
-              width: 120,
-              child: TimeTextFormField(
-                value,
-                onChanged,
-              ),
+            // TimeTextFormField に既定の縦余白を足すと、1行の ListTile より高くなる。
+            minVerticalPadding: 0,
+            title: Row(
+              children: [
+                Expanded(
+                  child: Text(mem.name),
+                ),
+                Flexible(
+                  child: TimeTextFormField(
+                    value,
+                    onChanged,
+                  ),
+                ),
+              ],
             ),
-            // trailing: Text(memRelationEntity.value.value.toString()),
           );
         },
         {

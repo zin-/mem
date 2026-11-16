@@ -5,9 +5,9 @@ import 'package:mem/features/mem_items/mem_item.dart' as mem_item_domain;
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
-import 'package:mem/features/mem_relations/mem_relation.dart'
-    as mem_relation_domain;
-import 'package:mem/features/mem_relations/mem_relation_entity.dart';
+import 'package:mem/features/mem_preposts/mem_prepost.dart'
+    as mem_prepost_domain;
+import 'package:mem/features/mem_preposts/mem_prepost_entity.dart';
 import 'package:mem/features/mems/mem.dart' as mem_domain;
 import 'package:mem/features/mems/mem_entity.dart' as mem_entity;
 import 'package:mem/features/targets/target.dart' as target_domain;
@@ -35,8 +35,8 @@ dynamic convertIntoDriftInsertable(dynamic domain) {
     case target_domain.Target _:
       return convertIntoTargetsInsertable(domain);
 
-    case mem_relation_domain.MemRelation _:
-      return convertIntoMemRelationsInsertable(domain);
+    case mem_prepost_domain.MemPrePost _:
+      return convertIntoMemPrePostsInsertable(domain);
 
     default:
       throw StateError('入力おかしいかも: ${domain.runtimeType}');
@@ -58,8 +58,8 @@ dynamic convertIntoDriftUpdateable(
     case TargetEntity _:
       return convertIntoTargetsUpdateable(entity);
 
-    case MemRelationEntity _:
-      return convertIntoMemRelationsUpdateable(entity);
+    case MemPrePostEntity _:
+      return convertIntoMemPrePostsUpdateable(entity);
 
     default:
       throw StateError('入力おかしいかも: ${entity.runtimeType}');

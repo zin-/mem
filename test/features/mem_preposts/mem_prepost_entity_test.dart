@@ -1,33 +1,47 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/features/mem_relations/mem_relation.dart';
-import 'package:mem/features/mem_relations/mem_relation_entity.dart';
+import 'package:mem/features/mem_preposts/mem_prepost.dart';
+import 'package:mem/features/mem_preposts/mem_prepost_entity.dart';
 
 void main() {
-  group('MemRelationEntity', () {
-    test('MemRelationEntityV1.by and toMap', () {
-      final entity = MemRelationEntityV1.by(
+  group('MemPrePost', () {
+    test('of returns null when an end or minutes is missing', () {
+      expect(
+        MemPrePost.of(sourceMemId: null, targetMemId: 2, minutes: 15),
+        isNull,
+      );
+      expect(
+        MemPrePost.of(sourceMemId: 1, targetMemId: null, minutes: 15),
+        isNull,
+      );
+      expect(
+        MemPrePost.of(sourceMemId: 1, targetMemId: 2, minutes: null),
+        isNull,
+      );
+    });
+  });
+
+  group('MemPrePostEntity', () {
+    test('MemPrePostEntityV1.by and toMap', () {
+      final entity = MemPrePostEntityV1.by(
         null,
         2,
-        MemRelationType.prePost,
         15,
       );
 
       expect(entity.value.sourceMemId, 0);
       expect(entity.value.targetMemId, 2);
-      expect(entity.toMap['type'], MemRelationType.prePost.name);
-      expect(entity.toMap['value'], 15);
+      expect(entity.toMap['minutes'], 15);
     });
 
-    test('SavedMemRelationEntityV1 map fallback and toEntityV2', () {
+    test('SavedMemPrePostEntityV1 map and toEntityV2', () {
       final createdAt = DateTime(2024, 1, 1);
       final updatedAt = DateTime(2024, 1, 2);
       final archivedAt = DateTime(2024, 1, 3);
-      final saved = SavedMemRelationEntityV1({
+      final saved = SavedMemPrePostEntityV1({
         'id': 9,
-        'source_mems_id': 10,
-        'target_mems_id': 11,
-        'type': MemRelationType.prePost.name,
-        'value': 12,
+        'sourceMemId': 10,
+        'targetMemId': 11,
+        'minutes': 12,
         'createdAt': createdAt,
         'updatedAt': updatedAt,
         'archivedAt': archivedAt,
@@ -35,7 +49,7 @@ void main() {
 
       expect(saved.value.sourceMemId, 10);
       expect(saved.value.targetMemId, 11);
-      expect(saved.value.value, 12);
+      expect(saved.value.minutes, 12);
       expect(saved.toEntityV2().id, 9);
       expect(saved.toEntityV2().sourceMemId, 10);
       expect(saved.toEntityV2().targetMemId, 11);
@@ -43,11 +57,10 @@ void main() {
 
     test('fromEntityV2 and fromTuple', () {
       final now = DateTime(2024, 2, 1);
-      final saved = SavedMemRelationEntityV1.fromEntityV2(
-        MemRelationEntity(
+      final saved = SavedMemPrePostEntityV1.fromEntityV2(
+        MemPrePostEntity(
           20,
           21,
-          MemRelationType.prePost,
           30,
           3,
           now,
@@ -58,38 +71,34 @@ void main() {
       expect(saved.id, 3);
       expect(saved.value.sourceMemId, 20);
 
-      final fromTuple = MemRelationEntity.fromTuple(
+      final fromTuple = MemPrePostEntity.fromTuple(
         _FakeRow(
           id: 4,
           sourceMemId: 31,
           targetMemId: 32,
-          type: MemRelationType.prePost.name,
-          value: 33,
+          minutes: 33,
           createdAt: now,
           updatedAt: now,
           archivedAt: null,
         ),
       );
       expect(fromTuple.id, 4);
-      expect(fromTuple.type, MemRelationType.prePost);
-      expect(fromTuple.value, 33);
+      expect(fromTuple.minutes, 33);
     });
 
     test('insertable and updateable convert fields', () {
-      final insertable = convertIntoMemRelationsInsertable(
-        MemRelation.by(1, 2, MemRelationType.prePost, 3),
+      final insertable = convertIntoMemPrePostsInsertable(
+        MemPrePost.of(sourceMemId: 1, targetMemId: 2, minutes: 3)!,
       );
       expect(insertable.sourceMemId.value, 1);
       expect(insertable.targetMemId.value, 2);
-      expect(insertable.type.value, MemRelationType.prePost.name);
-      expect(insertable.value.value, 3);
+      expect(insertable.minutes.value, 3);
       expect(insertable.createdAt.value, isNotNull);
 
-      final updateable = convertIntoMemRelationsUpdateable(
-        MemRelationEntity(
+      final updateable = convertIntoMemPrePostsUpdateable(
+        MemPrePostEntity(
           null,
           null,
-          MemRelationType.prePost,
           5,
           6,
           DateTime(2024, 3, 1),
@@ -99,10 +108,21 @@ void main() {
       );
       expect(updateable.sourceMemId.value, 0);
       expect(updateable.targetMemId.value, 0);
-      expect(updateable.type.value, MemRelationType.prePost.name);
-      expect(updateable.value.value, 5);
+      expect(updateable.minutes.value, 5);
       expect(updateable.archivedAt.value, DateTime(2024, 3, 2));
       expect(updateable.updatedAt.value, isNotNull);
+    });
+
+    test('updatedWith keeps the saved id', () {
+      final now = DateTime(2024, 4, 1);
+      final saved = SavedMemPrePostEntityV1.fromEntityV2(
+        MemPrePostEntity(1, 2, 10, 8, now, null, null),
+      ).updatedWith((v) => v.withSourceMemId(4));
+
+      expect(saved.id, 8);
+      expect(saved.value.sourceMemId, 4);
+      expect(saved.value.targetMemId, 2);
+      expect(saved.value.minutes, 10);
     });
   });
 }
@@ -111,8 +131,7 @@ class _FakeRow {
   final int id;
   final int sourceMemId;
   final int targetMemId;
-  final String type;
-  final int value;
+  final int minutes;
   final DateTime createdAt;
   final DateTime? updatedAt;
   final DateTime? archivedAt;
@@ -121,8 +140,7 @@ class _FakeRow {
     required this.id,
     required this.sourceMemId,
     required this.targetMemId,
-    required this.type,
-    required this.value,
+    required this.minutes,
     required this.createdAt,
     required this.updatedAt,
     required this.archivedAt,

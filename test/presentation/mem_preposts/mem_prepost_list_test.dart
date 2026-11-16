@@ -3,15 +3,15 @@ import '../../entity_factories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/features/mem_relations/mem_relation.dart';
-import 'package:mem/features/mem_relations/mem_relation_entity.dart';
-import 'package:mem/features/mem_relations/mem_relation_state.dart';
-import 'package:mem/features/mem_relations/mem_relation_widget.dart';
+import 'package:mem/features/mem_preposts/mem_prepost_entity.dart';
+import 'package:mem/features/mem_preposts/mem_prepost_state.dart';
+import 'package:mem/features/mem_preposts/mem_prepost_list.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/framework/date_and_time/time_text_form_field.dart';
 import 'package:mem/generated/l10n/app_localizations.dart';
 import 'package:mem/l10n/l10n.dart';
+import 'package:mem/values/dimens.dart';
 
 final _l10n = lookupAppLocalizations(const Locale('en'));
 
@@ -24,20 +24,20 @@ class _FakeMemEntities extends MemEntities {
   Iterable<MemEntity> build() => _state;
 }
 
-class _FakeMemRelationEntitiesByMemId extends MemRelationEntitiesByMemId {
-  final Future<Iterable<MemRelationEntityV1>> Function(int?) _buildFn;
-  final List<MemRelationEntityV1> _upsertedEntities = [];
+class _FakeMemPrePostEntitiesByMemId extends MemPrePostEntitiesByMemId {
+  final Future<Iterable<MemPrePostEntityV1>> Function(int?) _buildFn;
+  final List<MemPrePostEntityV1> _upsertedEntities = [];
 
-  _FakeMemRelationEntitiesByMemId(
-      Future<Iterable<MemRelationEntityV1>> Function(int?) buildFn)
+  _FakeMemPrePostEntitiesByMemId(
+      Future<Iterable<MemPrePostEntityV1>> Function(int?) buildFn)
       : _buildFn = buildFn;
 
   @override
-  Future<Iterable<MemRelationEntityV1>> build(int? memId) => _buildFn(memId);
+  Future<Iterable<MemPrePostEntityV1>> build(int? memId) => _buildFn(memId);
 
   @override
-  Future<Iterable<MemRelationEntityV1>> upsert(
-    Iterable<MemRelationEntityV1> entities,
+  Future<Iterable<MemPrePostEntityV1>> upsert(
+    Iterable<MemPrePostEntityV1> entities,
   ) async {
     _upsertedEntities.addAll(entities);
     final current = state.value ?? [];
@@ -66,9 +66,8 @@ Widget _buildTestApp(Widget child, {List<Override>? overrides}) {
 }
 
 void main() {
-  group('MemRelationList', () {
-    testWidgets('displays relations list when data is available',
-        (tester) async {
+  group('MemPrePostList', () {
+    testWidgets('displays preposts when data is available', (tester) async {
       const sourceMemId = 1;
       final now = DateTime.now();
       final mem1 =
@@ -76,25 +75,23 @@ void main() {
       final mem2 =
           savedMem(id: 2, name: 'Mem 2', createdAt: now, updatedAt: now);
 
-      final relation1 = MemRelationEntityV1.by(
+      final relation1 = MemPrePostEntityV1.by(
         sourceMemId,
         1,
-        MemRelationType.prePost,
         30,
       );
-      final relation2 = MemRelationEntityV1.by(
+      final relation2 = MemPrePostEntityV1.by(
         sourceMemId,
         2,
-        MemRelationType.prePost,
         60,
       );
 
       await tester.pumpWidget(
         _buildTestApp(
-          const MemRelationList(sourceMemId: sourceMemId),
+          const MemPrePostList(sourceMemId: sourceMemId),
           overrides: [
-            memRelationEntitiesByMemIdProvider(sourceMemId).overrideWith(
-              () => _FakeMemRelationEntitiesByMemId(
+            memPrePostEntitiesByMemIdProvider(sourceMemId).overrideWith(
+              () => _FakeMemPrePostEntitiesByMemId(
                 (memId) async => [relation1, relation2],
               ),
             ),
@@ -119,13 +116,13 @@ void main() {
 
       await tester.pumpWidget(
         _buildTestApp(
-          const MemRelationList(sourceMemId: sourceMemId),
+          const MemPrePostList(sourceMemId: sourceMemId),
           overrides: [
-            memRelationEntitiesByMemIdProvider(sourceMemId).overrideWith(
-              () => _FakeMemRelationEntitiesByMemId(
+            memPrePostEntitiesByMemIdProvider(sourceMemId).overrideWith(
+              () => _FakeMemPrePostEntitiesByMemId(
                 (memId) async {
                   await Future.delayed(const Duration(milliseconds: 100));
-                  return <MemRelationEntityV1>[];
+                  return <MemPrePostEntityV1>[];
                 },
               ),
             ),
@@ -147,10 +144,10 @@ void main() {
 
       await tester.pumpWidget(
         _buildTestApp(
-          const MemRelationList(sourceMemId: sourceMemId),
+          const MemPrePostList(sourceMemId: sourceMemId),
           overrides: [
-            memRelationEntitiesByMemIdProvider(sourceMemId).overrideWith(
-              () => _FakeMemRelationEntitiesByMemId(
+            memPrePostEntitiesByMemIdProvider(sourceMemId).overrideWith(
+              () => _FakeMemPrePostEntitiesByMemId(
                 (memId) async => throw Exception('Test error'),
               ),
             ),
@@ -164,16 +161,17 @@ void main() {
       expect(find.text(_l10n.loadError), findsOneWidget);
     });
 
-    testWidgets('displays empty list when no relations', (tester) async {
+    testWidgets('displays empty list when there are no preposts',
+        (tester) async {
       const sourceMemId = 1;
 
       await tester.pumpWidget(
         _buildTestApp(
-          const MemRelationList(sourceMemId: sourceMemId),
+          const MemPrePostList(sourceMemId: sourceMemId),
           overrides: [
-            memRelationEntitiesByMemIdProvider(sourceMemId).overrideWith(
-              () => _FakeMemRelationEntitiesByMemId(
-                (memId) async => <MemRelationEntityV1>[],
+            memPrePostEntitiesByMemIdProvider(sourceMemId).overrideWith(
+              () => _FakeMemPrePostEntitiesByMemId(
+                (memId) async => <MemPrePostEntityV1>[],
               ),
             ),
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([])),
@@ -191,11 +189,11 @@ void main() {
     testWidgets('handles sourceMemId null', (tester) async {
       await tester.pumpWidget(
         _buildTestApp(
-          const MemRelationList(sourceMemId: null),
+          const MemPrePostList(sourceMemId: null),
           overrides: [
-            memRelationEntitiesByMemIdProvider(null).overrideWith(
-              () => _FakeMemRelationEntitiesByMemId(
-                (memId) async => <MemRelationEntityV1>[],
+            memPrePostEntitiesByMemIdProvider(null).overrideWith(
+              () => _FakeMemPrePostEntitiesByMemId(
+                (memId) async => <MemPrePostEntityV1>[],
               ),
             ),
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([])),
@@ -209,26 +207,25 @@ void main() {
       expect(find.text(_l10n.addRelationTitle), findsOneWidget);
     });
 
-    testWidgets('opens dialog when Add Relation button is pressed',
+    testWidgets('opens dialog when Add Pre/Post button is pressed',
         (tester) async {
       const sourceMemId = 1;
       final now = DateTime.now();
       final mem1 =
           savedMem(id: 1, name: 'Mem 1', createdAt: now, updatedAt: now);
 
-      final relation1 = MemRelationEntityV1.by(
+      final relation1 = MemPrePostEntityV1.by(
         sourceMemId,
         1,
-        MemRelationType.prePost,
         30,
       );
 
       await tester.pumpWidget(
         _buildTestApp(
-          const MemRelationList(sourceMemId: sourceMemId),
+          const MemPrePostList(sourceMemId: sourceMemId),
           overrides: [
-            memRelationEntitiesByMemIdProvider(sourceMemId).overrideWith(
-              () => _FakeMemRelationEntitiesByMemId(
+            memPrePostEntitiesByMemIdProvider(sourceMemId).overrideWith(
+              () => _FakeMemPrePostEntitiesByMemId(
                 (memId) async => [relation1],
               ),
             ),
@@ -263,11 +260,11 @@ void main() {
 
       await tester.pumpWidget(
         _buildTestApp(
-          const MemRelationList(sourceMemId: sourceMemId),
+          const MemPrePostList(sourceMemId: sourceMemId),
           overrides: [
-            memRelationEntitiesByMemIdProvider(sourceMemId).overrideWith(
-              () => _FakeMemRelationEntitiesByMemId(
-                (memId) async => <MemRelationEntityV1>[],
+            memPrePostEntitiesByMemIdProvider(sourceMemId).overrideWith(
+              () => _FakeMemPrePostEntitiesByMemId(
+                (memId) async => <MemPrePostEntityV1>[],
               ),
             ),
             memEntitiesProvider.overrideWith(
@@ -306,22 +303,21 @@ void main() {
       final mem1 =
           savedMem(id: 1, name: 'Mem 1', createdAt: now, updatedAt: now);
 
-      final relation1 = MemRelationEntityV1.by(
+      final relation1 = MemPrePostEntityV1.by(
         sourceMemId,
         1,
-        MemRelationType.prePost,
         30,
       );
 
-      final fakeProvider = _FakeMemRelationEntitiesByMemId(
+      final fakeProvider = _FakeMemPrePostEntitiesByMemId(
         (memId) async => [relation1],
       );
 
       await tester.pumpWidget(
         _buildTestApp(
-          const MemRelationList(sourceMemId: sourceMemId),
+          const MemPrePostList(sourceMemId: sourceMemId),
           overrides: [
-            memRelationEntitiesByMemIdProvider(sourceMemId).overrideWith(
+            memPrePostEntitiesByMemIdProvider(sourceMemId).overrideWith(
               () => fakeProvider,
             ),
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([mem1])),
@@ -338,7 +334,7 @@ void main() {
       await tester.pump();
     });
 
-    testWidgets('displays relations with correct height when more than 3',
+    testWidgets('displays preposts with correct height when more than 3',
         (tester) async {
       const sourceMemId = 1;
       final now = DateTime.now();
@@ -351,20 +347,19 @@ void main() {
               updatedAt: now));
 
       final relations = mems
-          .map((mem) => MemRelationEntityV1.by(
+          .map((mem) => MemPrePostEntityV1.by(
                 sourceMemId,
                 mem.id,
-                MemRelationType.prePost,
                 30,
               ))
           .toList();
 
       await tester.pumpWidget(
         _buildTestApp(
-          const MemRelationList(sourceMemId: sourceMemId),
+          const MemPrePostList(sourceMemId: sourceMemId),
           overrides: [
-            memRelationEntitiesByMemIdProvider(sourceMemId).overrideWith(
-              () => _FakeMemRelationEntitiesByMemId(
+            memPrePostEntitiesByMemIdProvider(sourceMemId).overrideWith(
+              () => _FakeMemPrePostEntitiesByMemId(
                 (memId) async => relations,
               ),
             ),
@@ -382,10 +377,10 @@ void main() {
       expect(sizedBoxes, findsWidgets);
 
       final sizedBox = tester.widget<SizedBox>(sizedBoxes.first);
-      expect(sizedBox.height, 180.0);
+      expect(sizedBox.height, memPrePostListMaxHeight);
     });
 
-    testWidgets('displays relations with correct height when 3 or less',
+    testWidgets('displays preposts with correct height when 3 or less',
         (tester) async {
       const sourceMemId = 1;
       final now = DateTime.now();
@@ -398,20 +393,19 @@ void main() {
               updatedAt: now));
 
       final relations = mems
-          .map((mem) => MemRelationEntityV1.by(
+          .map((mem) => MemPrePostEntityV1.by(
                 sourceMemId,
                 mem.id,
-                MemRelationType.prePost,
                 30,
               ))
           .toList();
 
       await tester.pumpWidget(
         _buildTestApp(
-          const MemRelationList(sourceMemId: sourceMemId),
+          const MemPrePostList(sourceMemId: sourceMemId),
           overrides: [
-            memRelationEntitiesByMemIdProvider(sourceMemId).overrideWith(
-              () => _FakeMemRelationEntitiesByMemId(
+            memPrePostEntitiesByMemIdProvider(sourceMemId).overrideWith(
+              () => _FakeMemPrePostEntitiesByMemId(
                 (memId) async => relations,
               ),
             ),
@@ -429,7 +423,7 @@ void main() {
       expect(sizedBoxes, findsWidgets);
 
       final sizedBox = tester.widget<SizedBox>(sizedBoxes.first);
-      expect(sizedBox.height, 120.0);
+      expect(sizedBox.height, memPrePostListItemHeight * mems.length);
     });
 
     testWidgets('calls onChanged with 0 when value is null', (tester) async {
@@ -438,22 +432,21 @@ void main() {
       final mem1 =
           savedMem(id: 1, name: 'Mem 1', createdAt: now, updatedAt: now);
 
-      final relation1 = MemRelationEntityV1.by(
+      final relation1 = MemPrePostEntityV1.by(
         sourceMemId,
         1,
-        MemRelationType.prePost,
         30,
       );
 
-      final fakeProvider = _FakeMemRelationEntitiesByMemId(
+      final fakeProvider = _FakeMemPrePostEntitiesByMemId(
         (memId) async => [relation1],
       );
 
       await tester.pumpWidget(
         _buildTestApp(
-          const MemRelationList(sourceMemId: sourceMemId),
+          const MemPrePostList(sourceMemId: sourceMemId),
           overrides: [
-            memRelationEntitiesByMemIdProvider(sourceMemId).overrideWith(
+            memPrePostEntitiesByMemIdProvider(sourceMemId).overrideWith(
               () => fakeProvider,
             ),
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([mem1])),

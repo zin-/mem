@@ -6,8 +6,7 @@ import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
-import 'package:mem/features/mem_relations/mem_relation.dart';
-import 'package:mem/features/mem_relations/mem_relation_entity.dart';
+import 'package:mem/features/mem_preposts/mem_prepost_entity.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_view_data.dart';
@@ -195,11 +194,10 @@ void main() {
               null,
             ),
           ],
-          'mem_relations': [
-            MemRelationEntity(
+          'mem_preposts': [
+            MemPrePostEntity(
               2,
               3,
-              MemRelationType.prePost,
               10,
               3,
               DateTime(2024, 3, 1),
@@ -223,7 +221,7 @@ void main() {
       expect(mem.name, 'tuple');
       expect(mem.items, hasLength(1));
       expect(mem.repeatedNotifications, hasLength(1));
-      expect(mem.memRelations, hasLength(1));
+      expect(mem.memPrePosts, hasLength(1));
       expect(mem.latestAct, isNotNull);
       expect(mem.period, isNotNull);
       expect(mem.toDomain().latestAct, isNotNull);
@@ -232,7 +230,7 @@ void main() {
         update: (m) => Mem(m.id, 'changed', m.doneAt, m.period),
         items: () => [],
         repeatedNotifications: () => [],
-        memRelations: () => [],
+        memPrePosts: () => [],
         latestAct: () => null,
         updatedAt: () => DateTime(2024, 3, 10),
         archivedAt: () => DateTime(2024, 3, 11),
@@ -240,7 +238,7 @@ void main() {
       expect(changed.name, 'changed');
       expect(changed.items, isEmpty);
       expect(changed.repeatedNotifications, isEmpty);
-      expect(changed.memRelations, isEmpty);
+      expect(changed.memPrePosts, isEmpty);
       expect(changed.latestAct, isNull);
       expect(changed.updatedAt, DateTime(2024, 3, 10));
       expect(changed.archivedAt, DateTime(2024, 3, 11));
