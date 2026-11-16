@@ -3,8 +3,10 @@ import 'package:mem/features/settings/preference/keys.dart';
 
 const defaultStartOfDay = TimeOfDay(hour: 0, minute: 0);
 const defaultNotifyAfterInactivity = 3600;
+const defaultHabitualMemsCount = 3;
 
 final defaultPreferences = {
   startOfDayKey: defaultStartOfDay,
   notifyAfterInactivity: defaultNotifyAfterInactivity,
+  habitualMemsCountKey: defaultHabitualMemsCount,
 };
