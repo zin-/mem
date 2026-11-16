@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/mem_items/mem_items_view.dart';
 import 'package:mem/features/mem_notifications/mem_notifications_view.dart';
 import 'package:mem/features/mem_parents/mem_parent_view.dart';
-import 'package:mem/features/mem_preposts/mem_relation_widget.dart';
+import 'package:mem/features/mem_preposts/mem_prepost_list.dart';
 import 'package:mem/framework/date_and_time/created_and_updated_at_texts.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/targets/target_view.dart';
@@ -99,7 +99,7 @@ class _MemDetailBodyComponent extends StatelessWidget {
                       TargetText(_memId),
                       MemItemsFormFields(_memId),
                       if (_memId != null) MemParentView(_memId),
-                      MemRelationList(sourceMemId: _memId),
+                      MemPrePostList(sourceMemId: _memId),
                     ],
                   ),
                 ),

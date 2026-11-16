@@ -156,7 +156,7 @@ void main() {
     expect(find.text('子'), findsNothing);
   });
 
-  testWidgets('shows the saved parent name above relations', (tester) async {
+  testWidgets('shows the saved parent name above preposts', (tester) async {
     final child = await insertMem('Child');
     final parent = await insertMem('Parent');
     await MemRepository().receiveParent(

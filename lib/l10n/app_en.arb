@@ -156,8 +156,8 @@
   "disconnectParentAction": "Disconnect",
   "selectParentTitle": "Select parent",
 
-  "relationsTitle": "Relations",
-  "addRelationTitle": "Add Relation",
+  "relationsTitle": "Pre/Post",
+  "addRelationTitle": "Add Pre/Post",
   "addAction": "Add",
   "searchMemHint": "Search mem...",
   "loadError": "Error"
