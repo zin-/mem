@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:mem/features/logger/log_service.dart';
 
@@ -22,10 +20,6 @@ class AndroidAlarmScheduler implements AlarmScheduler {
   bool _started = false;
 
   Future<bool> _ready() async {
-    // 単体テストはホスト OS 上で動く。target が Android でもプラグインは無い
-    if (!Platform.isAndroid) {
-      return false;
-    }
     if (_started) {
       return true;
     }
