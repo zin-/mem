@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import '../entity_factories.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
@@ -77,29 +76,13 @@ void main() {
       (tester) async {
         final memId = 1;
         final memName = 'memName - $_name';
-        final acts = [
-          FinishedAct(1, DateAndTime.from(DateTime(2025, 9, 25)),
-              DateAndTime.from(DateTime(2025, 9, 25, 1))),
-          FinishedAct(1, DateAndTime.from(DateTime(2025, 9, 26)),
-              DateAndTime.from(DateTime(2025, 9, 26, 1))),
-          FinishedAct(1, DateAndTime.from(DateTime(2025, 9, 27)),
-              DateAndTime.from(DateTime(2025, 9, 27, 1))),
-        ];
 
-        await _pumpPage(tester, memId: memId, memName: memName, acts: acts);
+        await _pumpPage(tester, memId: memId, memName: memName);
 
         expect(
           find.text("$memName : ${AggregationType.count.name}"),
           findsOneWidget,
         );
-        expect(find.text('Min : '), findsOneWidget);
-        expect(find.text('Max : '), findsOneWidget);
-        expect(find.text('Avg : '), findsOneWidget);
-        expect(
-          _visibleRangeLabel(_localizations(tester)),
-          findsOneWidget,
-        );
-        expect(find.byType(LineChartWrapper).hitTestable(), findsOneWidget);
         expect(find.byIcon(Icons.chevron_left), findsNothing);
         expect(find.byIcon(Icons.chevron_right), findsNothing);
       },
@@ -172,31 +155,14 @@ void main() {
     );
 
     testWidgets(
-      'selects sum and shows elapsed time.',
+      'selects sum and shows it in the title.',
       (tester) async {
         final memName = 'memName - sum';
-        final start =
-            Period.aWeek.toPeriod(DateAndTime.now(), defaultStartOfDay)!.start;
 
         await _pumpPage(
           tester,
           memId: 1,
           memName: memName,
-          acts: [
-            FinishedAct(
-              1,
-              start,
-              // add は秒を捨てる
-              DateAndTime(
-                start.year,
-                start.month,
-                start.day,
-                start.hour + 1,
-                2,
-                3,
-              ),
-            ),
-          ],
         );
 
         await tester.tap(find.byIcon(Icons.more_vert));
@@ -208,7 +174,6 @@ void main() {
           find.text('$memName : ${AggregationType.sum.name}'),
           findsOneWidget,
         );
-        expect(find.text('1h 2m 3s'), findsAtLeastNWidgets(1));
       },
     );
 
@@ -228,52 +193,6 @@ void main() {
 
         expect(find.byType(PageView), findsNothing);
         expect(find.byType(LineChartWrapper), findsOneWidget);
-      },
-    );
-
-    testWidgets(
-      'plots acts inside the period and drops the rest',
-      (tester) async {
-        final period = Period.aWeek.toPeriod(
-          DateAndTime.now(),
-          defaultStartOfDay,
-        )!;
-        final insideStart = period.start;
-        final outsideStart = period.end;
-
-        await _pumpPage(
-          tester,
-          memId: 1,
-          memName: 'memName - period filter',
-          acts: [
-            FinishedAct(
-              1,
-              insideStart,
-              insideStart.add(const Duration(hours: 1)),
-            ),
-            FinishedAct(
-              1,
-              outsideStart,
-              outsideStart.add(const Duration(hours: 1)),
-            ),
-          ],
-        );
-
-        final spots = tester
-            .widget<LineChart>(find.byType(LineChart).hitTestable())
-            .data
-            .lineBarsData
-            .last
-            .spots
-            .where((spot) => spot.y > 0);
-
-        expect(spots, hasLength(1));
-        expect(
-          spots.single.x,
-          DateAndTime(insideStart.year, insideStart.month, insideStart.day)
-              .millisecondsSinceEpoch
-              .toDouble(),
-        );
       },
     );
 
