@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:mem/framework/notifications/alarm_scheduler.dart';
 import 'package:mem/framework/repository/repository.dart';
-import 'package:mem/framework/workmanager_wrapper.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/framework/notifications/notification_client.dart';
@@ -36,7 +35,6 @@ class ScheduleClient extends Repository {
 
   static void resetSingleton() => v(
         () {
-          WorkmanagerWrapper.resetSingleton();
           _instance = null;
         },
         {

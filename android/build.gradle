@@ -64,7 +64,7 @@ subprojects { subproject ->
       }
     }
     // プラグインごとに Java targetCompatibility と Kotlin jvmTarget がずれる（例: Java 17 / Kotlin 1.8）
-    // 全ライブラリへの Java 17 強制は workmanager_android 等と競合するため行わず、既存 Java 設定に jvmTarget を合わせる
+    // 全ライブラリへの Java 17 強制はプラグインごとの Java 設定と競合するため行わず、既存 Java 設定に jvmTarget を合わせる
     // home_widget は JVM 1.8 のままだと work-runtime-ktx (JVM 11) のインラインで失敗する
     // compileOptions は afterEvaluate では finalized 済みのため、home_widget のみタスク側で 11 に揃える
     subproject.afterEvaluate {
