@@ -14,14 +14,51 @@ void main() {
     required TargetUnit unit,
     required int value,
     required Period period,
+    TargetType targetType = TargetType.equalTo,
   }) =>
       Target(
         memId: memId,
-        targetType: TargetType.equalTo,
+        targetType: targetType,
         targetUnit: unit,
         value: value,
         period: period,
       );
+
+  void expectCentered(WidgetTester tester) {
+    expect(
+      tester.widget<Wrap>(find.byType(Wrap)).crossAxisAlignment,
+      WrapCrossAlignment.center,
+    );
+  }
+
+  void expectBoundMark(
+    WidgetTester tester, {
+    required String targetText,
+    required String periodLabel,
+    required IconData icon,
+  }) {
+    expectCentered(tester);
+
+    final children = tester.widget<Wrap>(find.byType(Wrap)).children;
+    final targetIndex = children.indexWhere(
+      (child) => child is Text && child.data == targetText,
+    );
+    final iconIndex = children.indexWhere(
+      (child) => child is Icon && child.icon == icon,
+    );
+    final periodIndex = children.indexWhere(
+      (child) => child is Text && child.data == periodLabel,
+    );
+    expect(iconIndex, targetIndex + 1);
+    expect(periodIndex, greaterThan(iconIndex));
+
+    final style = DefaultTextStyle.of(
+      tester.element(find.text(targetText)),
+    ).style;
+    final mark = tester.widget<Icon>(find.byIcon(icon));
+    expect(mark.size, style.fontSize);
+    expect(mark.color, style.color);
+  }
 
   Future<void> pump(
     WidgetTester tester, {
@@ -196,5 +233,72 @@ void main() {
     expect(find.text('$targetValue'), findsOneWidget);
     expect(find.text('d'), findsOneWidget);
     expect(find.text('all'), findsNothing);
+  });
+
+  testWidgets('shows a down arrow for a less-than count', (tester) async {
+    await pump(
+      tester,
+      amount: const ActAmount(count, Duration.zero),
+      target: goal(
+        unit: TargetUnit.count,
+        value: targetValue,
+        period: Period.aWeek,
+        targetType: TargetType.lessThan,
+      ),
+      shownIn: Period.aDay,
+    );
+
+    expect(find.byIcon(Icons.arrow_downward), findsOneWidget);
+    expect(find.byIcon(Icons.arrow_upward), findsNothing);
+    expectBoundMark(
+      tester,
+      targetText: '$targetValue',
+      periodLabel: 'w',
+      icon: Icons.arrow_downward,
+    );
+  });
+
+  testWidgets('shows an up arrow for a more-than time', (tester) async {
+    const targetLength = Duration(hours: 3);
+
+    await pump(
+      tester,
+      amount: const ActAmount(count, Duration.zero),
+      target: goal(
+        unit: TargetUnit.time,
+        value: targetLength.inSeconds,
+        period: Period.aWeek,
+        targetType: TargetType.moreThan,
+      ),
+      shownIn: Period.aDay,
+    );
+
+    expect(find.text('0:00'), findsOneWidget);
+    expect(find.text('3:00'), findsOneWidget);
+    expect(find.byIcon(Icons.arrow_upward), findsOneWidget);
+    expect(find.byIcon(Icons.arrow_downward), findsNothing);
+    expectBoundMark(
+      tester,
+      targetText: '3:00',
+      periodLabel: 'w',
+      icon: Icons.arrow_upward,
+    );
+  });
+
+  testWidgets('shows no bound arrow for an equal target', (tester) async {
+    await pump(
+      tester,
+      amount: const ActAmount(count, Duration.zero),
+      target: goal(
+        unit: TargetUnit.count,
+        value: targetValue,
+        period: Period.aWeek,
+      ),
+      shownIn: Period.aDay,
+    );
+
+    expect(find.byIcon(Icons.arrow_downward), findsNothing);
+    expect(find.byIcon(Icons.arrow_upward), findsNothing);
+    expectCentered(tester);
   });
 }

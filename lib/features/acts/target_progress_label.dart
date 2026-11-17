@@ -87,6 +87,12 @@ class TargetProgressLabel extends StatefulWidget {
     return _target.period.shortLabel;
   }
 
+  IconData? _boundIcon() => switch (_target.targetType) {
+        TargetType.equalTo => null,
+        TargetType.lessThan => Icons.arrow_downward,
+        TargetType.moreThan => Icons.arrow_upward,
+      };
+
   @override
   State<TargetProgressLabel> createState() => _TargetProgressLabelState();
 }
@@ -126,11 +132,20 @@ class _TargetProgressLabelState extends State<TargetProgressLabel> {
         () {
           const separator = Text(' / ');
           final periodLabel = widget._periodLabel();
+          final boundIcon = widget._boundIcon();
+          final style = DefaultTextStyle.of(context).style;
           return Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text(widget._currentText(DateTime.now())),
               separator,
               Text(widget._targetText()),
+              if (boundIcon != null)
+                Icon(
+                  boundIcon,
+                  size: style.fontSize,
+                  color: style.color,
+                ),
               if (periodLabel != null) ...[
                 separator,
                 Text(periodLabel),
