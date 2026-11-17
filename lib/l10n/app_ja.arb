@@ -102,6 +102,7 @@
   "startOfDayLabel": "1日の開始時間",
   "notifyAfterInactivityLabel": "何もしていなかったら通知する",
   "habitualMemsCountLabel": "いつもの表示件数",
+  "habitualMemsTimeRadiusLabel": "いつもの時間幅（時間）",
   "backupLabel": "バックアップ",
   "createBackupLabel": "作成",
   "restoreBackupLabel": "復元",

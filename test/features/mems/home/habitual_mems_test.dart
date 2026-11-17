@@ -8,6 +8,8 @@ import '../../../entity_factories.dart';
 
 void main() {
   final now = DateTime(2026, 11, 13, 14, 30);
+  // 時間。Settings の初期値。14:30 の窓は 13:30 から 15:30
+  const defaultTimeRadius = Duration(hours: 1);
   final createdAt = DateTime(2026, 6, 1);
 
   final friday = DateTime(2026, 11, 13, 14);
@@ -50,11 +52,13 @@ void main() {
     Iterable<Act> acts,
     Iterable<MemEntity> mems, {
     DateTime? at,
+    Duration timeRadius = defaultTimeRadius,
   }) =>
       HabitualMems.of(
         acts,
         mems,
         now: at ?? now,
+        timeRadius: timeRadius,
       ).mems.map((habitualMem) => habitualMem.mem.id).toList();
 
   group('HabitualMems', () {
@@ -73,6 +77,7 @@ void main() {
         ],
         [mem(1)],
         now: now,
+        timeRadius: defaultTimeRadius,
       ).mems.single;
 
       expect(habitualMem.mem.id, 1);
@@ -213,6 +218,27 @@ void main() {
           [mem(4), mem(1)],
         ),
         [1, 4],
+      );
+    });
+
+    test(
+        'includes an act outside the one hour window when the time radius is wider',
+        () {
+      // 16:00 開始。1 時間の窓は 15:30 までで届かず、2 時間の窓は 16:30 までで重なる
+      const widerTimeRadius = Duration(hours: 2);
+      final startsAt16 = spanning(
+        1,
+        DateTime(2026, 11, 13, 16),
+        const Duration(hours: 1),
+      );
+
+      expect(
+        ids([startsAt16], [mem(1)]),
+        isEmpty,
+      );
+      expect(
+        ids([startsAt16], [mem(1)], timeRadius: widerTimeRadius),
+        [1],
       );
     });
 

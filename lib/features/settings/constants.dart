@@ -6,9 +6,13 @@ const defaultNotifyAfterInactivity = 3600;
 const defaultHabitualMemsCount = 3;
 const minHabitualMemsCount = 1;
 const maxHabitualMemsCount = 9;
+const defaultHabitualMemsTimeRadius = 1;
+const minHabitualMemsTimeRadius = 1;
+const maxHabitualMemsTimeRadius = 12;
 
 final defaultPreferences = {
   startOfDayKey: defaultStartOfDay,
   notifyAfterInactivity: defaultNotifyAfterInactivity,
   habitualMemsCountKey: defaultHabitualMemsCount,
+  habitualMemsTimeRadiusKey: defaultHabitualMemsTimeRadius,
 };

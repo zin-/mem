@@ -5,6 +5,8 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mems_state.dart';
+import 'package:mem/features/settings/preference/keys.dart';
+import 'package:mem/features/settings/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 
@@ -79,7 +81,6 @@ class HabitualRank {
 
 class HabitualMems {
   // TODO settingsから持ってきたい https://github.com/zin-/mem/issues/752
-  static const timeRadius = Duration(hours: 1);
   static const lookback = Duration(days: 28);
 
   final List<HabitualMem> mems;
@@ -90,6 +91,7 @@ class HabitualMems {
     Iterable<Act> acts,
     Iterable<MemEntity> mems, {
     required DateTime now,
+    required Duration timeRadius,
   }) {
     final ordered = acts.toList()
       ..sort((a, b) {
@@ -101,7 +103,7 @@ class HabitualMems {
       });
 
     var day = DateTime(now.year, now.month, now.day);
-    final windows = <DateAndTimePeriod>[_window(now, day)];
+    final windows = <DateAndTimePeriod>[_window(now, day, timeRadius)];
     final actsByMemId = <int, List<Act>>{};
     for (final act in ordered) {
       final period = act.period;
@@ -109,7 +111,7 @@ class HabitualMems {
       if (period == null || period.start == null || end == null) continue;
       while (end.isBefore(windows.last.start!)) {
         day = DateTime(day.year, day.month, day.day - 1);
-        windows.add(_window(now, day));
+        windows.add(_window(now, day, timeRadius));
         if (windows.length == 3) windows.removeAt(0);
       }
       for (final window in windows) {
@@ -160,7 +162,11 @@ class HabitualMems {
     );
   }
 
-  static DateAndTimePeriod _window(DateTime now, DateTime day) {
+  static DateAndTimePeriod _window(
+    DateTime now,
+    DateTime day,
+    Duration timeRadius,
+  ) {
     final center = DateTime(
       day.year,
       day.month,
@@ -194,6 +200,9 @@ final habitualMemsProvider =
   ref.listen(loadMemListProvider, (_, __) {});
 
   final mems = ref.watch(memEntitiesProvider);
+  final timeRadius = Duration(
+    hours: ref.watch(preferenceProvider(habitualMemsTimeRadiusKey)),
+  );
   final now = DateTime.now();
   return v(
     () async {
@@ -205,11 +214,13 @@ final habitualMemsProvider =
         acts.map((act) => act.toDomain()),
         mems,
         now: now,
+        timeRadius: timeRadius,
       ).mems;
     },
     {
       'mems': mems,
       'now': now,
+      'timeRadius': timeRadius,
     },
   );
 });

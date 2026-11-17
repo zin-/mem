@@ -43,6 +43,11 @@ void main() {
               habitualMemsCountKey,
               defaultHabitualMemsCount,
             ));
+    when(mockedPreferenceRepository.shipByKey(habitualMemsTimeRadiusKey))
+        .thenAnswer((_) async => PreferenceEntity(
+              habitualMemsTimeRadiusKey,
+              defaultHabitualMemsTimeRadius,
+            ));
 
     when(mockedPreferenceRepository.receive(any)).thenAnswer((_) async => true);
   });
