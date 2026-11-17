@@ -1,7 +1,9 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/settings/constants.dart';
 import 'package:mem/features/settings/habitual_mems_count.dart';
 import 'package:mem/features/settings/notify_after_inactivity.dart';
+import 'package:mem/features/settings/number_picker_tile.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import 'package:mem/l10n/l10n.dart';
@@ -55,6 +57,34 @@ class SettingsPage extends ConsumerWidget {
               'picked': picked,
             },
           ),
+          ref.watch(preferenceProvider(habitualMemsTimeRadiusKey)),
+          (picked) => v(
+            () => picked == null
+                ? ref
+                    .read(
+                        preferenceProvider(habitualMemsTimeRadiusKey).notifier)
+                    .remove()
+                : ref
+                    .read(
+                        preferenceProvider(habitualMemsTimeRadiusKey).notifier)
+                    .replace(picked),
+            {
+              'picked': picked,
+            },
+          ),
+          ref.watch(preferenceProvider(habitualMemsLookbackKey)),
+          (picked) => v(
+            () => picked == null
+                ? ref
+                    .read(preferenceProvider(habitualMemsLookbackKey).notifier)
+                    .remove()
+                : ref
+                    .read(preferenceProvider(habitualMemsLookbackKey).notifier)
+                    .replace(picked),
+            {
+              'picked': picked,
+            },
+          ),
         ),
       );
 }
@@ -66,6 +96,10 @@ class _SettingsPage extends StatelessWidget {
   final void Function(int? picked) _onNotifyAfterInactivityChanged;
   final int? _habitualMemsCount;
   final void Function(int? picked) _onHabitualMemsCountChanged;
+  final int? _habitualMemsTimeRadius;
+  final void Function(int? picked) _onHabitualMemsTimeRadiusChanged;
+  final int? _habitualMemsLookback;
+  final void Function(int? picked) _onHabitualMemsLookbackChanged;
 
   const _SettingsPage(
     this._startOfDay,
@@ -74,6 +108,10 @@ class _SettingsPage extends StatelessWidget {
     this._onNotifyAfterInactivityChanged,
     this._habitualMemsCount,
     this._onHabitualMemsCountChanged,
+    this._habitualMemsTimeRadius,
+    this._onHabitualMemsTimeRadiusChanged,
+    this._habitualMemsLookback,
+    this._onHabitualMemsLookbackChanged,
   );
 
   @override
@@ -106,6 +144,26 @@ class _SettingsPage extends StatelessWidget {
                         _habitualMemsCount,
                         _onHabitualMemsCountChanged,
                       ),
+                      buildNumberPickerTile(
+                        context,
+                        l10n.habitualMemsTimeRadiusLabel,
+                        _habitualMemsTimeRadius,
+                        _onHabitualMemsTimeRadiusChanged,
+                        min: minHabitualMemsTimeRadius,
+                        max: maxHabitualMemsTimeRadius,
+                        defaultValue: defaultHabitualMemsTimeRadius,
+                        icon: Icons.timelapse,
+                      ),
+                      buildNumberPickerTile(
+                        context,
+                        l10n.habitualMemsLookbackLabel,
+                        _habitualMemsLookback,
+                        _onHabitualMemsLookbackChanged,
+                        min: minHabitualMemsLookback,
+                        max: maxHabitualMemsLookback,
+                        defaultValue: defaultHabitualMemsLookback,
+                        icon: Icons.date_range,
+                      ),
                       _buildResetNotification(l10n.resetNotificationLabel),
                     ],
                   ),
@@ -119,6 +177,8 @@ class _SettingsPage extends StatelessWidget {
           '_startOfDay': _startOfDay,
           '_notifyAfterInactivity': _notifyAfterInactivity,
           '_habitualMemsCount': _habitualMemsCount,
+          '_habitualMemsTimeRadius': _habitualMemsTimeRadius,
+          '_habitualMemsLookback': _habitualMemsLookback,
         },
       );
 }
