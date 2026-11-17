@@ -44,11 +44,16 @@ class TargetProgressLabel extends StatefulWidget {
         TargetUnit.time => _recordedAt(now).formatHHmm(),
       };
 
-  TargetShownValue? _shownValue() => TargetShownValue.of(
-        value: _target.value,
-        period: _target.period,
-        shownIn: _shownIn,
-      );
+  TargetShownValue? _shownValue() {
+    if (_shownIn == Period.aDay && _target.period != _shownIn) {
+      return null;
+    }
+    return TargetShownValue.of(
+      value: _target.value,
+      period: _target.period,
+      shownIn: _shownIn,
+    );
+  }
 
   String _targetText() {
     String textOf(int value) => switch (_target.targetUnit) {

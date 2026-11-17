@@ -63,7 +63,8 @@ void main() {
     expect(find.text('d'), findsNothing);
   });
 
-  testWidgets('scales a weekly count onto a day row', (tester) async {
+  testWidgets('keeps a weekly count and its period on a day row',
+      (tester) async {
     await pump(
       tester,
       amount: const ActAmount(count, Duration.zero),
@@ -76,10 +77,10 @@ void main() {
     );
 
     expect(find.text('$count'), findsOneWidget);
-    expect(find.text(' / '), findsOneWidget);
-    expect(find.text('1~'), findsOneWidget);
-    expect(find.text('$targetValue'), findsNothing);
-    expect(find.text('w'), findsNothing);
+    expect(find.text(' / '), findsNWidgets(2));
+    expect(find.text('$targetValue'), findsOneWidget);
+    expect(find.text('w'), findsOneWidget);
+    expect(find.text('1~'), findsNothing);
   });
 
   testWidgets('omits the period mark when the row matches the target',
