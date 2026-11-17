@@ -1,8 +1,8 @@
-import 'package:flutter/gestures.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/acts_summary.dart';
+import 'package:mem/features/acts/line_chart/chart_vertical_drag.dart';
 import 'package:mem/features/acts/line_chart/line_chart_wrapper.dart';
 import 'package:mem/framework/date_and_time/period.dart';
 import 'package:mem/features/acts/period_menu_item.dart';
@@ -261,7 +261,7 @@ class _PeriodPage extends ConsumerWidget {
             Expanded(
               child: paging == null
                   ? chart
-                  : _ChartVerticalDrag(
+                  : ChartVerticalDrag(
                       controller: paging,
                       child: chart,
                     ),
@@ -271,110 +271,6 @@ class _PeriodPage extends ConsumerWidget {
       },
     );
   }
-}
-
-// fl_chart の pan が縦ドラッグを取る。タップのツールチップは残し、縦の移動だけページへ渡す
-class _ChartVerticalDrag extends StatefulWidget {
-  final PageController controller;
-  final Widget child;
-
-  const _ChartVerticalDrag({
-    required this.controller,
-    required this.child,
-  });
-
-  @override
-  State<_ChartVerticalDrag> createState() => _ChartVerticalDragState();
-}
-
-class _ChartVerticalDragState extends State<_ChartVerticalDrag> {
-  Drag? _drag;
-  Offset? _start;
-  VelocityTracker? _tracker;
-
-  @override
-  void dispose() {
-    _drag?.cancel();
-    _drag = null;
-    super.dispose();
-  }
-
-  void _down(PointerDownEvent event) {
-    _drag?.cancel();
-    _drag = null;
-    _start = event.position;
-    _tracker = VelocityTracker.withKind(event.kind)
-      ..addPosition(event.timeStamp, event.position);
-  }
-
-  void _move(PointerMoveEvent event) {
-    final start = _start;
-    final tracker = _tracker;
-    if (start == null || tracker == null) {
-      return;
-    }
-    tracker.addPosition(event.timeStamp, event.position);
-    if (_drag == null) {
-      final moved = event.position - start;
-      if (moved.dy.abs() < kTouchSlop || moved.dy.abs() <= moved.dx.abs()) {
-        return;
-      }
-      if (!widget.controller.hasClients) {
-        return;
-      }
-      _drag = widget.controller.position.drag(
-        DragStartDetails(
-          sourceTimeStamp: event.timeStamp,
-          globalPosition: start,
-          kind: event.kind,
-        ),
-        () => _drag = null,
-      );
-    }
-    _drag?.update(
-      DragUpdateDetails(
-        sourceTimeStamp: event.timeStamp,
-        globalPosition: event.position,
-        delta: Offset(0, event.delta.dy),
-        primaryDelta: event.delta.dy,
-      ),
-    );
-  }
-
-  void _up(PointerUpEvent event) {
-    final drag = _drag;
-    final tracker = _tracker;
-    _drag = null;
-    _start = null;
-    _tracker = null;
-    if (drag == null || tracker == null) {
-      return;
-    }
-    tracker.addPosition(event.timeStamp, event.position);
-    final dy = tracker.getVelocity().pixelsPerSecond.dy;
-    drag.end(
-      DragEndDetails(
-        primaryVelocity: dy,
-        velocity: Velocity(pixelsPerSecond: Offset(0, dy)),
-      ),
-    );
-  }
-
-  void _cancel(PointerCancelEvent event) {
-    _drag?.cancel();
-    _drag = null;
-    _start = null;
-    _tracker = null;
-  }
-
-  @override
-  Widget build(BuildContext context) => Listener(
-        onPointerDown: _down,
-        onPointerMove: _move,
-        onPointerUp: _up,
-        onPointerCancel: _cancel,
-        child: widget.child,
-      );
 }
 
 class _SummaryStats extends StatelessWidget {
