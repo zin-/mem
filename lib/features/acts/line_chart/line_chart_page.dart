@@ -18,6 +18,12 @@ import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:mem/values/dimens.dart';
 
+// PageView の先頭。今の期間で、その offset も同じ
+const _currentPeriodPage = 0;
+
+// 本文が最大高さ以下なら、期間を分割しない
+const _onePeriodCount = 1;
+
 class ActLineChartPage extends ConsumerStatefulWidget {
   final int memId;
 
@@ -34,20 +40,65 @@ class _ActLineChartPageState extends ConsumerState<ActLineChartPage> {
   Period _period = Period.aWeek;
   AggregationType _aggregationType = AggregationType.count;
 
-  // 期間の種類を変えたらページ 0。PageStorage が前のページを戻さない
-  final PageController _pageController = PageController(keepPage: false);
+  // 期間の種類を変えたら今の期間へ戻す。PageStorage が前のページを戻さない
+  PageController? _pageController;
+
+  // 期間の種類を変えた直後。未接続のコントローラは今の期間で作り直す
+  int? _forcedPage;
 
   @override
   void dispose() {
-    _pageController.dispose();
+    _pageController?.dispose();
     super.dispose();
   }
 
   void _selectPeriod(Period period) {
-    setState(() => _period = period);
-    if (_pageController.hasClients) {
-      _pageController.jumpToPage(0);
+    setState(() {
+      _period = period;
+      _forcedPage = _currentPeriodPage;
+    });
+    final controller = _pageController;
+    if (controller != null && controller.hasClients) {
+      controller.jumpToPage(_currentPeriodPage);
     }
+  }
+
+  int _visiblePeriodCount(double bodyHeight) {
+    if (bodyHeight <= lineChartPeriodMaxHeight) {
+      return _onePeriodCount;
+    }
+    return (bodyHeight / lineChartPeriodMaxHeight).ceil();
+  }
+
+  PageController _pageControllerFor(int periodCount) {
+    final fraction = 1 / periodCount;
+    final current = _pageController;
+    final forcedPage = _forcedPage;
+    if (current != null &&
+        current.viewportFraction == fraction &&
+        (forcedPage == null || current.hasClients)) {
+      _forcedPage = null;
+      return current;
+    }
+
+    // viewportFraction はコンストラクタでしか渡せない
+    final page = forcedPage ??
+        (current != null && current.hasClients
+            ? (current.page?.round() ?? _currentPeriodPage)
+            : _currentPeriodPage);
+    _forcedPage = null;
+    final next = PageController(
+      initialPage: page,
+      keepPage: false,
+      viewportFraction: fraction,
+    );
+    _pageController = next;
+    if (current != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        current.dispose();
+      });
+    }
+    return next;
   }
 
   @override
@@ -70,13 +121,14 @@ class _ActLineChartPageState extends ConsumerState<ActLineChartPage> {
       editingMemByMemIdProvider(widget.memId).select((v) => v.value.name),
     );
 
-    Widget page(int offset) => _PeriodPage(
+    Widget periodPage(int offset, PageController? pageController) =>
+        _PeriodPage(
           memId: widget.memId,
           period: _period,
           offset: offset,
           aggregationType: _aggregationType,
           startOfDay: startOfDay,
-          pageController: _period == Period.all ? null : _pageController,
+          pageController: pageController,
         );
 
     return Scaffold(
@@ -109,14 +161,35 @@ class _ActLineChartPageState extends ConsumerState<ActLineChartPage> {
       ),
       body: Padding(
         padding: defaultPadding,
-        child: _period == Period.all
-            ? page(0)
-            : PageView.builder(
-                scrollDirection: Axis.vertical,
-                controller: _pageController,
-                // ページ 0 が今の期間。先のページほど過去なので offset は負
-                itemBuilder: (context, index) => page(-index),
-              ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            if (_period == Period.all) {
+              // 比べる隣がないので 1 枚。最大高さを超えた分は下を空ける
+              final height = constraints.maxHeight <= lineChartPeriodMaxHeight
+                  ? constraints.maxHeight
+                  : lineChartPeriodMaxHeight;
+              return Align(
+                alignment: Alignment.topCenter,
+                child: SizedBox(
+                  width: constraints.maxWidth,
+                  height: height,
+                  child: periodPage(_currentPeriodPage, null),
+                ),
+              );
+            }
+
+            final controller = _pageControllerFor(
+              _visiblePeriodCount(constraints.maxHeight),
+            );
+            return PageView.builder(
+              scrollDirection: Axis.vertical,
+              controller: controller,
+              // 今の期間を上端に揃える。先のページほど過去なので offset は負
+              padEnds: false,
+              itemBuilder: (context, index) => periodPage(-index, controller),
+            );
+          },
+        ),
       ),
     );
   }
