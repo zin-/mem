@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
+import 'package:mem/framework/notifications/alarm_scheduler.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/framework/workmanager_wrapper.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -12,20 +13,25 @@ import 'package:mem/framework/permissions/permission_handler_wrapper.dart';
 
 class ScheduleClient extends Repository {
   static ScheduleClient? _instance;
-  late final WorkmanagerWrapper? _workmanagerWrapper = v(
-    () => defaultTargetPlatform == TargetPlatform.android
-        ? WorkmanagerWrapper()
-        : null,
-  );
 
-  ScheduleClient._();
+  final AlarmScheduler? _scheduler;
 
-  factory ScheduleClient() => v(
-        () => _instance ??= ScheduleClient._(),
+  ScheduleClient._(this._scheduler);
+
+  factory ScheduleClient({AlarmScheduler? scheduler}) => v(
+        () => _instance ??= ScheduleClient._(
+          scheduler ?? _defaultScheduler(),
+        ),
         {
           '_instance': _instance,
+          'scheduler': scheduler,
         },
       );
+
+  static AlarmScheduler? _defaultScheduler() =>
+      defaultTargetPlatform == TargetPlatform.android
+          ? AndroidAlarmScheduler()
+          : null;
 
   static void resetSingleton() => v(
         () {
@@ -41,25 +47,20 @@ class ScheduleClient extends Repository {
         () async {
           if (entity is CancelSchedule) {
             await discard(entity.id);
-          } else if (await PermissionHandlerWrapper().request(
-            [Permission.notification],
-          )) {
-            if (entity is PeriodicSchedule) {
-              await _workmanagerWrapper?.registerPeriodicTask(
-                Task.notify,
-                entity.startAt,
-                entity.id,
-                entity.params,
-                entity.duration,
-              );
-            } else if (entity is TimedSchedule) {
-              await _workmanagerWrapper?.registerOneOffTask(
-                Task.notify,
-                entity.startAt,
-                entity.id,
-                entity.params,
-              );
-            }
+          } else if (entity is TimedSchedule &&
+              await PermissionHandlerWrapper().request(
+                [Permission.notification],
+              )) {
+            await _scheduler?.oneShotAt(
+              id: entity.id,
+              startAt: entity.startAt,
+              params: entity.params,
+              callback: scheduleCallback,
+              exact: true,
+              allowWhileIdle: true,
+              wakeup: true,
+              rescheduleOnReboot: true,
+            );
           }
         },
         {
@@ -69,7 +70,7 @@ class ScheduleClient extends Repository {
 
   Future<void> discard(int id) => v(
         () async {
-          await _workmanagerWrapper?.cancel(id);
+          await _scheduler?.cancel(id);
         },
         {"id": id},
       );

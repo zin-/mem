@@ -58,6 +58,7 @@ dependencies:
   collection: any
   home_widget: any
   workmanager: any
+  android_alarm_manager_plus: any
   day_picker: any
   file_picker: ^11.0.0
   permission_handler: any
