@@ -6,7 +6,7 @@ import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/framework/database/accessor.dart';
-import 'package:mem/framework/notifications/alarm_scheduler.dart';
+import 'package:mem/framework/notifications/android_alarm_manager_wrapper.dart';
 import 'package:mem/framework/notifications/mem_notifications.dart';
 import 'package:mem/framework/notifications/notification/type.dart';
 import 'package:mem/framework/notifications/notification_client.dart';

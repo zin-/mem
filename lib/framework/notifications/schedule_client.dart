@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:mem/framework/notifications/alarm_scheduler.dart';
+import 'package:mem/framework/notifications/android_alarm_manager_wrapper.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_repository.dart';
@@ -30,7 +30,7 @@ class ScheduleClient extends Repository {
 
   static AlarmScheduler? _defaultScheduler() =>
       defaultTargetPlatform == TargetPlatform.android
-          ? AndroidAlarmScheduler()
+          ? AndroidAlarmManagerWrapper()
           : null;
 
   static void resetSingleton() => v(

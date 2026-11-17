@@ -16,7 +16,7 @@ abstract class AlarmScheduler {
   Future<void> cancel(int id);
 }
 
-class AndroidAlarmScheduler implements AlarmScheduler {
+class AndroidAlarmManagerWrapper implements AlarmScheduler {
   bool _started = false;
 
   Future<bool> _ready() async {

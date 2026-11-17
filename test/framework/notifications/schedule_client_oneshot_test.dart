@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/framework/notifications/alarm_scheduler.dart';
+import 'package:mem/framework/notifications/android_alarm_manager_wrapper.dart';
 import 'package:mem/framework/notifications/mem_notifications.dart';
 import 'package:mem/framework/notifications/notification_client.dart';
 import 'package:mem/framework/notifications/notification_ids.dart';
