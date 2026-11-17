@@ -50,7 +50,11 @@ class ScheduleClient extends Repository {
             await discard(entity.id);
           } else if (entity is TimedSchedule &&
               await PermissionHandlerWrapper().request(
-                [Permission.notification],
+                [
+                  Permission.notification,
+                  if (defaultTargetPlatform == TargetPlatform.android)
+                    Permission.scheduleExactAlarm,
+                ],
               )) {
             await _scheduler?.oneShotAt(
               id: entity.id,

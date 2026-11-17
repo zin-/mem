@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/framework/notifications/alarm_scheduler.dart';
 import 'package:mem/framework/notifications/mem_notifications.dart';
@@ -5,6 +6,7 @@ import 'package:mem/framework/notifications/notification_client.dart';
 import 'package:mem/framework/notifications/notification_ids.dart';
 import 'package:mem/framework/notifications/schedule.dart';
 import 'package:mem/framework/notifications/schedule_client.dart';
+import 'package:mem/framework/permissions/permission.dart';
 import 'package:mem/values/constants.dart';
 
 void main() {
@@ -92,6 +94,27 @@ void main() {
     await client().discard(id);
 
     expect(scheduler.alarms, isEmpty);
+  });
+
+  test('does not register a one-shot when exact alarm permission is denied',
+      () async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.android;
+    addTearDown(() {
+      debugDefaultTargetPlatformOverride = null;
+    });
+    final requested = <String>[];
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(methodChannel, (call) async {
+      final names =
+          ((call.arguments as Map)[permissionNames] as List).cast<String>();
+      requested.addAll(names);
+      return !names.contains(Permission.scheduleExactAlarm.name);
+    });
+
+    await client().receive(TimedSchedule(id, startAt, params));
+
+    expect(scheduler.alarms, isEmpty);
+    expect(requested, contains(Permission.scheduleExactAlarm.name));
   });
 }
 

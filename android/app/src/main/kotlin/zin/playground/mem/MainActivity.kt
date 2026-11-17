@@ -1,7 +1,11 @@
 package zin.playground.mem
 
+import android.app.AlarmManager
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import android.Manifest
 import androidx.annotation.NonNull
 import androidx.core.app.ActivityCompat
@@ -14,6 +18,14 @@ class MainActivity : FlutterActivity() {
     companion object {
         private const val CHANNEL_NAME = "zin.playground.mem"
         private const val PERMISSION_REQUEST_CODE = 1001
+    }
+
+    // 再登録は mem ごとに要求する。設定画面は戻るまで一度だけ開く
+    private var exactAlarmSettingsOpen = false
+
+    override fun onResume() {
+        super.onResume()
+        exactAlarmSettingsOpen = false
     }
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
@@ -87,9 +99,13 @@ class MainActivity : FlutterActivity() {
                 }
             }
 
-            if (permissions.isEmpty()) {
+            // SCHEDULE_EXACT_ALARM はランタイム権限のダイアログでは付与できない
+            val exactAlarmMissing = permissionNames.contains("scheduleExactAlarm") &&
+                !canScheduleExactAlarms()
+
+            if (permissions.isEmpty() && !exactAlarmMissing) {
                 result.success(true)
-            } else {
+            } else if (permissions.isNotEmpty()) {
                 val results = ActivityCompat.requestPermissions(
                     this,
                     permissions.toTypedArray(),
@@ -97,10 +113,28 @@ class MainActivity : FlutterActivity() {
                 )
                 println("results: $results")
                 result.success(false)
+            } else {
+                if (!exactAlarmSettingsOpen) {
+                    exactAlarmSettingsOpen = true
+                    startActivity(
+                        Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                            data = Uri.parse("package:$packageName")
+                        },
+                    )
+                }
+                result.success(false)
             }
         } else {
             result.success(false)
         }
+    }
+
+    private fun canScheduleExactAlarms(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            return true
+        }
+        val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+        return alarmManager.canScheduleExactAlarms()
     }
 
     private fun isPermissionGranted(
