@@ -51,20 +51,17 @@ class _MemDetailFabComponent extends StatelessWidget {
               final l10n = buildL10n(context);
 
               final nextNotifyAt = await _saveMem();
+              final message = nextNotifyAt == null
+                  ? l10n.saveMemSuccessMessage(_memName)
+                  : l10n.saveMemSuccessMessage2(
+                      _memName,
+                      nextNotifyAt,
+                      nextNotifyAt,
+                    );
 
               scaffoldMessenger.showSnackBar(
                 SnackBar(
-                  content: Text(
-                    nextNotifyAt == null
-                        ? l10n.saveMemSuccessMessage(
-                            _memName,
-                          )
-                        : l10n.saveMemSuccessMessage2(
-                            _memName,
-                            nextNotifyAt,
-                            nextNotifyAt,
-                          ),
-                  ),
+                  content: Text(message),
                   duration: defaultDismissDuration,
                   dismissDirection: DismissDirection.horizontal,
                 ),

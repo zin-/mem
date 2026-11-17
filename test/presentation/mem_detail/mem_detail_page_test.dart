@@ -259,6 +259,11 @@ void main() {
         WidgetTester tester,
         DateTime? nextNotifyAt,
       ) async {
+        if (nextNotifyAt != null) {
+          // 次回通知ありの文言は日付プレースホルダを intl で組む
+          await initializeDateFormatting('en');
+        }
+
         when(mockMemClient.save(
           any,
           any,
@@ -286,13 +291,7 @@ void main() {
               nextNotifyAt,
             ));
 
-        await tester.pumpWidget(
-          ProviderScope(
-            child: MaterialApp(
-              home: const MemDetailPage(null),
-            ),
-          ),
-        );
+        await tester.pumpWidget(_createTestWidget());
         await tester.pumpAndSettle();
 
         final nameField = find.byKey(keyMemName);
@@ -319,29 +318,34 @@ void main() {
         return tester.widget<SnackBar>(find.byType(SnackBar));
       }
 
+      void expectSaveSnackBar(SnackBar snackBar, String message) {
+        expect(snackBar.content, isA<Text>());
+        expect((snackBar.content as Text).data, equals(message));
+        expect(snackBar.duration, defaultDismissDuration);
+      }
+
       testWidgets('mem when save FAB is tapped with valid input.',
           (tester) async {
         final snackBar = await showSaveSnackBar(tester, null);
-        final expectedMessage = buildL10n().saveMemSuccessMessage(testMemName);
-        expect(snackBar.content, isA<Text>());
-        expect((snackBar.content as Text).data, equals(expectedMessage));
-        expect(snackBar.duration, defaultDismissDuration);
+        expectSaveSnackBar(
+          snackBar,
+          buildL10n().saveMemSuccessMessage(testMemName),
+        );
       });
 
       testWidgets(
-          'snack bar dismisses in default duration when next notify at is returned.',
+          'snack bar with default duration when next notify at is returned.',
           (tester) async {
-        await initializeDateFormatting('en');
         final nextNotifyAt = DateTime(2026, 1, 2, 3, 4, 5);
         final snackBar = await showSaveSnackBar(tester, nextNotifyAt);
-        final expectedMessage = buildL10n().saveMemSuccessMessage2(
-          testMemName,
-          nextNotifyAt,
-          nextNotifyAt,
+        expectSaveSnackBar(
+          snackBar,
+          buildL10n().saveMemSuccessMessage2(
+            testMemName,
+            nextNotifyAt,
+            nextNotifyAt,
+          ),
         );
-        expect(snackBar.content, isA<Text>());
-        expect((snackBar.content as Text).data, equals(expectedMessage));
-        expect(snackBar.duration, defaultDismissDuration);
       });
     });
 
