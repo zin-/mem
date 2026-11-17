@@ -80,6 +80,8 @@ final startOfDayValue = tester.widget<Text>(textWidgets.at(index)).data;
 final titleText = _getTextWidget(tester, _TestConstants.appBarTitleIndex);
 ```
 
+固定値の意味（単位と、なぜその大きさか）は `principal_no_magic_number` に従い、定義の隣に書く。
+
 **コメント禁止パターン:**
 - `// 〜を取得する`
 - `// 〜を検証する`

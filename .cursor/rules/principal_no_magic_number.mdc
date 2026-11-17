@@ -39,7 +39,29 @@ header: Container(
 )
 ```
 
+## テスト
+
+テストの固定値は、定義の隣にその意味を書く。名前は参照用であり、単位や、なぜその大きさなのかはコメントが持つ。
+
+既存テストの一括置換はしない。新たに書く固定値と、その変更で触った固定値だけ従う。
+
+**❌ 名前だけで、速さと距離の意味が分からない:**
+
+```dart
+const _flingSpeed = 1000.0;
+const _pageFlingDistance = 300.0;
+```
+
+**✅ 単位と、その大きさである理由を書く:**
+
+```dart
+// px/秒。ページ送りの速度閾値より大きいので、離したページの隣へスナップする
+const _flingSpeed = 1000.0;
+// px。テスト画面（高さ 600）の1ページより短い。超えると2ページ進む
+const _pageFlingDistance = 300.0;
+```
+
 ## Relations(関連)
 
-- Dry(Don't Repeat Yourself)
+- Dry(Don't Repeat Yourself)（コメントは「なぜその値なのか」）
 - `lib/values/dimens.dart`

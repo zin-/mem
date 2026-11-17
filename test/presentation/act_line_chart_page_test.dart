@@ -23,6 +23,34 @@ import 'package:mem/framework/view/value_state_notifier.dart';
 
 const _name = 'ActLineChartPage test';
 
+// px/秒。ページ送りの速度閾値より大きいので、離したページの隣へスナップする
+const _flingSpeed = 1000.0;
+
+// px。テスト画面（高さ 600）の1ページより短い。超えると2ページ進む
+const _pageFlingDistance = 300.0;
+
+// Y が負だと指は上へ動く。上へ払うと過去の期間へ進む
+const _towardPast = Offset(0, -_pageFlingDistance);
+
+// Y が正だと指は下へ動く。下へ払うと現在の期間へ戻る
+const _towardPresent = Offset(0, _pageFlingDistance);
+
+// 今の期間。PageView のページ 0
+const _currentPeriodOffset = 0;
+
+// 1期間過去。PageView のページ 1
+const _previousPeriodOffset = -1;
+
+// 1期間未来。ページ 0 からは表示されない
+const _futurePeriodOffset = 1;
+
+// 過去ページの隣（さらに1期間過去）まで含む。未 stub の offset は実 DB を叩く
+const _stubbedPeriodOffsets = [
+  _currentPeriodOffset,
+  _previousPeriodOffset,
+  _previousPeriodOffset - 1,
+];
+
 void main() {
   group(_name, () {
     testWidgets(
@@ -48,14 +76,18 @@ void main() {
         expect(find.text('Min : '), findsOneWidget);
         expect(find.text('Max : '), findsOneWidget);
         expect(find.text('Avg : '), findsOneWidget);
-        expect(find.byType(LineChartWrapper), findsOneWidget);
-        expect(find.byIcon(Icons.chevron_left), findsOneWidget);
-        expect(find.byIcon(Icons.chevron_right), findsOneWidget);
+        expect(
+          _visibleRangeLabel(_localizations(tester)),
+          findsOneWidget,
+        );
+        expect(find.byType(LineChartWrapper).hitTestable(), findsOneWidget);
+        expect(find.byIcon(Icons.chevron_left), findsNothing);
+        expect(find.byIcon(Icons.chevron_right), findsNothing);
       },
     );
 
     testWidgets(
-      'shows period range and navigates previous/next.',
+      'flings to the previous period and back, and does not enter the future.',
       (tester) async {
         await _pumpPage(
           tester,
@@ -64,32 +96,34 @@ void main() {
         );
 
         final localizations = _localizations(tester);
-        final nextButton = find.widgetWithIcon(IconButton, Icons.chevron_right);
-        final previousButton =
-            find.widgetWithIcon(IconButton, Icons.chevron_left);
 
-        expect(find.text(_rangeLabel(localizations)), findsOneWidget);
-        expect(tester.widget<IconButton>(nextButton).onPressed, isNull);
+        expect(_visibleRangeLabel(localizations), findsOneWidget);
 
-        await tester.tap(previousButton);
-        await tester.pumpAndSettle();
+        await _flingVisibleChart(tester, _towardPast);
 
         expect(
-          find.text(_rangeLabel(localizations, offset: -1)),
+          _visibleRangeLabel(localizations, offset: _previousPeriodOffset),
           findsOneWidget,
         );
-        expect(tester.widget<IconButton>(nextButton).onPressed, isNotNull);
 
-        await tester.tap(nextButton);
-        await tester.pumpAndSettle();
+        await _flingVisibleChart(tester, _towardPresent);
 
-        expect(find.text(_rangeLabel(localizations)), findsOneWidget);
-        expect(tester.widget<IconButton>(nextButton).onPressed, isNull);
+        expect(_visibleRangeLabel(localizations), findsOneWidget);
+
+        await _flingVisibleChart(tester, _towardPresent);
+
+        expect(_visibleRangeLabel(localizations), findsOneWidget);
+        expect(
+          find.text(
+            _rangeLabel(localizations, offset: _futurePeriodOffset),
+          ),
+          findsNothing,
+        );
       },
     );
 
     testWidgets(
-      'resets offset when period type changes.',
+      'returns to the current range when the period type changes.',
       (tester) async {
         await _pumpPage(
           tester,
@@ -99,8 +133,12 @@ void main() {
 
         final localizations = _localizations(tester);
 
-        await tester.tap(find.widgetWithIcon(IconButton, Icons.chevron_left));
-        await tester.pumpAndSettle();
+        await _flingVisibleChart(tester, _towardPast);
+
+        expect(
+          _visibleRangeLabel(localizations, offset: _previousPeriodOffset),
+          findsOneWidget,
+        );
 
         await tester.tap(find.byIcon(Icons.more_vert));
         await tester.pumpAndSettle();
@@ -108,16 +146,8 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(
-          find.text(_rangeLabel(localizations, period: Period.aMonth)),
+          _visibleRangeLabel(localizations, period: Period.aMonth),
           findsOneWidget,
-        );
-        expect(
-          tester
-              .widget<IconButton>(
-                find.widgetWithIcon(IconButton, Icons.chevron_right),
-              )
-              .onPressed,
-          isNull,
         );
       },
     );
@@ -164,7 +194,7 @@ void main() {
     );
 
     testWidgets(
-      'hides navigation for Period.all.',
+      'has no PageView for Period.all.',
       (tester) async {
         await _pumpPage(
           tester,
@@ -177,8 +207,8 @@ void main() {
         await tester.tap(find.text(Period.all.name));
         await tester.pumpAndSettle();
 
-        expect(find.byIcon(Icons.chevron_left), findsNothing);
-        expect(find.byIcon(Icons.chevron_right), findsNothing);
+        expect(find.byType(PageView), findsNothing);
+        expect(find.byType(LineChartWrapper), findsOneWidget);
       },
     );
 
@@ -211,7 +241,7 @@ void main() {
         );
 
         final spots = tester
-            .widget<LineChart>(find.byType(LineChart))
+            .widget<LineChart>(find.byType(LineChart).hitTestable())
             .data
             .lineBarsData
             .last
@@ -257,15 +287,33 @@ MaterialLocalizations _localizations(WidgetTester tester) =>
 String _rangeLabel(
   MaterialLocalizations localizations, {
   Period period = Period.aWeek,
-  int offset = 0,
+  int offset = _currentPeriodOffset,
 }) =>
     period
         .toPeriod(DateAndTime.now(), defaultStartOfDay, offset: offset)!
         .formatCompactRange(localizations);
 
+Finder _visibleRangeLabel(
+  MaterialLocalizations localizations, {
+  Period period = Period.aWeek,
+  int offset = _currentPeriodOffset,
+}) =>
+    find
+        .text(_rangeLabel(localizations, period: period, offset: offset))
+        .hitTestable();
+
+Future<void> _flingVisibleChart(WidgetTester tester, Offset offset) async {
+  await tester.fling(
+    find.byType(LineChartWrapper).hitTestable(),
+    offset,
+    _flingSpeed,
+  );
+  await tester.pumpAndSettle();
+}
+
 List<Override> _overrides(int memId, String memName, List<Act> acts) => [
       for (final period in Period.values)
-        for (final offset in const [0, -1])
+        for (final offset in _stubbedPeriodOffsets)
           loadActListProvider(memId, period, offset).overrideWith(
             (ref) => AsyncValue.data(acts),
           ),
