@@ -35,3 +35,7 @@ const memPrePostListItemHeight = 60.0;
 const _memPrePostListMaxVisibleItemCount = 3;
 const memPrePostListMaxHeight =
     memPrePostListItemHeight * _memPrePostListMaxVisibleItemCount;
+
+// 論理px。チャートの1期間（範囲、Min / Max / Avg、チャート）の最大高さ。
+// 本文がこれを超えると、超えない高さで複数期間を並べる
+const lineChartPeriodMaxHeight = 480.0;

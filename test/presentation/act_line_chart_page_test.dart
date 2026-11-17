@@ -20,14 +20,30 @@ import 'package:mem/features/settings/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/features/acts/line_chart/line_chart_wrapper.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
+import 'package:mem/values/dimens.dart';
 
 const _name = 'ActLineChartPage test';
 
 // px/秒。ページ送りの速度閾値より大きいので、離したページの隣へスナップする
 const _flingSpeed = 1000.0;
 
-// px。テスト画面（高さ 600）の1ページより短い。超えると2ページ進む
+// px。1枚の画面でも2枚の画面でも、1ページより短い。超えると2ページ進む
 const _pageFlingDistance = 300.0;
+
+// 論理px。既定のテスト画面と同じ幅。高さだけを変える
+const _screenWidth = 800.0;
+
+// physicalSize を論理pxとして使う
+const _devicePixelRatio = 1.0;
+
+// 論理px。画面高さを1期間の最大高さと同じにすると、AppBar と本文の余白を引いた本文はそれ以下。
+// 期間は1枚。その1ページはフリック距離より高い
+const _oneSlotScreen = Size(_screenWidth, lineChartPeriodMaxHeight);
+
+// 論理px。AppBar と本文の余白を引いた本文が最大高さを超え、その2倍以下。
+// 週は2枚で、1枚はフリック距離より高い。Period.all は上限が無ければこの本文いっぱいまで伸びる
+const _tallScreenHeight = 800.0;
+const _tallScreen = Size(_screenWidth, _tallScreenHeight);
 
 // Y が負だと指は上へ動く。上へ払うと過去の期間へ進む
 const _towardPast = Offset(0, -_pageFlingDistance);
@@ -41,6 +57,9 @@ const _currentPeriodOffset = 0;
 // 1期間過去。PageView のページ 1
 const _previousPeriodOffset = -1;
 
+// 2期間過去。2枚見えるときは、払うまで画面の外
+const _twoPeriodsAgoOffset = _previousPeriodOffset - 1;
+
 // 1期間未来。ページ 0 からは表示されない
 const _futurePeriodOffset = 1;
 
@@ -48,7 +67,7 @@ const _futurePeriodOffset = 1;
 const _stubbedPeriodOffsets = [
   _currentPeriodOffset,
   _previousPeriodOffset,
-  _previousPeriodOffset - 1,
+  _twoPeriodsAgoOffset,
 ];
 
 void main() {
@@ -257,6 +276,104 @@ void main() {
         );
       },
     );
+
+    testWidgets(
+      'shows the current and previous periods when the body is taller than one period.',
+      (tester) async {
+        await _pumpPage(
+          tester,
+          memId: 1,
+          memName: 'memName - two periods',
+          screen: _tallScreen,
+        );
+
+        final localizations = _localizations(tester);
+
+        expect(_visibleRangeLabel(localizations), findsOneWidget);
+        expect(
+          _visibleRangeLabel(localizations, offset: _previousPeriodOffset),
+          findsOneWidget,
+        );
+        expect(
+          _visibleRangeLabel(
+            localizations,
+            offset: _twoPeriodsAgoOffset,
+          ),
+          findsNothing,
+        );
+      },
+    );
+
+    testWidgets(
+      'shows only the current period when the body fits in one period.',
+      (tester) async {
+        await _pumpPage(
+          tester,
+          memId: 1,
+          memName: 'memName - one period',
+          screen: _oneSlotScreen,
+        );
+
+        final localizations = _localizations(tester);
+
+        expect(_visibleRangeLabel(localizations), findsOneWidget);
+        expect(
+          _visibleRangeLabel(localizations, offset: _previousPeriodOffset),
+          findsNothing,
+        );
+      },
+    );
+
+    testWidgets(
+      'advances one period when two periods are visible.',
+      (tester) async {
+        await _pumpPage(
+          tester,
+          memId: 1,
+          memName: 'memName - two period fling',
+          screen: _tallScreen,
+        );
+
+        final localizations = _localizations(tester);
+
+        await _flingVisibleChart(tester, _towardPast);
+
+        expect(_visibleRangeLabel(localizations), findsNothing);
+        expect(
+          _visibleRangeLabel(localizations, offset: _previousPeriodOffset),
+          findsOneWidget,
+        );
+        expect(
+          _visibleRangeLabel(
+            localizations,
+            offset: _twoPeriodsAgoOffset,
+          ),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'keeps Period.all within one period height on a tall screen.',
+      (tester) async {
+        await _pumpPage(
+          tester,
+          memId: 1,
+          memName: 'memName - period all height',
+          screen: _tallScreen,
+        );
+
+        await tester.tap(find.byIcon(Icons.more_vert));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(Period.all.name));
+        await tester.pumpAndSettle();
+
+        expect(
+          _periodBlockHeight(tester),
+          lessThanOrEqualTo(lineChartPeriodMaxHeight),
+        );
+      },
+    );
   });
 }
 
@@ -265,7 +382,13 @@ Future<void> _pumpPage(
   required int memId,
   required String memName,
   List<Act> acts = const [],
+  Size screen = _oneSlotScreen,
 }) async {
+  tester.view.physicalSize = screen;
+  tester.view.devicePixelRatio = _devicePixelRatio;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+
   await tester.pumpWidget(
     ProviderScope(
       overrides: _overrides(memId, memName, acts),
@@ -304,11 +427,22 @@ Finder _visibleRangeLabel(
 
 Future<void> _flingVisibleChart(WidgetTester tester, Offset offset) async {
   await tester.fling(
-    find.byType(LineChartWrapper).hitTestable(),
+    find.byType(LineChartWrapper).hitTestable().first,
     offset,
     _flingSpeed,
   );
   await tester.pumpAndSettle();
+}
+
+double _periodBlockHeight(WidgetTester tester) {
+  final block = find.ancestor(
+    of: find.byType(LineChartWrapper),
+    matching: find.byWidgetPredicate(
+      (widget) => widget is Flex && widget.direction == Axis.vertical,
+    ),
+  );
+  expect(block, findsOneWidget);
+  return tester.getSize(block).height;
 }
 
 List<Override> _overrides(int memId, String memName, List<Act> acts) => [
