@@ -27,8 +27,13 @@ class _TestConstants {
   static const int habitualMemsTimeRadiusTileIndex = 3;
   // 時間。初期値 1 ではなく、ピッカーの 1〜12 に入る
   static const int selectedHabitualMemsTimeRadius = 4;
-  static const int resetNotificationLabelIndex = 8;
-  static const int appBarTitleIndex = 12;
+  static const int habitualMemsLookbackLabelIndex = 8;
+  static const int habitualMemsLookbackValueIndex = 9;
+  static const int habitualMemsLookbackTileIndex = 4;
+  // 日。初期値 28 ではなく、ピッカーの 1〜90 に入る
+  static const int selectedHabitualMemsLookback = 10;
+  static const int resetNotificationLabelIndex = 10;
+  static const int appBarTitleIndex = 14;
 }
 
 Widget _createTestWidget() {
@@ -78,6 +83,11 @@ void main() {
               habitualMemsTimeRadiusKey,
               defaultHabitualMemsTimeRadius,
             ));
+    when(mockedPreferenceRepository.shipByKey(habitualMemsLookbackKey))
+        .thenAnswer((_) async => PreferenceEntity(
+              habitualMemsLookbackKey,
+              defaultHabitualMemsLookback,
+            ));
 
     when(mockedPreferenceRepository.receive(any)).thenAnswer((_) async => true);
   });
@@ -123,6 +133,14 @@ void main() {
 
         expect(
           tester
+              .widget<Text>(textWidgets
+                  .at(_TestConstants.habitualMemsLookbackLabelIndex))
+              .data,
+          equals(l10n.habitualMemsLookbackLabel),
+        );
+
+        expect(
+          tester
               .widget<Text>(
                   textWidgets.at(_TestConstants.resetNotificationLabelIndex))
               .data,
@@ -141,6 +159,7 @@ void main() {
           _TestConstants.notifyAfterInactivityValueIndex,
           _TestConstants.habitualMemsCountValueIndex,
           _TestConstants.habitualMemsTimeRadiusValueIndex,
+          _TestConstants.habitualMemsLookbackValueIndex,
         ]);
       });
 
@@ -176,6 +195,15 @@ void main() {
         expect(
           habitualMemsTimeRadiusValue,
           equals('$defaultHabitualMemsTimeRadius'),
+        );
+
+        final habitualMemsLookbackValue = tester
+            .widget<Text>(
+                textWidgets.at(_TestConstants.habitualMemsLookbackValueIndex))
+            .data;
+        expect(
+          habitualMemsLookbackValue,
+          equals('$defaultHabitualMemsLookback'),
         );
       });
     });
@@ -323,6 +351,58 @@ void main() {
                   .at(_TestConstants.habitualMemsTimeRadiusValueIndex))
               .data,
           equals('${_TestConstants.selectedHabitualMemsTimeRadius}'),
+        );
+      });
+
+      testWidgets('habitual mems lookback value.', (tester) async {
+        await _pumpAndSettle(tester);
+
+        final textWidgets = find.byType(Text);
+        final habitualMemsLookbackValue = tester
+            .widget<Text>(
+                textWidgets.at(_TestConstants.habitualMemsLookbackValueIndex))
+            .data;
+        expect(
+          habitualMemsLookbackValue,
+          equals('$defaultHabitualMemsLookback'),
+        );
+
+        await tester.tap(
+          find
+              .byType(SettingsTile)
+              .at(_TestConstants.habitualMemsLookbackTileIndex),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(BottomSheet), findsOneWidget);
+
+        final controller = tester
+            .widget<ListWheelScrollView>(find.byType(ListWheelScrollView))
+            .controller! as FixedExtentScrollController;
+        controller.jumpToItem(
+          _TestConstants.selectedHabitualMemsLookback -
+              minHabitualMemsLookback,
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('OK'));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(BottomSheet), findsNothing);
+
+        final captured = verify(mockedPreferenceRepository.receive(captureAny))
+            .captured
+            .single as PreferenceEntity;
+        expect(captured.key, habitualMemsLookbackKey);
+        expect(captured.value, _TestConstants.selectedHabitualMemsLookback);
+
+        expect(
+          tester
+              .widget<Text>(find
+                  .byType(Text)
+                  .at(_TestConstants.habitualMemsLookbackValueIndex))
+              .data,
+          equals('${_TestConstants.selectedHabitualMemsLookback}'),
         );
       });
     });

@@ -4,3 +4,4 @@ final startOfDayKey = TimeOfDayPreferenceKey("start_of_day");
 final notifyAfterInactivity = IntPreferenceKey('notify_after_inactivity');
 final habitualMemsCountKey = IntPreferenceKey('habitual_mems_count');
 final habitualMemsTimeRadiusKey = IntPreferenceKey('habitual_mems_time_radius');
+final habitualMemsLookbackKey = IntPreferenceKey('habitual_mems_lookback');

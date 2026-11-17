@@ -80,9 +80,6 @@ class HabitualRank {
 }
 
 class HabitualMems {
-  // TODO settingsから持ってきたい https://github.com/zin-/mem/issues/752
-  static const lookback = Duration(days: 28);
-
   final List<HabitualMem> mems;
 
   HabitualMems._(this.mems);
@@ -203,11 +200,14 @@ final habitualMemsProvider =
   final timeRadius = Duration(
     hours: ref.watch(preferenceProvider(habitualMemsTimeRadiusKey)),
   );
+  final lookback = Duration(
+    days: ref.watch(preferenceProvider(habitualMemsLookbackKey)),
+  );
   final now = DateTime.now();
   return v(
     () async {
       final acts = await ActQueryService().fetchFinishedStartedAround(
-        since: now.subtract(HabitualMems.lookback),
+        since: now.subtract(lookback),
         until: now,
       );
       return HabitualMems.of(
@@ -221,6 +221,7 @@ final habitualMemsProvider =
       'mems': mems,
       'now': now,
       'timeRadius': timeRadius,
+      'lookback': lookback,
     },
   );
 });

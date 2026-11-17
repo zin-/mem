@@ -9,10 +9,14 @@ const maxHabitualMemsCount = 9;
 const defaultHabitualMemsTimeRadius = 1;
 const minHabitualMemsTimeRadius = 1;
 const maxHabitualMemsTimeRadius = 12;
+const defaultHabitualMemsLookback = 28;
+const minHabitualMemsLookback = 1;
+const maxHabitualMemsLookback = 90;
 
 final defaultPreferences = {
   startOfDayKey: defaultStartOfDay,
   notifyAfterInactivity: defaultNotifyAfterInactivity,
   habitualMemsCountKey: defaultHabitualMemsCount,
   habitualMemsTimeRadiusKey: defaultHabitualMemsTimeRadius,
+  habitualMemsLookbackKey: defaultHabitualMemsLookback,
 };

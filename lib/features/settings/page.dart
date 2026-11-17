@@ -72,6 +72,19 @@ class SettingsPage extends ConsumerWidget {
               'picked': picked,
             },
           ),
+          ref.watch(preferenceProvider(habitualMemsLookbackKey)),
+          (picked) => v(
+            () => picked == null
+                ? ref
+                    .read(preferenceProvider(habitualMemsLookbackKey).notifier)
+                    .remove()
+                : ref
+                    .read(preferenceProvider(habitualMemsLookbackKey).notifier)
+                    .replace(picked),
+            {
+              'picked': picked,
+            },
+          ),
         ),
       );
 }
@@ -85,6 +98,8 @@ class _SettingsPage extends StatelessWidget {
   final void Function(int? picked) _onHabitualMemsCountChanged;
   final int? _habitualMemsTimeRadius;
   final void Function(int? picked) _onHabitualMemsTimeRadiusChanged;
+  final int? _habitualMemsLookback;
+  final void Function(int? picked) _onHabitualMemsLookbackChanged;
 
   const _SettingsPage(
     this._startOfDay,
@@ -95,6 +110,8 @@ class _SettingsPage extends StatelessWidget {
     this._onHabitualMemsCountChanged,
     this._habitualMemsTimeRadius,
     this._onHabitualMemsTimeRadiusChanged,
+    this._habitualMemsLookback,
+    this._onHabitualMemsLookbackChanged,
   );
 
   @override
@@ -137,6 +154,16 @@ class _SettingsPage extends StatelessWidget {
                         defaultValue: defaultHabitualMemsTimeRadius,
                         icon: Icons.timelapse,
                       ),
+                      buildNumberPickerTile(
+                        context,
+                        l10n.habitualMemsLookbackLabel,
+                        _habitualMemsLookback,
+                        _onHabitualMemsLookbackChanged,
+                        min: minHabitualMemsLookback,
+                        max: maxHabitualMemsLookback,
+                        defaultValue: defaultHabitualMemsLookback,
+                        icon: Icons.date_range,
+                      ),
                       _buildResetNotification(l10n.resetNotificationLabel),
                     ],
                   ),
@@ -151,6 +178,7 @@ class _SettingsPage extends StatelessWidget {
           '_notifyAfterInactivity': _notifyAfterInactivity,
           '_habitualMemsCount': _habitualMemsCount,
           '_habitualMemsTimeRadius': _habitualMemsTimeRadius,
+          '_habitualMemsLookback': _habitualMemsLookback,
         },
       );
 }

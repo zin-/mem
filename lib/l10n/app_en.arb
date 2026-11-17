@@ -103,6 +103,7 @@
   "notifyAfterInactivityLabel": "Notify after inactivity",
   "habitualMemsCountLabel": "Habitual mems count",
   "habitualMemsTimeRadiusLabel": "Habitual mems time radius (hours)",
+  "habitualMemsLookbackLabel": "Habitual mems lookback (days)",
   "backupLabel": "Backup",
   "createBackupLabel": "Create",
   "restoreBackupLabel": "Restore",
