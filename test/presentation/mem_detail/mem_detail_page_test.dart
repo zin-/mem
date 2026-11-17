@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:mem/framework/date_and_time/period.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
@@ -22,6 +23,7 @@ import 'package:mem/features/mem_items/mem_items_view.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/mems/detail/app_bar/remove_mem_action.dart';
 import 'package:mem/features/mems/states.dart';
+import 'package:mem/values/durations.dart';
 
 import 'mem_detail_page_test.mocks.dart';
 
@@ -251,9 +253,16 @@ void main() {
     });
 
     group('should save', () {
-      testWidgets('mem when save FAB is tapped with valid input.',
-          (tester) async {
-        const testMemName = 'Test Mem';
+      const testMemName = 'Test Mem';
+
+      Future<SnackBar> showSaveSnackBar(
+        WidgetTester tester,
+        DateTime? nextNotifyAt,
+      ) async {
+        if (nextNotifyAt != null) {
+          // 次回通知ありの文言は日付プレースホルダを intl で組む
+          await initializeDateFormatting('en');
+        }
 
         when(mockMemClient.save(
           any,
@@ -279,16 +288,10 @@ void main() {
                   target: null,
                 ),
               ),
-              null,
+              nextNotifyAt,
             ));
 
-        await tester.pumpWidget(
-          ProviderScope(
-            child: MaterialApp(
-              home: const MemDetailPage(null),
-            ),
-          ),
-        );
+        await tester.pumpWidget(_createTestWidget());
         await tester.pumpAndSettle();
 
         final nameField = find.byKey(keyMemName);
@@ -312,10 +315,37 @@ void main() {
         )).called(1);
         expect(find.byType(SnackBar), findsOneWidget);
 
-        final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
-        final expectedMessage = buildL10n().saveMemSuccessMessage(testMemName);
+        return tester.widget<SnackBar>(find.byType(SnackBar));
+      }
+
+      void expectSaveSnackBar(SnackBar snackBar, String message) {
         expect(snackBar.content, isA<Text>());
-        expect((snackBar.content as Text).data, equals(expectedMessage));
+        expect((snackBar.content as Text).data, equals(message));
+        expect(snackBar.duration, defaultDismissDuration);
+      }
+
+      testWidgets('mem when save FAB is tapped with valid input.',
+          (tester) async {
+        final snackBar = await showSaveSnackBar(tester, null);
+        expectSaveSnackBar(
+          snackBar,
+          buildL10n().saveMemSuccessMessage(testMemName),
+        );
+      });
+
+      testWidgets(
+          'snack bar with default duration when next notify at is returned.',
+          (tester) async {
+        final nextNotifyAt = DateTime(2026, 1, 2, 3, 4, 5);
+        final snackBar = await showSaveSnackBar(tester, nextNotifyAt);
+        expectSaveSnackBar(
+          snackBar,
+          buildL10n().saveMemSuccessMessage2(
+            testMemName,
+            nextNotifyAt,
+            nextNotifyAt,
+          ),
+        );
       });
     });
 

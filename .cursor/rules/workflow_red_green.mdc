@@ -1,17 +1,26 @@
 ---
-alwaysApply: false
+description: 失敗テストを先に書き、analyze とテストは各変更の中で確認する
+alwaysApply: true
 ---
 # Red-Green（失敗テスト先行）
 
-機能追加・バグ修正のデフォルト手順は **Red → Green → Refactor → Lint → Verify** とする。
+機能追加・バグ修正のデフォルト手順は **Red → Green → Refactor** とする。
+
+analyze（`task lint`、変更ファイルの `flutter analyze`、または `ReadLints`）とテストは、その変更の Red / Green / Refactor の中で実行する。計画の To-do の最後に、analyze とテストだけの項目を置かない。
+
+変更が複数あるとき、最後にまとめて一度通ればよい、ではない。変更ごとに、その変更のテストが失敗または成功することを確認する。
 
 ## 手順
 
 1. **Red**: 期待する振る舞いを表すテストを先に書き、`flutter test`（または対象ファイル）で **失敗することを確認** する
-2. **Green**: テストが通る **最小** の実装だけを足す
-3. **Refactor**: Green を維持したまま重複・命名・構造を整理する（同一変更でもよい）
-4. **Lint**: `task lint`（または変更ファイルに対する `flutter analyze` / `ReadLints`）を実行し、指摘を直す
-5. **Verify**: lint 修正後、再度 `flutter test`（または対象ファイル）で **パスすることを確認** する
+2. **Green**: テストが通る **最小** の実装だけを足す。続けてその変更の analyze を実行し、指摘を直す。対象の `flutter test` で **パスすることを確認** する
+3. **Refactor**: Green を維持したまま重複・命名・構造を整理する（同一変更でもよい）。整理したあとも、その変更の analyze と対象テストをその場で通す
+
+## Example(具体例)
+
+**❌ 実装を並べ、最後の To-do でだけ analyze とテストを実行する**
+
+**✅ 各変更の To-do に、その変更のテストと analyze を含める**
 
 ## Red を省略してよい場合
 
