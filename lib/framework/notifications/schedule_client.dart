@@ -4,6 +4,7 @@ import 'package:mem/framework/notifications/alarm_scheduler.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/framework/workmanager_wrapper.dart';
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/framework/notifications/notification_client.dart';
 import 'package:mem/framework/notifications/mem_notifications.dart';
 import 'package:mem/framework/notifications/notification/type.dart';
@@ -77,19 +78,40 @@ class ScheduleClient extends Repository {
 }
 
 @pragma('vm:entry-point')
-Future<void> scheduleCallback(int id, Map<String, dynamic> params) => i(
+Future<void> scheduleCallback(
+  int id,
+  Map<String, dynamic> params, {
+  DateTime? firedAt,
+}) =>
+    i(
       () async {
         WidgetsFlutterBinding.ensureInitialized();
 
-        await NotificationClient().show(
-          NotificationType.values.singleWhere(
-            (element) => element.name == params[notificationTypeKey],
-          ),
-          params[memIdKey] as int?,
+        final notificationType = NotificationType.values.singleWhere(
+          (element) => element.name == params[notificationTypeKey],
         );
+        final memId = params[memIdKey] as int?;
+
+        await NotificationClient().show(
+          notificationType,
+          memId,
+        );
+
+        if (notificationType == NotificationType.repeat && memId != null) {
+          final mem = await MemRepository()
+              .shipById(memId)
+              .then((entity) => entity.toDomain());
+          // MemNotifyAt.repeat は now と同時刻なら同じ表示時刻を返す
+          const justAfterFire = Duration(microseconds: 1);
+          await NotificationClient().registerMemNotifications(
+            mem,
+            now: (firedAt ?? DateTime.now()).add(justAfterFire),
+          );
+        }
       },
       {
         'id': id,
         'params': params,
+        'firedAt': firedAt,
       },
     );
