@@ -1,9 +1,5 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/framework/workmanager_wrapper.dart';
-import 'package:mem/framework/notifications/mem_notifications.dart';
-import 'package:mem/framework/notifications/notification/type.dart';
-import 'package:mem/framework/notifications/notification_client.dart';
 
 import 'features/acts/counter/act_counter_client.dart';
 import 'application.dart';
@@ -31,9 +27,6 @@ Future<void> _runApplication({
     await LogService().init(
       () async {
         WidgetsFlutterBinding.ensureInitialized();
-        WorkmanagerWrapper(
-          callbackDispatcher: workmanagerCallbackDispatcher,
-        );
 
         if (initialPath != null ||
             await NotificationRepository().ship() == false) {
@@ -54,8 +47,6 @@ Future<void> _runApplication({
 Future<void> onNotificationResponseReceived(dynamic details) async {
   await LogService().init(
     () async {
-      WorkmanagerWrapper(callbackDispatcher: workmanagerCallbackDispatcher);
-
       await onDidReceiveNotificationResponse(
         details,
         (memId) => v(
@@ -115,34 +106,6 @@ Future<void> backgroundCallback(Uri? uri) async {
     },
   );
 }
-
-@pragma('vm:entry-point')
-void workmanagerCallbackDispatcher() => LogService().init(
-      () => WorkmanagerWrapper().executeTask(
-        (inputData) => v(
-          () async {
-            final notificationTypeName = inputData?[notificationTypeKey];
-            final memId = inputData?[memIdKey] as int?;
-
-            if (notificationTypeName == null) {
-              return false;
-            } else {
-              await NotificationClient().show(
-                NotificationType.values.singleWhere(
-                  (element) => element.name == notificationTypeName,
-                ),
-                memId,
-              );
-
-              return true;
-            }
-          },
-          {
-            'inputData': inputData,
-          },
-        ),
-      ),
-    );
 
 // class DebugObserver extends ProviderObserver {
 //   @override

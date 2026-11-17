@@ -133,7 +133,11 @@ class NotificationClient {
         },
       );
 
-  Future<DateTime?> registerMemNotifications(Mem mem) => v(
+  Future<DateTime?> registerMemNotifications(
+    Mem mem, {
+    DateTime? now,
+  }) =>
+      v(
         () async {
           if (mem.isDone || mem.isArchived) {
             cancelMemNotifications(mem.id!);
@@ -152,10 +156,10 @@ class NotificationClient {
                 (await _preferenceClientRepository.shipByKey(startOfDayKey))
                         .value ??
                     defaultStartOfDay;
-            final now = DateTime.now();
+            final clock = now ?? DateTime.now();
             final today = await _actQueryService.todayActCount(
               memId: mem.id!,
-              period: TodayActCount.period(now, startOfDay),
+              period: TodayActCount.period(clock, startOfDay),
               targets: _targetRepository,
             );
 
@@ -168,7 +172,7 @@ class NotificationClient {
                     .ship(memId: mem.id!)
                     .then((v) => v.map((e) => e.toDomain())),
                 latestAct,
-                now,
+                clock,
                 scheduleAnchor: scheduleAnchor,
                 target: today?.target,
                 todayCount: today?.value ?? 0,
@@ -186,6 +190,7 @@ class NotificationClient {
         },
         {
           "mem": mem,
+          "now": now,
         },
       );
 

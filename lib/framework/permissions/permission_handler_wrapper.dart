@@ -59,6 +59,8 @@ extension on Permission {
     switch (this) {
       case Permission.notification:
         return permission_handler.Permission.notification;
+      case Permission.scheduleExactAlarm:
+        return permission_handler.Permission.scheduleExactAlarm;
     }
   }
 }
