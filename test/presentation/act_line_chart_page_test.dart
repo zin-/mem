@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import '../entity_factories.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
@@ -20,8 +19,55 @@ import 'package:mem/features/settings/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/features/acts/line_chart/line_chart_wrapper.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
+import 'package:mem/values/dimens.dart';
 
 const _name = 'ActLineChartPage test';
+
+// px/秒。ページ送りの速度閾値より大きいので、離したページの隣へスナップする
+const _flingSpeed = 1000.0;
+
+// px。1枚の画面でも2枚の画面でも、1ページより短い。超えると2ページ進む
+const _pageFlingDistance = 300.0;
+
+// 論理px。既定のテスト画面と同じ幅。高さだけを変える
+const _screenWidth = 800.0;
+
+// physicalSize を論理pxとして使う
+const _devicePixelRatio = 1.0;
+
+// 論理px。画面高さを1期間の最大高さと同じにすると、AppBar と本文の余白を引いた本文はそれ以下。
+// 期間は1枚。その1ページはフリック距離より高い
+const _oneSlotScreen = Size(_screenWidth, lineChartPeriodMaxHeight);
+
+// 論理px。AppBar と本文の余白を引いた本文が最大高さを超え、その2倍以下。
+// 週は2枚で、1枚はフリック距離より高い。Period.all は上限が無ければこの本文いっぱいまで伸びる
+const _tallScreenHeight = 800.0;
+const _tallScreen = Size(_screenWidth, _tallScreenHeight);
+
+// Y が負だと指は上へ動く。上へ払うと過去の期間へ進む
+const _towardPast = Offset(0, -_pageFlingDistance);
+
+// Y が正だと指は下へ動く。下へ払うと現在の期間へ戻る
+const _towardPresent = Offset(0, _pageFlingDistance);
+
+// 今の期間。PageView のページ 0
+const _currentPeriodOffset = 0;
+
+// 1期間過去。PageView のページ 1
+const _previousPeriodOffset = -1;
+
+// 2期間過去。2枚見えるときは、払うまで画面の外
+const _twoPeriodsAgoOffset = _previousPeriodOffset - 1;
+
+// 1期間未来。ページ 0 からは表示されない
+const _futurePeriodOffset = 1;
+
+// 過去ページの隣（さらに1期間過去）まで含む。未 stub の offset は実 DB を叩く
+const _stubbedPeriodOffsets = [
+  _currentPeriodOffset,
+  _previousPeriodOffset,
+  _twoPeriodsAgoOffset,
+];
 
 void main() {
   group(_name, () {
@@ -30,32 +76,20 @@ void main() {
       (tester) async {
         final memId = 1;
         final memName = 'memName - $_name';
-        final acts = [
-          FinishedAct(1, DateAndTime.from(DateTime(2025, 9, 25)),
-              DateAndTime.from(DateTime(2025, 9, 25, 1))),
-          FinishedAct(1, DateAndTime.from(DateTime(2025, 9, 26)),
-              DateAndTime.from(DateTime(2025, 9, 26, 1))),
-          FinishedAct(1, DateAndTime.from(DateTime(2025, 9, 27)),
-              DateAndTime.from(DateTime(2025, 9, 27, 1))),
-        ];
 
-        await _pumpPage(tester, memId: memId, memName: memName, acts: acts);
+        await _pumpPage(tester, memId: memId, memName: memName);
 
         expect(
           find.text("$memName : ${AggregationType.count.name}"),
           findsOneWidget,
         );
-        expect(find.text('Min : '), findsOneWidget);
-        expect(find.text('Max : '), findsOneWidget);
-        expect(find.text('Avg : '), findsOneWidget);
-        expect(find.byType(LineChartWrapper), findsOneWidget);
-        expect(find.byIcon(Icons.chevron_left), findsOneWidget);
-        expect(find.byIcon(Icons.chevron_right), findsOneWidget);
+        expect(find.byIcon(Icons.chevron_left), findsNothing);
+        expect(find.byIcon(Icons.chevron_right), findsNothing);
       },
     );
 
     testWidgets(
-      'shows period range and navigates previous/next.',
+      'flings to the previous period and back, and does not enter the future.',
       (tester) async {
         await _pumpPage(
           tester,
@@ -64,32 +98,34 @@ void main() {
         );
 
         final localizations = _localizations(tester);
-        final nextButton = find.widgetWithIcon(IconButton, Icons.chevron_right);
-        final previousButton =
-            find.widgetWithIcon(IconButton, Icons.chevron_left);
 
-        expect(find.text(_rangeLabel(localizations)), findsOneWidget);
-        expect(tester.widget<IconButton>(nextButton).onPressed, isNull);
+        expect(_visibleRangeLabel(localizations), findsOneWidget);
 
-        await tester.tap(previousButton);
-        await tester.pumpAndSettle();
+        await _flingVisibleChart(tester, _towardPast);
 
         expect(
-          find.text(_rangeLabel(localizations, offset: -1)),
+          _visibleRangeLabel(localizations, offset: _previousPeriodOffset),
           findsOneWidget,
         );
-        expect(tester.widget<IconButton>(nextButton).onPressed, isNotNull);
 
-        await tester.tap(nextButton);
-        await tester.pumpAndSettle();
+        await _flingVisibleChart(tester, _towardPresent);
 
-        expect(find.text(_rangeLabel(localizations)), findsOneWidget);
-        expect(tester.widget<IconButton>(nextButton).onPressed, isNull);
+        expect(_visibleRangeLabel(localizations), findsOneWidget);
+
+        await _flingVisibleChart(tester, _towardPresent);
+
+        expect(_visibleRangeLabel(localizations), findsOneWidget);
+        expect(
+          find.text(
+            _rangeLabel(localizations, offset: _futurePeriodOffset),
+          ),
+          findsNothing,
+        );
       },
     );
 
     testWidgets(
-      'resets offset when period type changes.',
+      'returns to the current range when the period type changes.',
       (tester) async {
         await _pumpPage(
           tester,
@@ -99,8 +135,12 @@ void main() {
 
         final localizations = _localizations(tester);
 
-        await tester.tap(find.widgetWithIcon(IconButton, Icons.chevron_left));
-        await tester.pumpAndSettle();
+        await _flingVisibleChart(tester, _towardPast);
+
+        expect(
+          _visibleRangeLabel(localizations, offset: _previousPeriodOffset),
+          findsOneWidget,
+        );
 
         await tester.tap(find.byIcon(Icons.more_vert));
         await tester.pumpAndSettle();
@@ -108,46 +148,21 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(
-          find.text(_rangeLabel(localizations, period: Period.aMonth)),
+          _visibleRangeLabel(localizations, period: Period.aMonth),
           findsOneWidget,
-        );
-        expect(
-          tester
-              .widget<IconButton>(
-                find.widgetWithIcon(IconButton, Icons.chevron_right),
-              )
-              .onPressed,
-          isNull,
         );
       },
     );
 
     testWidgets(
-      'selects sum and shows elapsed time.',
+      'selects sum and shows it in the title.',
       (tester) async {
         final memName = 'memName - sum';
-        final start =
-            Period.aWeek.toPeriod(DateAndTime.now(), defaultStartOfDay)!.start;
 
         await _pumpPage(
           tester,
           memId: 1,
           memName: memName,
-          acts: [
-            FinishedAct(
-              1,
-              start,
-              // add は秒を捨てる
-              DateAndTime(
-                start.year,
-                start.month,
-                start.day,
-                start.hour + 1,
-                2,
-                3,
-              ),
-            ),
-          ],
         );
 
         await tester.tap(find.byIcon(Icons.more_vert));
@@ -159,12 +174,11 @@ void main() {
           find.text('$memName : ${AggregationType.sum.name}'),
           findsOneWidget,
         );
-        expect(find.text('1h 2m 3s'), findsAtLeastNWidgets(1));
       },
     );
 
     testWidgets(
-      'hides navigation for Period.all.',
+      'has no PageView for Period.all.',
       (tester) async {
         await _pumpPage(
           tester,
@@ -177,53 +191,105 @@ void main() {
         await tester.tap(find.text(Period.all.name));
         await tester.pumpAndSettle();
 
-        expect(find.byIcon(Icons.chevron_left), findsNothing);
-        expect(find.byIcon(Icons.chevron_right), findsNothing);
+        expect(find.byType(PageView), findsNothing);
+        expect(find.byType(LineChartWrapper), findsOneWidget);
       },
     );
 
     testWidgets(
-      'plots acts inside the period and drops the rest',
+      'shows the current and previous periods when the body is taller than one period.',
       (tester) async {
-        final period = Period.aWeek.toPeriod(
-          DateAndTime.now(),
-          defaultStartOfDay,
-        )!;
-        final insideStart = period.start;
-        final outsideStart = period.end;
-
         await _pumpPage(
           tester,
           memId: 1,
-          memName: 'memName - period filter',
-          acts: [
-            FinishedAct(
-              1,
-              insideStart,
-              insideStart.add(const Duration(hours: 1)),
-            ),
-            FinishedAct(
-              1,
-              outsideStart,
-              outsideStart.add(const Duration(hours: 1)),
-            ),
-          ],
+          memName: 'memName - two periods',
+          screen: _tallScreen,
         );
 
-        final spots = tester
-            .widget<LineChart>(find.byType(LineChart))
-            .data
-            .lineBarsData
-            .last
-            .spots
-            .where((spot) => spot.y > 0);
+        final localizations = _localizations(tester);
 
-        expect(spots, hasLength(1));
+        expect(_visibleRangeLabel(localizations), findsOneWidget);
         expect(
-          spots.single.x,
-          DateAndTime(insideStart.year, insideStart.month, insideStart.day)
-              .millisecondsSinceEpoch
-              .toDouble(),
+          _visibleRangeLabel(localizations, offset: _previousPeriodOffset),
+          findsOneWidget,
+        );
+        expect(
+          _visibleRangeLabel(
+            localizations,
+            offset: _twoPeriodsAgoOffset,
+          ),
+          findsNothing,
+        );
+      },
+    );
+
+    testWidgets(
+      'shows only the current period when the body fits in one period.',
+      (tester) async {
+        await _pumpPage(
+          tester,
+          memId: 1,
+          memName: 'memName - one period',
+          screen: _oneSlotScreen,
+        );
+
+        final localizations = _localizations(tester);
+
+        expect(_visibleRangeLabel(localizations), findsOneWidget);
+        expect(
+          _visibleRangeLabel(localizations, offset: _previousPeriodOffset),
+          findsNothing,
+        );
+      },
+    );
+
+    testWidgets(
+      'advances one period when two periods are visible.',
+      (tester) async {
+        await _pumpPage(
+          tester,
+          memId: 1,
+          memName: 'memName - two period fling',
+          screen: _tallScreen,
+        );
+
+        final localizations = _localizations(tester);
+
+        await _flingVisibleChart(tester, _towardPast);
+
+        expect(_visibleRangeLabel(localizations), findsNothing);
+        expect(
+          _visibleRangeLabel(localizations, offset: _previousPeriodOffset),
+          findsOneWidget,
+        );
+        expect(
+          _visibleRangeLabel(
+            localizations,
+            offset: _twoPeriodsAgoOffset,
+          ),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'keeps Period.all within one period height on a tall screen.',
+      (tester) async {
+        await _pumpPage(
+          tester,
+          memId: 1,
+          memName: 'memName - period all height',
+          screen: _tallScreen,
+        );
+
+        await tester.tap(find.byIcon(Icons.more_vert));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(Period.all.name));
+        await tester.pumpAndSettle();
+
+        expect(
+          _periodBlockHeight(tester),
+          lessThanOrEqualTo(lineChartPeriodMaxHeight),
         );
       },
     );
@@ -235,7 +301,13 @@ Future<void> _pumpPage(
   required int memId,
   required String memName,
   List<Act> acts = const [],
+  Size screen = _oneSlotScreen,
 }) async {
+  tester.view.physicalSize = screen;
+  tester.view.devicePixelRatio = _devicePixelRatio;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+
   await tester.pumpWidget(
     ProviderScope(
       overrides: _overrides(memId, memName, acts),
@@ -257,15 +329,44 @@ MaterialLocalizations _localizations(WidgetTester tester) =>
 String _rangeLabel(
   MaterialLocalizations localizations, {
   Period period = Period.aWeek,
-  int offset = 0,
+  int offset = _currentPeriodOffset,
 }) =>
     period
         .toPeriod(DateAndTime.now(), defaultStartOfDay, offset: offset)!
         .formatCompactRange(localizations);
 
+Finder _visibleRangeLabel(
+  MaterialLocalizations localizations, {
+  Period period = Period.aWeek,
+  int offset = _currentPeriodOffset,
+}) =>
+    find
+        .text(_rangeLabel(localizations, period: period, offset: offset))
+        .hitTestable();
+
+Future<void> _flingVisibleChart(WidgetTester tester, Offset offset) async {
+  await tester.fling(
+    find.byType(LineChartWrapper).hitTestable().first,
+    offset,
+    _flingSpeed,
+  );
+  await tester.pumpAndSettle();
+}
+
+double _periodBlockHeight(WidgetTester tester) {
+  final block = find.ancestor(
+    of: find.byType(LineChartWrapper),
+    matching: find.byWidgetPredicate(
+      (widget) => widget is Flex && widget.direction == Axis.vertical,
+    ),
+  );
+  expect(block, findsOneWidget);
+  return tester.getSize(block).height;
+}
+
 List<Override> _overrides(int memId, String memName, List<Act> acts) => [
       for (final period in Period.values)
-        for (final offset in const [0, -1])
+        for (final offset in _stubbedPeriodOffsets)
           loadActListProvider(memId, period, offset).overrideWith(
             (ref) => AsyncValue.data(acts),
           ),
