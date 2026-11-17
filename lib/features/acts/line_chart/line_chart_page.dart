@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/acts/act.dart';
@@ -31,36 +32,30 @@ class ActLineChartPage extends ConsumerStatefulWidget {
 
 class _ActLineChartPageState extends ConsumerState<ActLineChartPage> {
   Period _period = Period.aWeek;
-  int _periodOffset = 0;
   AggregationType _aggregationType = AggregationType.count;
 
-  void _selectPeriod(Period period) => setState(() {
-        _period = period;
-        _periodOffset = 0;
-      });
+  // 期間の種類を変えたらページ 0。PageStorage が前のページを戻さない
+  final PageController _pageController = PageController(keepPage: false);
 
-  void _goPreviousPeriod() => setState(() => _periodOffset--);
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
-  void _goNextPeriod() => setState(() {
-        if (_periodOffset < 0) {
-          _periodOffset++;
-        }
-      });
+  void _selectPeriod(Period period) {
+    setState(() => _period = period);
+    if (_pageController.hasClients) {
+      _pageController.jumpToPage(0);
+    }
+  }
 
   @override
   Widget build(BuildContext context) => v(
         () {
           final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
-          final selectedPeriod = _period.toPeriod(
-            DateAndTime.now(),
-            startOfDay,
-            offset: _periodOffset,
-          );
 
-          return AsyncValueView(
-            loadActListProvider(widget.memId, _period, _periodOffset),
-            (_) => _buildScaffold(context, selectedPeriod, startOfDay),
-          );
+          return _buildScaffold(context, startOfDay);
         },
         {
           'memId': widget.memId,
@@ -69,18 +64,20 @@ class _ActLineChartPageState extends ConsumerState<ActLineChartPage> {
 
   Widget _buildScaffold(
     BuildContext context,
-    DateAndTimePeriod? selectedPeriod,
     TimeOfDay startOfDay,
   ) {
     final memName = ref.read(
       editingMemByMemIdProvider(widget.memId).select((v) => v.value.name),
     );
-    final actsSummary = ActsSummary(
-      _actsInPeriod(selectedPeriod),
-      _aggregationType,
-      period: selectedPeriod,
-      startOfDay: startOfDay,
-    );
+
+    Widget page(int offset) => _PeriodPage(
+          memId: widget.memId,
+          period: _period,
+          offset: offset,
+          aggregationType: _aggregationType,
+          startOfDay: startOfDay,
+          pageController: _period == Period.all ? null : _pageController,
+        );
 
     return Scaffold(
       appBar: AppBar(
@@ -112,76 +109,198 @@ class _ActLineChartPageState extends ConsumerState<ActLineChartPage> {
       ),
       body: Padding(
         padding: defaultPadding,
-        child: Flex(
+        child: _period == Period.all
+            ? page(0)
+            : PageView.builder(
+                scrollDirection: Axis.vertical,
+                controller: _pageController,
+                // ページ 0 が今の期間。先のページほど過去なので offset は負
+                itemBuilder: (context, index) => page(-index),
+              ),
+      ),
+    );
+  }
+}
+
+class _PeriodPage extends ConsumerWidget {
+  final int memId;
+  final Period period;
+  final int offset;
+  final AggregationType aggregationType;
+  final TimeOfDay startOfDay;
+  final PageController? pageController;
+
+  const _PeriodPage({
+    required this.memId,
+    required this.period,
+    required this.offset,
+    required this.aggregationType,
+    required this.startOfDay,
+    this.pageController,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    Iterable<Act> actsIn(DateAndTimePeriod? selectedPeriod) => ref
+        .watch(actListProvider(memId).select(
+          (value) => value.where((e) {
+            if (selectedPeriod is! WithStartAndEnd) {
+              return true;
+            }
+            final start = e.value.period?.start;
+            return start != null && selectedPeriod.includesStart(start);
+          }),
+        ))
+        .map((e) => e.value);
+
+    final selectedPeriod = period.toPeriod(
+      DateAndTime.now(),
+      startOfDay,
+      offset: offset,
+    );
+
+    return AsyncValueView(
+      loadActListProvider(memId, period, offset),
+      (_) {
+        final actsSummary = ActsSummary(
+          actsIn(selectedPeriod),
+          aggregationType,
+          period: selectedPeriod,
+          startOfDay: startOfDay,
+        );
+        final chart = LineChartWrapper(
+          actsSummary,
+          aggregationType.format,
+        );
+        final paging = pageController;
+
+        return Flex(
           direction: Axis.vertical,
           children: [
             if (selectedPeriod is WithStartAndEnd)
-              _PeriodNavigation(
-                periodLabel: selectedPeriod.formatCompactRange(
+              Text(
+                selectedPeriod.formatCompactRange(
                   MaterialLocalizations.of(context),
                 ),
-                canGoNext: _periodOffset < 0,
-                onPrevious: _goPreviousPeriod,
-                onNext: _goNextPeriod,
+                textAlign: TextAlign.center,
               ),
-            _SummaryStats(actsSummary, _aggregationType.format),
+            _SummaryStats(actsSummary, aggregationType.format),
             Expanded(
-              child: LineChartWrapper(
-                actsSummary,
-                _aggregationType.format,
-              ),
+              child: paging == null
+                  ? chart
+                  : _ChartVerticalDrag(
+                      controller: paging,
+                      child: chart,
+                    ),
             ),
           ],
+        );
+      },
+    );
+  }
+}
+
+// fl_chart の pan が縦ドラッグを取る。タップのツールチップは残し、縦の移動だけページへ渡す
+class _ChartVerticalDrag extends StatefulWidget {
+  final PageController controller;
+  final Widget child;
+
+  const _ChartVerticalDrag({
+    required this.controller,
+    required this.child,
+  });
+
+  @override
+  State<_ChartVerticalDrag> createState() => _ChartVerticalDragState();
+}
+
+class _ChartVerticalDragState extends State<_ChartVerticalDrag> {
+  Drag? _drag;
+  Offset? _start;
+  VelocityTracker? _tracker;
+
+  @override
+  void dispose() {
+    _drag?.cancel();
+    _drag = null;
+    super.dispose();
+  }
+
+  void _down(PointerDownEvent event) {
+    _drag?.cancel();
+    _drag = null;
+    _start = event.position;
+    _tracker = VelocityTracker.withKind(event.kind)
+      ..addPosition(event.timeStamp, event.position);
+  }
+
+  void _move(PointerMoveEvent event) {
+    final start = _start;
+    final tracker = _tracker;
+    if (start == null || tracker == null) {
+      return;
+    }
+    tracker.addPosition(event.timeStamp, event.position);
+    if (_drag == null) {
+      final moved = event.position - start;
+      if (moved.dy.abs() < kTouchSlop || moved.dy.abs() <= moved.dx.abs()) {
+        return;
+      }
+      if (!widget.controller.hasClients) {
+        return;
+      }
+      _drag = widget.controller.position.drag(
+        DragStartDetails(
+          sourceTimeStamp: event.timeStamp,
+          globalPosition: start,
+          kind: event.kind,
         ),
+        () => _drag = null,
+      );
+    }
+    _drag?.update(
+      DragUpdateDetails(
+        sourceTimeStamp: event.timeStamp,
+        globalPosition: event.position,
+        delta: Offset(0, event.delta.dy),
+        primaryDelta: event.delta.dy,
       ),
     );
   }
 
-  Iterable<Act> _actsInPeriod(DateAndTimePeriod? selectedPeriod) => ref
-      .watch(actListProvider(widget.memId).select(
-        (value) => value.where((e) {
-          if (selectedPeriod is! WithStartAndEnd) {
-            return true;
-          }
-          final start = e.value.period?.start;
-          return start != null && selectedPeriod.includesStart(start);
-        }),
-      ))
-      .map((e) => e.value);
-}
+  void _up(PointerUpEvent event) {
+    final drag = _drag;
+    final tracker = _tracker;
+    _drag = null;
+    _start = null;
+    _tracker = null;
+    if (drag == null || tracker == null) {
+      return;
+    }
+    tracker.addPosition(event.timeStamp, event.position);
+    final dy = tracker.getVelocity().pixelsPerSecond.dy;
+    drag.end(
+      DragEndDetails(
+        primaryVelocity: dy,
+        velocity: Velocity(pixelsPerSecond: Offset(0, dy)),
+      ),
+    );
+  }
 
-class _PeriodNavigation extends StatelessWidget {
-  final String periodLabel;
-  final bool canGoNext;
-  final VoidCallback onPrevious;
-  final VoidCallback onNext;
-
-  const _PeriodNavigation({
-    required this.periodLabel,
-    required this.canGoNext,
-    required this.onPrevious,
-    required this.onNext,
-  });
+  void _cancel(PointerCancelEvent event) {
+    _drag?.cancel();
+    _drag = null;
+    _start = null;
+    _tracker = null;
+  }
 
   @override
-  Widget build(BuildContext context) => Flex(
-        direction: Axis.horizontal,
-        children: [
-          IconButton(
-            onPressed: onPrevious,
-            icon: const Icon(Icons.chevron_left),
-          ),
-          Expanded(
-            child: Text(
-              periodLabel,
-              textAlign: TextAlign.center,
-            ),
-          ),
-          IconButton(
-            onPressed: canGoNext ? onNext : null,
-            icon: const Icon(Icons.chevron_right),
-          ),
-        ],
+  Widget build(BuildContext context) => Listener(
+        onPointerDown: _down,
+        onPointerMove: _move,
+        onPointerUp: _up,
+        onPointerCancel: _cancel,
+        child: widget.child,
       );
 }
 
