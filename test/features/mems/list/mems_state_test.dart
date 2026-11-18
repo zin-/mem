@@ -385,8 +385,7 @@ void main() {
       );
     });
 
-    test(
-        'keeps a newer latestAct when an earlier loadMemList returns later',
+    test('keeps a newer latestAct when an earlier loadMemList returns later',
         () async {
       const memId = 1;
       final fixedDate = DateTime(2024, 10, 1);
@@ -447,6 +446,201 @@ void main() {
       final cached = container.read(memEntitiesProvider).single;
       expect(cached.name, 'renamed');
       expect(cached.latestAct, isA<FinishedAct>());
+    });
+
+    test('uses the shipped latestAct when loadMemList starts after refresh',
+        () async {
+      const memId = 1;
+      final fixedDate = DateTime(2024, 10, 1);
+      // 時。終了より前なので、refresh が返す act はこの時刻に始まっている
+      final startedHour = 8;
+      // 時。開始の1時間後なので、refresh が返す act は終了済み
+      final endedHour = 9;
+      // 時。終了の1時間後なので、その後の一覧が返す act は再開している
+      final restartedHour = 10;
+      final finished = FinishedAct(
+        memId,
+        DateAndTime(2024, 10, 1, startedHour),
+        DateAndTime(2024, 10, 1, endedHour),
+        actKind: ActKind.finished,
+      );
+      final restarted = ActiveAct(
+        memId,
+        DateAndTime(2024, 10, 1, restartedHour),
+      );
+      final refreshed = savedMem(
+        id: memId,
+        name: 'original',
+        createdAt: fixedDate,
+        updatedAt: fixedDate,
+        latestAct: finished,
+      );
+      final reloaded = savedMem(
+        id: memId,
+        name: 'renamed',
+        createdAt: fixedDate,
+        updatedAt: fixedDate,
+        latestAct: restarted,
+      );
+      final listResponse = Completer<List<MemEntity>>();
+
+      when(mockMemRepository.ship(
+        id: anyNamed('id'),
+        archived: anyNamed('archived'),
+        done: anyNamed('done'),
+        loadLatestAct: anyNamed('loadLatestAct'),
+      )).thenAnswer((invocation) {
+        final id = invocation.namedArguments[#id] as int?;
+        if (id == memId) return Future.value([refreshed]);
+        return listResponse.future;
+      });
+      when(mockMemNotificationRepository.ship(
+        memId: anyNamed('memId'),
+        memIdsIn: anyNamed('memIdsIn'),
+      )).thenAnswer((_) async => []);
+
+      final container = loadMemListTestContainer();
+      addTearDown(container.dispose);
+      final notifier = container.read(memEntitiesProvider.notifier);
+
+      await notifier.refreshLatestActForMem(memId);
+      final listCall = notifier.loadMemList(archived: false, done: false);
+      listResponse.complete([reloaded]);
+      await listCall;
+
+      final cached = container.read(memEntitiesProvider).single;
+      expect(cached.name, 'renamed');
+      expect(cached.latestAct, isA<ActiveAct>());
+    });
+  });
+
+  group('loadByMemId', () {
+    test('keeps a newer latestAct when an earlier loadByMemId returns later',
+        () async {
+      const memId = 1;
+      final fixedDate = DateTime(2024, 10, 1);
+      // 時。終了より前なので、先に始まった load が返す act は進行中のまま
+      final startedHour = 8;
+      // 時。開始の1時間後なので、refresh が返す act は終了済み
+      final endedHour = 9;
+      final active = ActiveAct(
+        memId,
+        DateAndTime(2024, 10, 1, startedHour),
+      );
+      final finished = FinishedAct(
+        memId,
+        DateAndTime(2024, 10, 1, startedHour),
+        DateAndTime(2024, 10, 1, endedHour),
+        actKind: ActKind.finished,
+      );
+      final stale = savedMem(
+        id: memId,
+        name: 'renamed',
+        createdAt: fixedDate,
+        updatedAt: fixedDate,
+        latestAct: active,
+      );
+      final refreshed = savedMem(
+        id: memId,
+        name: 'original',
+        createdAt: fixedDate,
+        updatedAt: fixedDate,
+        latestAct: finished,
+      );
+      final byIdResponse = Completer<List<MemEntity>>();
+      var idShipCount = 0;
+
+      when(mockMemRepository.ship(
+        id: anyNamed('id'),
+        archived: anyNamed('archived'),
+        done: anyNamed('done'),
+        loadLatestAct: anyNamed('loadLatestAct'),
+      )).thenAnswer((invocation) {
+        final id = invocation.namedArguments[#id] as int?;
+        if (id != memId) return Future.value(<MemEntity>[]);
+        idShipCount += 1;
+        // loadByMemId が先に ship する。その次が refresh
+        if (idShipCount == 1) return byIdResponse.future;
+        return Future.value([refreshed]);
+      });
+
+      final container = loadMemListTestContainer();
+      addTearDown(container.dispose);
+      final notifier = container.read(memEntitiesProvider.notifier);
+
+      final byIdCall = notifier.loadByMemId(memId);
+      await notifier.refreshLatestActForMem(memId);
+      byIdResponse.complete([stale]);
+      await byIdCall;
+
+      final cached = container.read(memEntitiesProvider).single;
+      expect(cached.name, 'renamed');
+      expect(cached.latestAct, isA<FinishedAct>());
+    });
+
+    test('uses the shipped latestAct when loadByMemId starts after refresh',
+        () async {
+      const memId = 1;
+      final fixedDate = DateTime(2024, 10, 1);
+      // 時。終了より前なので、refresh が返す act はこの時刻に始まっている
+      final startedHour = 8;
+      // 時。開始の1時間後なので、refresh が返す act は終了済み
+      final endedHour = 9;
+      // 時。終了の1時間後なので、その後の load が返す act は再開している
+      final restartedHour = 10;
+      final finished = FinishedAct(
+        memId,
+        DateAndTime(2024, 10, 1, startedHour),
+        DateAndTime(2024, 10, 1, endedHour),
+        actKind: ActKind.finished,
+      );
+      final restarted = ActiveAct(
+        memId,
+        DateAndTime(2024, 10, 1, restartedHour),
+      );
+      final refreshed = savedMem(
+        id: memId,
+        name: 'original',
+        createdAt: fixedDate,
+        updatedAt: fixedDate,
+        latestAct: finished,
+      );
+      final reloaded = savedMem(
+        id: memId,
+        name: 'renamed',
+        createdAt: fixedDate,
+        updatedAt: fixedDate,
+        latestAct: restarted,
+      );
+      final byIdResponse = Completer<List<MemEntity>>();
+      var idShipCount = 0;
+
+      when(mockMemRepository.ship(
+        id: anyNamed('id'),
+        archived: anyNamed('archived'),
+        done: anyNamed('done'),
+        loadLatestAct: anyNamed('loadLatestAct'),
+      )).thenAnswer((invocation) {
+        final id = invocation.namedArguments[#id] as int?;
+        if (id != memId) return Future.value(<MemEntity>[]);
+        idShipCount += 1;
+        // refresh が先に ship する。その次が loadByMemId
+        if (idShipCount == 1) return Future.value([refreshed]);
+        return byIdResponse.future;
+      });
+
+      final container = loadMemListTestContainer();
+      addTearDown(container.dispose);
+      final notifier = container.read(memEntitiesProvider.notifier);
+
+      await notifier.refreshLatestActForMem(memId);
+      final byIdCall = notifier.loadByMemId(memId);
+      byIdResponse.complete([reloaded]);
+      await byIdCall;
+
+      final cached = container.read(memEntitiesProvider).single;
+      expect(cached.name, 'renamed');
+      expect(cached.latestAct, isA<ActiveAct>());
     });
   });
 
