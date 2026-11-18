@@ -6,11 +6,14 @@ import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/home/habitual_mems.dart';
 import 'package:mem/features/mems/list/states.dart';
+import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/preference/preference_key.dart';
 import 'package:mem/features/settings/states.dart';
+import 'package:mem/features/targets/target.dart';
+import 'package:mem/framework/date_and_time/period.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/home_screen.dart';
 import 'package:mem/l10n/l10n.dart';
@@ -18,11 +21,22 @@ import 'package:mem/values/colors.dart';
 
 import '../../../entity_factories.dart';
 
+// 1回目は表示前の loadMemList。2回目が引き下げ
+const _reloadLoadCount = 2;
+const _reloadedNameSuffix = ' reloaded';
+
 class _FakeMemEntities extends MemEntities {
   final Iterable<MemEntity> _state;
   final void Function()? _onLoad;
+  final bool _renameOnReload;
+  var _loadCount = 0;
 
-  _FakeMemEntities(this._state, {void Function()? onLoad}) : _onLoad = onLoad;
+  _FakeMemEntities(
+    this._state, {
+    void Function()? onLoad,
+    bool renameOnReload = false,
+  })  : _onLoad = onLoad,
+        _renameOnReload = renameOnReload;
 
   @override
   Iterable<MemEntity> build() => _state;
@@ -30,6 +44,26 @@ class _FakeMemEntities extends MemEntities {
   @override
   Future<void> loadMemList({bool? archived, bool? done}) async {
     _onLoad?.call();
+    if (!_renameOnReload) return;
+
+    _loadCount += 1;
+    if (_loadCount < _reloadLoadCount) return;
+
+    // loadMemListProvider の build 中に state を更新すると Riverpod が拒否する
+    await Future<void>.value();
+    state = [
+      for (final mem in state)
+        mem.updatedWith(
+          update: (current) => Mem(
+            current.id,
+            '${current.name}$_reloadedNameSuffix',
+            current.doneAt,
+            current.period,
+            latestAct: current.latestAct,
+            scheduleAnchorAct: current.scheduleAnchorAct,
+          ),
+        ),
+    ];
   }
 }
 
@@ -631,6 +665,127 @@ void main() {
       expect(find.text('7:00, 8'), findsNothing);
       expect(find.text('8:00, 9'), findsNothing);
       expect(find.text('9:00, 10'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'pull to refresh reloads mem names, period counts, and habitual mems',
+    (tester) async {
+      // px。中身が短くても overscroll して RefreshIndicator が走る
+      const reloadFlingDistance = 300.0;
+      // px/秒。引き下げとして扱われる速度
+      const reloadFlingSpeed = 1000.0;
+      // RefreshIndicator が閉じるまで。pumpAndSettle はインジケータが残ると終わらない
+      const refreshIndicatorSettle = Duration(seconds: 1);
+      // 1日5回。未達なので表示回数は期間回数のまま `n / 5` になる
+      const dayTargetCount = 5;
+      const periodCountBeforeReload = 1;
+      const periodCountAfterReload = 4;
+      const countedMemId = 2;
+      const oftenMemId = 30;
+      const laterMemId = 31;
+      const beforeName = 'Before';
+      const oftenName = 'Often';
+      const laterName = 'Later';
+
+      final counted = savedMem(
+        id: countedMemId,
+        name: beforeName,
+        createdAt: createdAt,
+        updatedAt: createdAt,
+        notifyOn: DateTime(2099, 1, 1, 10),
+        notifyAt: DateTime(2099, 1, 1, 10),
+        target: Target(
+          memId: countedMemId,
+          targetType: TargetType.equalTo,
+          targetUnit: TargetUnit.count,
+          value: dayTargetCount,
+          period: Period.aDay,
+        ),
+      );
+      final often = savedMem(
+        id: oftenMemId,
+        name: oftenName,
+        createdAt: createdAt,
+        updatedAt: createdAt,
+      );
+      final later = savedMem(
+        id: laterMemId,
+        name: laterName,
+        createdAt: createdAt,
+        updatedAt: createdAt,
+      );
+      final mems = [counted, often, later];
+      var periodCountBuilds = 0;
+      var habitualBuilds = 0;
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            preferenceProvider(startOfDayKey).overrideWith(
+              () => _FakePreference(),
+            ),
+            memEntitiesProvider.overrideWith(
+              () => _FakeMemEntities(mems, renameOnReload: true),
+            ),
+            savedMemNotificationsProvider.overrideWith(
+              (ref) => ListValueStateNotifier<SavedMemNotificationEntityV1>([]),
+            ),
+            for (final mem in mems)
+              memNotificationsByMemIdProvider(mem.id).overrideWith(
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
+              ),
+            listPeriodCountByMemIdProvider.overrideWith((ref) async {
+              periodCountBuilds += 1;
+              final count = periodCountBuilds == 1
+                  ? periodCountBeforeReload
+                  : periodCountAfterReload;
+              return {countedMemId: count};
+            }),
+            habitualMemsProvider.overrideWith((ref) async {
+              habitualBuilds += 1;
+              final mem = habitualBuilds == 1 ? often : later;
+              return [habitualMem(mem)];
+            }),
+          ],
+          child: MaterialApp(
+            home: HomeScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text(beforeName), findsOneWidget);
+      expect(find.text('$periodCountBeforeReload'), findsOneWidget);
+      expect(find.text(oftenName), findsOneWidget);
+      expect(find.text(laterName), findsNothing);
+
+      await tester.fling(
+        find.byType(ListView),
+        const Offset(0, reloadFlingDistance),
+        reloadFlingSpeed,
+      );
+      await tester.pump();
+      await tester.pump(refreshIndicatorSettle);
+      await tester.pump(refreshIndicatorSettle);
+
+      expect(find.text('$beforeName$_reloadedNameSuffix'), findsOneWidget);
+      expect(find.text('$periodCountAfterReload'), findsOneWidget);
+      expect(find.text('$periodCountBeforeReload'), findsNothing);
+
+      final habitualCard = find.ancestor(
+        of: find.byIcon(Icons.schedule),
+        matching: find.byType(Card),
+      );
+      expect(
+        find.descendant(
+          of: habitualCard,
+          matching: find.text('$laterName$_reloadedNameSuffix'),
+        ),
+        findsOneWidget,
+      );
+      expect(find.text(oftenName), findsNothing);
+      expect(find.text('$oftenName$_reloadedNameSuffix'), findsNothing);
     },
   );
 }
