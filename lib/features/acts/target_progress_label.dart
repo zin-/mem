@@ -135,33 +135,19 @@ class _TargetProgressLabelState extends State<TargetProgressLabel> {
           final periodLabel = widget._periodLabel();
           final boundIcon = widget._boundIcon();
           final style = DefaultTextStyle.of(context).style;
-          final targetText = widget._targetText();
           return Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text(widget._currentText(DateTime.now())),
               separator,
-              if (boundIcon == null)
-                Text(targetText)
-              else
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(text: targetText),
-                      WidgetSpan(
-                        alignment: PlaceholderAlignment.middle,
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            left: targetBoundIconGap,
-                          ),
-                          child: Icon(
-                            boundIcon,
-                            size: style.fontSize,
-                            color: style.color,
-                          ),
-                        ),
-                      ),
-                    ],
+              Text(widget._targetText()),
+              if (boundIcon != null)
+                Padding(
+                  padding: const EdgeInsets.only(left: targetBoundIconGap),
+                  child: Icon(
+                    boundIcon,
+                    size: style.fontSize,
+                    color: style.color,
                   ),
                 ),
               if (periodLabel != null) ...[

@@ -41,34 +41,20 @@ void main() {
     expectCentered(tester);
 
     final children = tester.widget<Wrap>(find.byType(Wrap)).children;
-    final targetIndex = children.indexWhere((child) {
-      if (child is! Text) {
+    final markIndex = children.indexWhere((child) {
+      if (child is! Padding || child.child is! Icon) {
         return false;
       }
-      final span = child.textSpan;
-      if (span is! TextSpan) {
-        return false;
-      }
-      final spans = span.children;
-      if (spans == null || spans.length != 2) {
-        return false;
-      }
-      final text = spans[0];
-      return text is TextSpan &&
-          text.text == targetText &&
-          spans[1] is WidgetSpan;
+      return (child.child! as Icon).icon == icon;
     });
-    expect(targetIndex, isNonNegative);
+    expect(markIndex, greaterThan(0));
 
-    final target = children[targetIndex] as Text;
-    final markSpan = (target.textSpan! as TextSpan).children![1] as WidgetSpan;
-    expect(markSpan.alignment, PlaceholderAlignment.middle);
-    expect(markSpan.child, isA<Padding>());
-    final gap = markSpan.child as Padding;
+    final gap = children[markIndex] as Padding;
     expect(gap.padding, const EdgeInsets.only(left: targetBoundIconGap));
-    expect(gap.child, isA<Icon>());
     final mark = gap.child! as Icon;
-    expect(mark.icon, icon);
+    final target = children[markIndex - 1];
+    expect(target, isA<Text>());
+    expect((target as Text).data, targetText);
 
     final style = DefaultTextStyle.of(
       tester.element(find.byWidget(target)),
@@ -79,7 +65,7 @@ void main() {
     final periodIndex = children.indexWhere(
       (child) => child is Text && child.data == periodLabel,
     );
-    expect(periodIndex, greaterThan(targetIndex));
+    expect(periodIndex, greaterThan(markIndex));
   }
 
   Future<void> pump(
