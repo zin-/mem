@@ -40,7 +40,7 @@ class ActListSubHeader extends StatelessWidget {
                   style: _subHeaderTextStyle,
                 ),
                 Text(
-                  amount.recorded.formatElapsedTime(),
+                  amount.recorded.format(),
                   style: _subHeaderTextStyle,
                 ),
               ],

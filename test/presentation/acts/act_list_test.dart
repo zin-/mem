@@ -136,7 +136,7 @@ void main() {
 
       expect(find.byType(TotalActTimeListItem), findsOneWidget);
       expect(
-        find.text(const Duration(hours: 1).formatElapsedTime()),
+        find.text(const Duration(hours: 1).format()),
         // 小見出しと行が同じ合計を出す
         findsNWidgets(2),
       );
@@ -310,12 +310,12 @@ void main() {
 
       expect(
         find.text(
-            const Duration(hours: _hoursOnFirstReload).formatElapsedTime()),
+            const Duration(hours: _hoursOnFirstReload).format()),
         // 小見出しと行が同じ合計を出す
         findsNWidgets(2),
       );
       expect(
-        find.text(const Duration(hours: _hoursOnRefresh).formatElapsedTime()),
+        find.text(const Duration(hours: _hoursOnRefresh).format()),
         findsNothing,
       );
 
@@ -329,13 +329,13 @@ void main() {
       await tester.pump(refreshIndicatorSettle);
 
       expect(
-        find.text(const Duration(hours: _hoursOnRefresh).formatElapsedTime()),
+        find.text(const Duration(hours: _hoursOnRefresh).format()),
         // 小見出しと行が同じ合計を出す
         findsNWidgets(2),
       );
       expect(
         find.text(
-            const Duration(hours: _hoursOnFirstReload).formatElapsedTime()),
+            const Duration(hours: _hoursOnFirstReload).format()),
         findsNothing,
       );
     },

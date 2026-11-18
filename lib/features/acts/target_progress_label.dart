@@ -42,7 +42,7 @@ class TargetProgressLabel extends StatefulWidget {
 
   String _currentText(DateTime now) => switch (_target.targetUnit) {
         TargetUnit.count => _amount.count.toString(),
-        TargetUnit.time => _recordedAt(now).formatElapsedTime(),
+        TargetUnit.time => _recordedAt(now).format(),
       };
 
   TargetShownValue? _shownValue() {
@@ -59,7 +59,7 @@ class TargetProgressLabel extends StatefulWidget {
   String _targetText() {
     String textOf(int value) => switch (_target.targetUnit) {
           TargetUnit.count => value.toString(),
-          TargetUnit.time => Duration(seconds: value).formatElapsedTime(),
+          TargetUnit.time => Duration(seconds: value).format(),
         };
 
     final shown = _shownValue();

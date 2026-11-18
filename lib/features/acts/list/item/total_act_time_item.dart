@@ -128,7 +128,7 @@ class TotalActTimeListItem extends ConsumerWidget {
         target.targetUnit == TargetUnit.time) {
       return null;
     }
-    return Text(groupAmount.recorded.formatElapsedTime());
+    return Text(groupAmount.recorded.format());
   }
 
   ({Widget? leading, Widget? trailing}) _actions(

@@ -1462,9 +1462,9 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text(recorded.formatElapsedTime()), findsOneWidget);
+        expect(find.text(recorded.format()), findsOneWidget);
         expect(
-          find.text(const Duration(seconds: targetSeconds).formatElapsedTime()),
+          find.text(const Duration(seconds: targetSeconds).format()),
           findsOneWidget,
         );
       });
@@ -1518,10 +1518,10 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text(todayRecorded.formatElapsedTime()), findsOneWidget);
-        expect(find.text(weekRecorded.formatElapsedTime()), findsNothing);
+        expect(find.text(todayRecorded.format()), findsOneWidget);
+        expect(find.text(weekRecorded.format()), findsNothing);
         expect(
-          find.text(const Duration(seconds: targetSeconds).formatElapsedTime()),
+          find.text(const Duration(seconds: targetSeconds).format()),
           findsOneWidget,
         );
         expect(find.text(' / '), findsNWidgets(2));

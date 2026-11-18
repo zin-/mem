@@ -19,7 +19,7 @@ extension AggregationTypeFormat on AggregationType {
       case AggregationType.count:
         return value.toStringAsFixed(1);
       case AggregationType.time:
-        return Duration(seconds: value.floor()).formatElapsedTime();
+        return Duration(seconds: value.floor()).format();
     }
   }
 }

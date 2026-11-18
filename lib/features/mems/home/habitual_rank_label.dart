@@ -35,7 +35,7 @@ class _HabitualRankChunk extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => v(
-        () => Text('${_time.formatElapsedTime()}, $_count'),
+        () => Text('${_time.format()}, $_count'),
         {
           '_time': _time,
           '_count': _count,

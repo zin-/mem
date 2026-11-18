@@ -46,7 +46,7 @@ class _LiveElapsedTimeTextState extends State<LiveElapsedTimeText> {
   Widget build(BuildContext context) => v(
         () => Text(
           (elapsedTime ?? DateTime.now().difference(widget._start))
-              .formatElapsedTime(),
+              .format(),
         ),
         elapsedTime,
       );

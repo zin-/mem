@@ -1,5 +1,5 @@
 extension DurationExt on Duration {
-  String formatElapsedTime() {
+  String format() {
     // 桁。時・分・秒の欄。日は桁が伸びるので埋めない
     const fieldWidth = 2;
     String two(int n) => n.toString().padLeft(fieldWidth, '0');
