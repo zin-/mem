@@ -9,6 +9,7 @@ import 'package:mem/features/acts/period_view.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_shown_value.dart';
+import 'package:mem/values/dimens.dart';
 
 const _tickInterval = Duration(seconds: 1);
 const _approximateMark = '~';
@@ -44,11 +45,16 @@ class TargetProgressLabel extends StatefulWidget {
         TargetUnit.time => _recordedAt(now).formatHHmm(),
       };
 
-  TargetShownValue? _shownValue() => TargetShownValue.of(
-        value: _target.value,
-        period: _target.period,
-        shownIn: _shownIn,
-      );
+  TargetShownValue? _shownValue() {
+    if (_shownIn == Period.aDay && _target.period != _shownIn) {
+      return null;
+    }
+    return TargetShownValue.of(
+      value: _target.value,
+      period: _target.period,
+      shownIn: _shownIn,
+    );
+  }
 
   String _targetText() {
     String textOf(int value) => switch (_target.targetUnit) {
@@ -81,6 +87,12 @@ class TargetProgressLabel extends StatefulWidget {
     }
     return _target.period.shortLabel;
   }
+
+  IconData? _boundIcon() => switch (_target.targetType) {
+        TargetType.equalTo => null,
+        TargetType.lessThan => Icons.arrow_downward,
+        TargetType.moreThan => Icons.arrow_upward,
+      };
 
   @override
   State<TargetProgressLabel> createState() => _TargetProgressLabelState();
@@ -121,11 +133,23 @@ class _TargetProgressLabelState extends State<TargetProgressLabel> {
         () {
           const separator = Text(' / ');
           final periodLabel = widget._periodLabel();
+          final boundIcon = widget._boundIcon();
+          final style = DefaultTextStyle.of(context).style;
           return Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text(widget._currentText(DateTime.now())),
               separator,
               Text(widget._targetText()),
+              if (boundIcon != null)
+                Padding(
+                  padding: const EdgeInsets.only(left: targetBoundIconGap),
+                  child: Icon(
+                    boundIcon,
+                    size: style.fontSize,
+                    color: style.color,
+                  ),
+                ),
               if (periodLabel != null) ...[
                 separator,
                 Text(periodLabel),

@@ -39,3 +39,6 @@ const memPrePostListMaxHeight =
 // 論理px。チャートの1期間（範囲、Min / Max / Avg、チャート）の最大高さ。
 // 本文がこれを超えると、超えない高さで複数期間を並べる
 const lineChartPeriodMaxHeight = 480.0;
+
+// 論理px。アイコン枠の内側余白だけでは数字に近い
+const targetBoundIconGap = 2.0;
