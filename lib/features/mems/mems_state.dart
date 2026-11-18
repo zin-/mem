@@ -16,6 +16,9 @@ part 'mems_state.g.dart';
 class MemEntities extends _$MemEntities
     with EntitiesStateMixinV1<MemEntity, int> {
   final _detailLoads = <int, Future<void>>{};
+  final _latestActEpochs = <int, int>{};
+
+  static const _initialLatestActEpoch = 0;
 
   @override
   Iterable<MemEntity> build() => v(() => []);
@@ -27,13 +30,16 @@ class MemEntities extends _$MemEntities
 
   Future<void> loadMemList({bool? archived, bool? done}) => v(
         () async {
+          final epochsAtStart = Map<int, int>.of(_latestActEpochs);
           final mems = await MemRepository().ship(
             archived: archived,
             done: done,
             loadLatestAct: true,
           );
 
-          upsert(mems);
+          upsert([
+            for (final mem in mems) _keepingRefreshedAct(mem, epochsAtStart),
+          ]);
 
           await upsertSavedMemNotifications(
             ref,
@@ -49,6 +55,7 @@ class MemEntities extends _$MemEntities
 
   Future<MemEntity?> loadByMemId(int memId) => v(
         () async {
+          final epochsAtStart = Map<int, int>.of(_latestActEpochs);
           final mem = await _shipOne(
             MemRepository(),
             memId,
@@ -56,7 +63,7 @@ class MemEntities extends _$MemEntities
           );
           if (mem == null) return null;
 
-          upsert([mem]);
+          upsert([_keepingRefreshedAct(mem, epochsAtStart)]);
 
           return _entity(mem.id) ?? mem;
         },
@@ -82,12 +89,15 @@ class MemEntities extends _$MemEntities
 
   Future<void> refreshLatestActForMem(int memId) => v(
         () async {
+          final epoch = _advanceLatestActEpoch(memId);
           final mem = await _shipOne(
             MemRepository(),
             memId,
             loadLatestAct: true,
           );
           if (mem == null) return;
+          // 待っている間に次の refresh が進んでいれば、古い ship は棄てる
+          if (_latestActEpoch(memId) != epoch) return;
           upsert([mem]);
         },
         {'memId': memId},
@@ -206,6 +216,7 @@ class MemEntities extends _$MemEntities
   }
 
   Future<void> _fetchDetail(int memId) async {
+    final epochsAtStart = Map<int, int>.of(_latestActEpochs);
     final repository = MemRepository();
     final mem = await _shipOne(
       repository,
@@ -242,12 +253,15 @@ class MemEntities extends _$MemEntities
     }
 
     upsert([
-      mem.updatedWith(
-        parentsLoaded: () => true,
-        parentMemId: () => parent?.parentMemId,
-        childMemIds: () => [
-          for (final child in children) child.memId,
-        ],
+      _keepingRefreshedAct(
+        mem.updatedWith(
+          parentsLoaded: () => true,
+          parentMemId: () => parent?.parentMemId,
+          childMemIds: () => [
+            for (final child in children) child.memId,
+          ],
+        ),
+        epochsAtStart,
       ),
     ]);
   }
@@ -257,6 +271,32 @@ class MemEntities extends _$MemEntities
       if (entity.id == id) return entity;
     }
     return null;
+  }
+
+  int _epochIn(Map<int, int> epochs, int memId) =>
+      epochs[memId] ?? _initialLatestActEpoch;
+
+  int _latestActEpoch(int memId) => _epochIn(_latestActEpochs, memId);
+
+  int _advanceLatestActEpoch(int memId) {
+    final next = _latestActEpoch(memId) + 1;
+    _latestActEpochs[memId] = next;
+    return next;
+  }
+
+  // 先に始まった ship の act で、その後に refresh した act を戻さない
+  MemEntity _keepingRefreshedAct(
+    MemEntity shipped,
+    Map<int, int> epochsAtStart,
+  ) {
+    final atStart = _epochIn(epochsAtStart, shipped.id);
+    if (_latestActEpoch(shipped.id) == atStart) return shipped;
+    final existing = _entity(shipped.id);
+    if (existing == null) return shipped;
+    return shipped.updatedWith(
+      latestAct: () => existing.latestAct,
+      scheduleAnchorAct: () => existing.scheduleAnchorAct,
+    );
   }
 
   // ship は親リンクを含まない。取得済みのリンクを後から来た ship で消さない
