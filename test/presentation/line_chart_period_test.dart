@@ -26,17 +26,17 @@ const _memId = 1;
 // 時間。期間の内外は開始時刻で決まり、打点には正の長さがあれば足りる
 const _actLength = Duration(hours: 1);
 
-// 時。1桁なので 01:02:03 では0で埋まる
+// 時。1桁なので 01 h 02 m では0で埋まる
 const _elapsedHours = 1;
 
-// 分。1桁なので 01:02:03 では0で埋まる
+// 分。1桁なので 01 h 02 m では0で埋まる
 const _elapsedMinutes = 2;
 
-// 秒。1桁なので 01:02:03 では0で埋まる
+// 秒。1時間以上は出さない。1時間2分3秒は 01 h 02 m
 const _elapsedSeconds = 3;
 
-// 1時間2分3秒。時・分・秒をそれぞれ2桁で0埋めした表示
-const _elapsedClock = '01:02:03';
+// 1時間2分3秒。1時間以上24時間未満は分まで
+const _elapsedClock = '01 h 02 m';
 
 // 未保存の id は 0。保存済みは 1 から振る
 const _firstSavedActId = 1;

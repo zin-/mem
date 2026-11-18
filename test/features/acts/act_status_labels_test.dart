@@ -123,9 +123,9 @@ void main() {
       amount: const ActAmount(1, Duration(minutes: 30)),
     );
 
-    expect(find.text('0:30'), findsOneWidget);
+    expect(find.text('30 m 00 s'), findsOneWidget);
     expect(find.text(' / '), findsOneWidget);
-    expect(find.text('2:00'), findsOneWidget);
+    expect(find.text('02 h 00 m'), findsOneWidget);
     expect(find.byType(LiveElapsedTimeText), findsNothing);
   });
 
@@ -142,8 +142,9 @@ void main() {
       amount: const ActAmount(1, Duration.zero),
     );
 
-    expect(find.text('0:02'), findsOneWidget);
-    expect(find.text('1:00'), findsOneWidget);
+    // 進捗と実行中表示が同じ経過を出す。秒はテスト中に進む
+    expect(find.textContaining(RegExp(r'^02 m 3\d s$')), findsNWidgets(2));
+    expect(find.text('01 h 00 m'), findsOneWidget);
     expect(find.byType(LiveElapsedTimeText), findsOneWidget);
 
     await pump(
@@ -156,9 +157,9 @@ void main() {
       amount: const ActAmount(1, Duration(hours: 1)),
     );
 
-    expect(find.text('1:00'), findsOneWidget);
-    expect(find.text('1:10'), findsNothing);
-    expect(find.text('2:00'), findsOneWidget);
+    expect(find.text('01 h 00 m'), findsOneWidget);
+    expect(find.text('01 h 10 m'), findsNothing);
+    expect(find.text('02 h 00 m'), findsOneWidget);
     expect(find.byType(LiveElapsedTimeText), findsOneWidget);
   });
 }

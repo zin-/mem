@@ -201,8 +201,8 @@ void main() {
 
       // 秒。10:00 から 11:02:03 まで。format は double を受ける
       const elapsedSeconds = 3723.0;
-      // 1時間2分3秒。時・分・秒をそれぞれ2桁で0埋めした表示
-      const elapsedClock = '01:02:03';
+      // 1時間2分3秒。1時間以上は分まで出す
+      const elapsedClock = '01 h 02 m';
 
       expect(summary.getValue(acts), elapsedSeconds);
       expect(AggregationType.time.format(elapsedSeconds), elapsedClock);

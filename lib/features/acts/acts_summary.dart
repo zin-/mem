@@ -5,6 +5,7 @@ import 'package:mem/features/acts/act_amount.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
+import 'package:mem/framework/date_and_time/duration_ext.dart';
 import 'package:mem/framework/statistics/summary_statistics.dart';
 
 enum AggregationType {
@@ -18,16 +19,7 @@ extension AggregationTypeFormat on AggregationType {
       case AggregationType.count:
         return value.toStringAsFixed(1);
       case AggregationType.time:
-        // 桁。時・分・秒はそれぞれこの幅まで0で埋める。100時以上はそのまま出す
-        const clockFieldWidth = 2;
-        String clock(int part) => part.toString().padLeft(clockFieldWidth, '0');
-
-        final duration = Duration(seconds: value.floor());
-        return [
-          duration.inHours,
-          duration.inMinutes.remainder(Duration.minutesPerHour),
-          duration.inSeconds.remainder(Duration.secondsPerMinute),
-        ].map(clock).join(':');
+        return Duration(seconds: value.floor()).formatElapsedTime();
     }
   }
 }

@@ -647,7 +647,7 @@ void main() {
       );
       expect(
         textsIn(habitualCard),
-        containsAllInOrder(['Mem 30', '1:00, 2', ' / ', '3:00, 4']),
+        containsAllInOrder(['Mem 30', '01 h 00 m, 2', ' / ', '03 h 00 m, 4']),
       );
 
       Finder cardOf(String name) => find.ancestor(
@@ -657,14 +657,14 @@ void main() {
 
       for (final name in ['Mem 20', 'Mem 2']) {
         final texts = textsIn(cardOf(name));
-        expect(texts, isNot(contains('1:00, 2')));
-        expect(texts, isNot(contains('3:00, 4')));
+        expect(texts, isNot(contains('01 h 00 m, 2')));
+        expect(texts, isNot(contains('03 h 00 m, 4')));
         expect(texts, isNot(contains(' / ')));
       }
-      expect(find.text('5:00, 6'), findsNothing);
-      expect(find.text('7:00, 8'), findsNothing);
-      expect(find.text('8:00, 9'), findsNothing);
-      expect(find.text('9:00, 10'), findsNothing);
+      expect(find.text('05 h 00 m, 6'), findsNothing);
+      expect(find.text('07 h 00 m, 8'), findsNothing);
+      expect(find.text('08 h 00 m, 9'), findsNothing);
+      expect(find.text('09 h 00 m, 10'), findsNothing);
     },
   );
 

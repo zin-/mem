@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_amount.dart';
-import 'package:mem/features/acts/list/duration.dart';
+import 'package:mem/framework/date_and_time/duration_ext.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
@@ -1462,15 +1462,14 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text(recorded.formatHHmm()), findsOneWidget);
+        expect(find.text(recorded.formatElapsedTime()), findsOneWidget);
         expect(
-          find.text(const Duration(seconds: targetSeconds).formatHHmm()),
+          find.text(const Duration(seconds: targetSeconds).formatElapsedTime()),
           findsOneWidget,
         );
       });
 
-      testWidgets(
-          'shows today recorded time over a weekly time target',
+      testWidgets('shows today recorded time over a weekly time target',
           (tester) async {
         const targetSeconds = 3 * Duration.secondsPerHour;
         const weekRecorded = Duration(hours: 1, minutes: 30);
@@ -1519,15 +1518,15 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text(todayRecorded.formatHHmm()), findsOneWidget);
-        expect(find.text(weekRecorded.formatHHmm()), findsNothing);
+        expect(find.text(todayRecorded.formatElapsedTime()), findsOneWidget);
+        expect(find.text(weekRecorded.formatElapsedTime()), findsNothing);
         expect(
-          find.text(const Duration(seconds: targetSeconds).formatHHmm()),
+          find.text(const Duration(seconds: targetSeconds).formatElapsedTime()),
           findsOneWidget,
         );
         expect(find.text(' / '), findsNWidgets(2));
         expect(find.text('w'), findsOneWidget);
-        expect(find.text('0:25~'), findsNothing);
+        expect(find.text('25 m 43 s~'), findsNothing);
       });
     });
 

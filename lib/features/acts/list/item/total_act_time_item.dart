@@ -9,7 +9,7 @@ import 'package:mem/features/acts/act_status_labels.dart';
 import 'package:mem/features/acts/act_amount.dart';
 import 'package:mem/framework/date_and_time/period.dart';
 import 'package:mem/features/acts/list/act_list_group.dart';
-import 'package:mem/features/acts/list/duration.dart';
+import 'package:mem/framework/date_and_time/duration_ext.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/acts/target_progress_label.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -128,7 +128,7 @@ class TotalActTimeListItem extends ConsumerWidget {
         target.targetUnit == TargetUnit.time) {
       return null;
     }
-    return Text(groupAmount.recorded.formatHHmm());
+    return Text(groupAmount.recorded.formatElapsedTime());
   }
 
   ({Widget? leading, Widget? trailing}) _actions(

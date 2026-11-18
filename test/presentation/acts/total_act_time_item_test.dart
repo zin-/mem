@@ -595,8 +595,8 @@ void main() {
         ],
       );
       expect(find.byType(LiveElapsedTimeText), findsNothing);
-      expect(find.text('0:30'), findsNothing);
-      expect(find.text('0:00'), findsOneWidget);
+      expect(find.text('30 m 00 s'), findsNothing);
+      expect(find.text('00 m 00 s'), findsOneWidget);
 
       await pumpItem(
         tester,
@@ -654,17 +654,18 @@ void main() {
       expect(find.text('5'), findsOneWidget);
       expect(find.text('m'), findsOneWidget);
       expect(find.text('0~'), findsNothing);
-      expect(find.text('1:00'), findsOneWidget);
+      expect(find.text('01 h 00 m'), findsOneWidget);
       expect(find.byType(LiveElapsedTimeText), findsNothing);
       final row = tester.getRect(
         find
             .ancestor(
-              of: find.text('1:00'),
+              of: find.text('01 h 00 m'),
               matching: find.byType(Row),
             )
             .first,
       );
-      expect(tester.getTopLeft(find.text('1:00')).dx, closeTo(row.left, 1));
+      expect(
+          tester.getTopLeft(find.text('01 h 00 m')).dx, closeTo(row.left, 1));
       expect(
         tester.getTopRight(find.text('m')).dx,
         closeTo(row.right, 1),
@@ -726,9 +727,9 @@ void main() {
         dayAmount: const ActAmount(1, Duration(minutes: 30)),
       );
 
-      expect(find.text('0:30'), findsOneWidget);
-      expect(find.text('3:00'), findsOneWidget);
-      expect(find.text('1:00'), findsOneWidget);
+      expect(find.text('30 m 00 s'), findsOneWidget);
+      expect(find.text('03 h 00 m'), findsOneWidget);
+      expect(find.text('01 h 00 m'), findsOneWidget);
     });
 
     testWidgets('keeps month totals without state time', (tester) async {
@@ -742,9 +743,9 @@ void main() {
       );
 
       expect(find.byType(LiveElapsedTimeText), findsNothing);
-      expect(find.text('1:00'), findsOneWidget);
-      expect(find.text('3:00'), findsOneWidget);
-      expect(find.text('0:30'), findsNothing);
+      expect(find.text('01 h 00 m'), findsOneWidget);
+      expect(find.text('03 h 00 m'), findsOneWidget);
+      expect(find.text('30 m 00 s'), findsNothing);
     });
 
     testWidgets(
@@ -762,9 +763,9 @@ void main() {
         ),
       );
 
-      expect(find.text('1:00'), findsOneWidget);
-      expect(find.text('0:13~'), findsOneWidget);
-      expect(find.text('3:00'), findsNothing);
+      expect(find.text('01 h 00 m'), findsOneWidget);
+      expect(find.text('13 m 51 s~'), findsOneWidget);
+      expect(find.text('03 h 00 m'), findsNothing);
       expect(find.text('y'), findsNothing);
     });
   });

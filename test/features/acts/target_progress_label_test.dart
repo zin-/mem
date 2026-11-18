@@ -162,9 +162,9 @@ void main() {
       shownIn: Period.aDay,
     );
 
-    expect(find.text('0:30'), findsOneWidget);
+    expect(find.text('30 m 00 s'), findsOneWidget);
     expect(find.text(' / '), findsOneWidget);
-    expect(find.text('3:00'), findsOneWidget);
+    expect(find.text('03 h 00 m'), findsOneWidget);
   });
 
   testWidgets('scales a daily time target onto a week row', (tester) async {
@@ -179,9 +179,9 @@ void main() {
       shownIn: Period.aWeek,
     );
 
-    expect(find.text('0:00'), findsOneWidget);
+    expect(find.text('00 m 00 s'), findsOneWidget);
     expect(find.text(' / '), findsOneWidget);
-    expect(find.text('7:00'), findsOneWidget);
+    expect(find.text('07 h 00 m'), findsOneWidget);
     expect(find.text('d'), findsNothing);
   });
 
@@ -281,13 +281,13 @@ void main() {
       shownIn: Period.aDay,
     );
 
-    expect(find.text('0:00'), findsOneWidget);
-    expect(find.textContaining('3:00'), findsOneWidget);
+    expect(find.text('00 m 00 s'), findsOneWidget);
+    expect(find.textContaining('03 h 00 m'), findsOneWidget);
     expect(find.byIcon(Icons.arrow_upward), findsOneWidget);
     expect(find.byIcon(Icons.arrow_downward), findsNothing);
     expectBoundMark(
       tester,
-      targetText: '3:00',
+      targetText: '03 h 00 m',
       periodLabel: 'w',
       icon: Icons.arrow_upward,
     );

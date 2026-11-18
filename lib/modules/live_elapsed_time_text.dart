@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/framework/date_and_time/duration_ext.dart';
 
 const _tickInterval = Duration(seconds: 1);
 
@@ -44,7 +45,8 @@ class _LiveElapsedTimeTextState extends State<LiveElapsedTimeText> {
   @override
   Widget build(BuildContext context) => v(
         () => Text(
-          (elapsedTime ?? DateTime.now().difference(widget._start)).format(),
+          (elapsedTime ?? DateTime.now().difference(widget._start))
+              .formatElapsedTime(),
         ),
         elapsedTime,
       );
@@ -54,20 +56,4 @@ class _LiveElapsedTimeTextState extends State<LiveElapsedTimeText> {
     _timer?.cancel();
     super.dispose();
   }
-}
-
-String formatElapsedTime(Duration elapsed) {
-  if (elapsed.inHours < 1) {
-    return '${_two(elapsed.inMinutes)} m ${_two(elapsed.inSeconds.remainder(60))} s';
-  }
-  if (elapsed.inHours < 24) {
-    return '${_two(elapsed.inHours)} h ${_two(elapsed.inMinutes.remainder(60))} m';
-  }
-  return '${elapsed.inDays} d ${_two(elapsed.inHours.remainder(24))} h';
-}
-
-String _two(int n) => n.toString().padLeft(2, '0');
-
-extension on Duration {
-  String format() => formatElapsedTime(this);
 }
