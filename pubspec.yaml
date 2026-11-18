@@ -59,7 +59,7 @@ dependencies:
   home_widget: any
   android_alarm_manager_plus: any
   day_picker: any
-  file_picker: ^11.0.0
+  file_picker: any
   permission_handler: any
   sentry_flutter: any
   flutter_foreground_task: any
