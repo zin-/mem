@@ -25,34 +25,39 @@ class MemNotifications {
     int todayCount = 0,
   }) =>
       v(
-        () => memNotifications
-                .where(
-                  (e) =>
-                      e.isEnabled() &&
-                      (e.isRepeated() ||
-                          e.isRepeatByNDay() ||
-                          e.isRepeatByDayOfWeek()),
+        () {
+          final id = memRepeatedNotificationId(mem.id!);
+          final hasRepeat = memNotifications
+              .where(
+                (e) =>
+                    e.isEnabled() &&
+                    (e.isRepeated() ||
+                        e.isRepeatByNDay() ||
+                        e.isRepeatByDayOfWeek()),
+              )
+              .isNotEmpty;
+          final nextAt = hasRepeat
+              ? nextRepeatNotifyAt(
+                  memNotifications,
+                  startOfDay,
+                  latestAct,
+                  scheduleAnchor ?? mem.resolvedScheduleAnchor,
+                  now,
+                  target: target,
+                  todayCount: todayCount,
                 )
-                .isEmpty
-            ? CancelSchedule(memRepeatedNotificationId(mem.id!))
-            : PeriodicSchedule(
-                memRepeatedNotificationId(mem.id!),
-                nextRepeatNotifyAt(
-                      memNotifications,
-                      startOfDay,
-                      latestAct,
-                      scheduleAnchor ?? mem.resolvedScheduleAnchor,
-                      now,
-                      target: target,
-                      todayCount: todayCount,
-                    ) ??
-                    now,
-                const Duration(days: 1),
-                {
-                  memIdKey: mem.id,
-                  notificationTypeKey: NotificationType.repeat.name,
-                },
-              ),
+              : null;
+          if (nextAt == null) return CancelSchedule(id);
+          return PeriodicSchedule(
+            id,
+            nextAt,
+            const Duration(days: 1),
+            {
+              memIdKey: mem.id,
+              notificationTypeKey: NotificationType.repeat.name,
+            },
+          );
+        },
         {
           'mem': mem,
           'startOfDay': startOfDay,
