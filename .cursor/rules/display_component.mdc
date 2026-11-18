@@ -4,13 +4,11 @@ alwaysApply: true
 
 # 一塊の表示は Widget にする
 
-`0 / 5` や `0 / 5 / w`、`0 / 5 / all` のような一塊の表示は、親が `Text` や単位文字列を並べて作らない。
+`0 / 5` や `0 / 5 / all` のような一塊の表示は、親が `Text` や単位文字列を並べて作らない。
 
-その表示の Widget を一つ定義し、出す場所はすべてそれを使う。回数も時間も、` / ` と期間の短い表示と、以下・以上の矢印を出すのはその Widget だけ。
+その表示の Widget を一つ定義し、出す場所はすべてそれを使う。回数も時間も、` / ` と期間の短い表示を出すのはその Widget だけ。
 
-`TargetProgressLabel` は `ActAmount` と `Target` と、行の期間 `shownIn` を受ける。回数なら整数、時間なら `formatHHmm`。行が `Period.aDay` で目標の期間がそれと違うときは `TargetShownValue` を使わない。目標値と `PeriodView.shortLabel` を出す。週5回を1日の行で見ると `0 / 5 / w`。1日の目標を1日の行で見るときは `0 / 5`。それ以外は `TargetShownValue` で表示期間へ換算し、割り切れないときだけ末尾に `~` を付ける。換算できたときは期間ラベルを出さない。1日3回を週で見るなら `0 / 21`。換算できないときも `PeriodView.shortLabel` を付ける。全期間の目標なら `0 / 5 / all`。週3時間を1日の行で見るときは `0:10 / 3:00 / w`。
-
-目標値の直後、期間ラベルの前に境界を置く。`TargetType.equalTo` は印なし。`TargetType.lessThan` は `Icons.arrow_downward`、`TargetType.moreThan` は `Icons.arrow_upward`。アイコンの選択は Widget 側に置く。`Target` は Material に依存させない。大きさは隣の文字の `fontSize`、色はその文字色。`Wrap` は縦位置を中央に揃える。回数も時間も同じ印にする。
+`TargetProgressLabel` は `ActAmount` と `Target` と、行の期間 `shownIn` を受ける。回数なら整数、時間なら `formatHHmm`。目標値は `TargetShownValue` で表示期間へ換算し、割り切れないときだけ末尾に `~` を付ける。換算できたときは期間ラベルを出さない。換算しないときだけ `PeriodView.shortLabel` を付ける。同じ期間なら `0 / 5`、1日3回を週で見るなら `0 / 21`、全期間の目標なら `0 / 5 / all`。
 
 ## Example(具体例)
 
@@ -67,4 +65,3 @@ TargetProgressLabel(
 - `TargetShownValue`
 - `ActAmount`
 - `Target`
-- `TargetType`
