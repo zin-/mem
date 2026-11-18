@@ -55,6 +55,55 @@ class ActEntities extends _$ActEntities
         },
       );
 
+  Future<void> reloadShown(int? memId) => v(
+        () async {
+          ref
+              .read(
+                // ignore: avoid_manual_providers_as_generated_provider_dependency
+                isLoading(memId).notifier,
+              )
+              .updatedBy(true);
+
+          final latest = await ActsClient().fetch(memId, 1);
+          final c = ref.read(
+            // ignore: avoid_manual_providers_as_generated_provider_dependency
+            currentPage(memId),
+          );
+
+          ListWithTotalPage<SavedActEntityV1>? byPage;
+          if (c != 1) {
+            byPage = await ActsClient().fetch(memId, c);
+          }
+
+          ref
+              .read(
+                // ignore: avoid_manual_providers_as_generated_provider_dependency
+                isLoading(memId).notifier,
+              )
+              .updatedBy(false);
+          ref
+              .read(
+                // ignore: avoid_manual_providers_as_generated_provider_dependency
+                isUpdating(memId).notifier,
+              )
+              .updatedBy(true);
+          ref
+              .read(
+                // ignore: avoid_manual_providers_as_generated_provider_dependency
+                maxPage(memId).notifier,
+              )
+              .updatedBy(latest.totalPage);
+
+          upsert([
+            ...latest.list,
+            if (byPage != null) ...byPage.list,
+          ]);
+        },
+        {
+          'memId': memId,
+        },
+      );
+
   Future<void> startActby(int memId) => v(
         () async {
           final now = DateAndTime.now();
@@ -209,36 +258,7 @@ List<SavedActEntityV1> actList(Ref ref, int? memId) => v(
               isUpdating(memId));
         } else {
           Future.microtask(() async {
-            ref.read(
-                // ignore: avoid_manual_providers_as_generated_provider_dependency
-                isLoading(memId).notifier).updatedBy(true);
-
-            final latest = await ActsClient().fetch(memId, 1);
-            final c = ref.read(
-                // ignore: avoid_manual_providers_as_generated_provider_dependency
-                currentPage(memId));
-
-            ListWithTotalPage<SavedActEntityV1>? byPage;
-            if (c != 1) {
-              byPage = await ActsClient().fetch(memId, c);
-            }
-
-            ref.read(
-                // ignore: avoid_manual_providers_as_generated_provider_dependency
-                isLoading(memId).notifier).updatedBy(false);
-            ref.read(
-                // ignore: avoid_manual_providers_as_generated_provider_dependency
-                isUpdating(memId).notifier).updatedBy(true);
-            ref.read(
-                // ignore: avoid_manual_providers_as_generated_provider_dependency
-                maxPage(memId).notifier).updatedBy(latest.totalPage);
-
-            ref.read(actEntitiesProvider.notifier).upsert(
-              [
-                ...latest.list,
-                if (byPage != null) ...byPage.list,
-              ],
-            );
+            await ref.read(actEntitiesProvider.notifier).reloadShown(memId);
           });
         }
 
