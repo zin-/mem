@@ -18,7 +18,6 @@ class MemEntities extends _$MemEntities
   final _detailLoads = <int, Future<void>>{};
   final _latestActEpochs = <int, int>{};
 
-  // refresh する前の世代
   static const _initialLatestActEpoch = 0;
 
   @override
