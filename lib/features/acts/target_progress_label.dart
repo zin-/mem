@@ -9,6 +9,7 @@ import 'package:mem/features/acts/period_view.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_shown_value.dart';
+import 'package:mem/values/dimens.dart';
 
 const _tickInterval = Duration(seconds: 1);
 const _approximateMark = '~';
@@ -134,17 +135,34 @@ class _TargetProgressLabelState extends State<TargetProgressLabel> {
           final periodLabel = widget._periodLabel();
           final boundIcon = widget._boundIcon();
           final style = DefaultTextStyle.of(context).style;
+          final targetText = widget._targetText();
           return Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text(widget._currentText(DateTime.now())),
               separator,
-              Text(widget._targetText()),
-              if (boundIcon != null)
-                Icon(
-                  boundIcon,
-                  size: style.fontSize,
-                  color: style.color,
+              if (boundIcon == null)
+                Text(targetText)
+              else
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(text: targetText),
+                      WidgetSpan(
+                        alignment: PlaceholderAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            left: targetBoundIconGap,
+                          ),
+                          child: Icon(
+                            boundIcon,
+                            size: style.fontSize,
+                            color: style.color,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               if (periodLabel != null) ...[
                 separator,

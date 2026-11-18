@@ -4,6 +4,7 @@ import 'package:mem/features/acts/act_amount.dart';
 import 'package:mem/framework/date_and_time/period.dart';
 import 'package:mem/features/acts/target_progress_label.dart';
 import 'package:mem/features/targets/target.dart';
+import 'package:mem/values/dimens.dart';
 
 void main() {
   const memId = 1;
@@ -40,24 +41,45 @@ void main() {
     expectCentered(tester);
 
     final children = tester.widget<Wrap>(find.byType(Wrap)).children;
-    final targetIndex = children.indexWhere(
-      (child) => child is Text && child.data == targetText,
-    );
-    final iconIndex = children.indexWhere(
-      (child) => child is Icon && child.icon == icon,
-    );
+    final targetIndex = children.indexWhere((child) {
+      if (child is! Text) {
+        return false;
+      }
+      final span = child.textSpan;
+      if (span is! TextSpan) {
+        return false;
+      }
+      final spans = span.children;
+      if (spans == null || spans.length != 2) {
+        return false;
+      }
+      final text = spans[0];
+      return text is TextSpan &&
+          text.text == targetText &&
+          spans[1] is WidgetSpan;
+    });
+    expect(targetIndex, isNonNegative);
+
+    final target = children[targetIndex] as Text;
+    final markSpan = (target.textSpan! as TextSpan).children![1] as WidgetSpan;
+    expect(markSpan.alignment, PlaceholderAlignment.middle);
+    expect(markSpan.child, isA<Padding>());
+    final gap = markSpan.child as Padding;
+    expect(gap.padding, const EdgeInsets.only(left: targetBoundIconGap));
+    expect(gap.child, isA<Icon>());
+    final mark = gap.child! as Icon;
+    expect(mark.icon, icon);
+
+    final style = DefaultTextStyle.of(
+      tester.element(find.byWidget(target)),
+    ).style;
+    expect(mark.size, style.fontSize);
+    expect(mark.color, style.color);
+
     final periodIndex = children.indexWhere(
       (child) => child is Text && child.data == periodLabel,
     );
-    expect(iconIndex, targetIndex + 1);
-    expect(periodIndex, greaterThan(iconIndex));
-
-    final style = DefaultTextStyle.of(
-      tester.element(find.text(targetText)),
-    ).style;
-    final mark = tester.widget<Icon>(find.byIcon(icon));
-    expect(mark.size, style.fontSize);
-    expect(mark.color, style.color);
+    expect(periodIndex, greaterThan(targetIndex));
   }
 
   Future<void> pump(
@@ -274,7 +296,7 @@ void main() {
     );
 
     expect(find.text('0:00'), findsOneWidget);
-    expect(find.text('3:00'), findsOneWidget);
+    expect(find.textContaining('3:00'), findsOneWidget);
     expect(find.byIcon(Icons.arrow_upward), findsOneWidget);
     expect(find.byIcon(Icons.arrow_downward), findsNothing);
     expectBoundMark(
