@@ -99,5 +99,33 @@ void main() {
         DateTime(2024, 10, 13, 9, 0),
       );
     });
+
+    test('periodicScheduleOf cancels the repeat while an act is active', () {
+      // 時。now（10:00）より前に始まり、終了が無いので実行中
+      final active = Act.by(
+        1,
+        startWhen: DateAndTime(2024, 10, 12, 9),
+      );
+      final mem = Mem(
+        1,
+        'm',
+        null,
+        null,
+        latestAct: active,
+      );
+      final notifications = [
+        MemNotification.by(1, MemNotificationType.repeat, 3600 + 120, 'r'),
+      ];
+
+      final schedule = MemNotifications.periodicScheduleOf(
+        mem,
+        startOfDay,
+        notifications,
+        active,
+        now,
+      );
+
+      expect(schedule, isA<CancelSchedule>());
+    });
   });
 }
