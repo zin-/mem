@@ -56,6 +56,7 @@ class MemEntities extends _$MemEntities
 
   Future<MemEntity?> loadByMemId(int memId) => v(
         () async {
+          final epochsAtStart = Map<int, int>.of(_latestActEpochs);
           final mem = await _shipOne(
             MemRepository(),
             memId,
@@ -63,7 +64,7 @@ class MemEntities extends _$MemEntities
           );
           if (mem == null) return null;
 
-          upsert([mem]);
+          upsert([_keepingRefreshedAct(mem, epochsAtStart)]);
 
           return _entity(mem.id) ?? mem;
         },
@@ -216,6 +217,7 @@ class MemEntities extends _$MemEntities
   }
 
   Future<void> _fetchDetail(int memId) async {
+    final epochsAtStart = Map<int, int>.of(_latestActEpochs);
     final repository = MemRepository();
     final mem = await _shipOne(
       repository,
@@ -252,12 +254,15 @@ class MemEntities extends _$MemEntities
     }
 
     upsert([
-      mem.updatedWith(
-        parentsLoaded: () => true,
-        parentMemId: () => parent?.parentMemId,
-        childMemIds: () => [
-          for (final child in children) child.memId,
-        ],
+      _keepingRefreshedAct(
+        mem.updatedWith(
+          parentsLoaded: () => true,
+          parentMemId: () => parent?.parentMemId,
+          childMemIds: () => [
+            for (final child in children) child.memId,
+          ],
+        ),
+        epochsAtStart,
       ),
     ]);
   }

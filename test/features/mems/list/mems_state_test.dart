@@ -644,6 +644,146 @@ void main() {
     });
   });
 
+  group('loadDetail', () {
+    setUp(() {
+      when(mockMemRepository.shipParentByMemId(any))
+          .thenAnswer((_) async => null);
+      when(mockMemRepository.shipChildrenByParentMemId(any))
+          .thenAnswer((_) async => []);
+    });
+
+    test('keeps a newer latestAct when an earlier loadDetail returns later',
+        () async {
+      const memId = 1;
+      final fixedDate = DateTime(2024, 10, 1);
+      // 時。終了より前なので、先に始まった load が返す act は進行中のまま
+      final startedHour = 8;
+      // 時。開始の1時間後なので、refresh が返す act は終了済み
+      final endedHour = 9;
+      final active = ActiveAct(
+        memId,
+        DateAndTime(2024, 10, 1, startedHour),
+      );
+      final finished = FinishedAct(
+        memId,
+        DateAndTime(2024, 10, 1, startedHour),
+        DateAndTime(2024, 10, 1, endedHour),
+        actKind: ActKind.finished,
+      );
+      final stale = savedMem(
+        id: memId,
+        name: 'renamed',
+        createdAt: fixedDate,
+        updatedAt: fixedDate,
+        latestAct: active,
+      );
+      final refreshed = savedMem(
+        id: memId,
+        name: 'original',
+        createdAt: fixedDate,
+        updatedAt: fixedDate,
+        latestAct: finished,
+      );
+      final detailResponse = Completer<List<MemEntity>>();
+      var idShipCount = 0;
+
+      when(mockMemRepository.ship(
+        id: anyNamed('id'),
+        archived: anyNamed('archived'),
+        done: anyNamed('done'),
+        loadLatestAct: anyNamed('loadLatestAct'),
+      )).thenAnswer((invocation) {
+        final id = invocation.namedArguments[#id] as int?;
+        if (id != memId) return Future.value(<MemEntity>[]);
+        idShipCount += 1;
+        // loadDetail が先に ship する。その次が refresh
+        if (idShipCount == 1) return detailResponse.future;
+        return Future.value([refreshed]);
+      });
+
+      final container = loadMemListTestContainer();
+      addTearDown(container.dispose);
+      final notifier = container.read(memEntitiesProvider.notifier);
+
+      final detailCall = notifier.loadDetail(memId);
+      await notifier.refreshLatestActForMem(memId);
+      detailResponse.complete([stale]);
+      await detailCall;
+
+      final cached = container.read(memEntitiesProvider).single;
+      // act 以外は後から届いた詳細の値。親の取得済みもここに含まれる
+      expect(cached.name, 'renamed');
+      expect(cached.parentsLoaded, isTrue);
+      expect(cached.latestAct, isA<FinishedAct>());
+    });
+
+    test('uses the shipped latestAct when loadDetail starts after refresh',
+        () async {
+      const memId = 1;
+      final fixedDate = DateTime(2024, 10, 1);
+      // 時。終了より前なので、refresh が返す act はこの時刻に始まっている
+      final startedHour = 8;
+      // 時。開始の1時間後なので、refresh が返す act は終了済み
+      final endedHour = 9;
+      // 時。終了の1時間後なので、その後の load が返す act は再開している
+      final restartedHour = 10;
+      final finished = FinishedAct(
+        memId,
+        DateAndTime(2024, 10, 1, startedHour),
+        DateAndTime(2024, 10, 1, endedHour),
+        actKind: ActKind.finished,
+      );
+      final restarted = ActiveAct(
+        memId,
+        DateAndTime(2024, 10, 1, restartedHour),
+      );
+      final refreshed = savedMem(
+        id: memId,
+        name: 'original',
+        createdAt: fixedDate,
+        updatedAt: fixedDate,
+        latestAct: finished,
+      );
+      final reloaded = savedMem(
+        id: memId,
+        name: 'renamed',
+        createdAt: fixedDate,
+        updatedAt: fixedDate,
+        latestAct: restarted,
+      );
+      final detailResponse = Completer<List<MemEntity>>();
+      var idShipCount = 0;
+
+      when(mockMemRepository.ship(
+        id: anyNamed('id'),
+        archived: anyNamed('archived'),
+        done: anyNamed('done'),
+        loadLatestAct: anyNamed('loadLatestAct'),
+      )).thenAnswer((invocation) {
+        final id = invocation.namedArguments[#id] as int?;
+        if (id != memId) return Future.value(<MemEntity>[]);
+        idShipCount += 1;
+        // refresh が先に ship する。その次が loadDetail
+        if (idShipCount == 1) return Future.value([refreshed]);
+        return detailResponse.future;
+      });
+
+      final container = loadMemListTestContainer();
+      addTearDown(container.dispose);
+      final notifier = container.read(memEntitiesProvider.notifier);
+
+      await notifier.refreshLatestActForMem(memId);
+      final detailCall = notifier.loadDetail(memId);
+      detailResponse.complete([reloaded]);
+      await detailCall;
+
+      final cached = container.read(memEntitiesProvider).single;
+      expect(cached.name, 'renamed');
+      expect(cached.parentsLoaded, isTrue);
+      expect(cached.latestAct, isA<ActiveAct>());
+    });
+  });
+
   test('reading memEntitiesProvider does not ship', () async {
     final container = ProviderContainer();
     addTearDown(container.dispose);
