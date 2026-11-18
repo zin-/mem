@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/acts/list/add_act_fab.dart';
 import 'package:mem/features/logger/log_service.dart';
 
-import 'act_list.dart';
+import 'view.dart';
 
 class ActListPage extends ConsumerWidget {
   final _scrollController = ScrollController();

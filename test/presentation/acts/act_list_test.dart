@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/framework/date_and_time/period.dart';
-import 'package:mem/features/acts/list/act_list.dart';
+import 'package:mem/features/acts/list/view.dart';
 import 'package:mem/features/acts/list/duration.dart';
 import 'package:mem/features/acts/list/item/total_act_time_item.dart';
 import 'package:mem/features/acts/states.dart';
