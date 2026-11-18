@@ -5,11 +5,12 @@ import 'package:mem/features/acts/act_amount.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
+import 'package:mem/framework/date_and_time/duration_ext.dart';
 import 'package:mem/framework/statistics/summary_statistics.dart';
 
 enum AggregationType {
   count,
-  sum,
+  time,
 }
 
 extension AggregationTypeFormat on AggregationType {
@@ -17,11 +18,8 @@ extension AggregationTypeFormat on AggregationType {
     switch (this) {
       case AggregationType.count:
         return value.toStringAsFixed(1);
-      case AggregationType.sum:
-        final hours = (value / 3600).floor();
-        final minutes = ((value % 3600) / 60).floor();
-        final seconds = (value % 60).floor();
-        return '${hours}h ${minutes}m ${seconds}s';
+      case AggregationType.time:
+        return Duration(seconds: value.floor()).format();
     }
   }
 }
@@ -49,7 +47,7 @@ class ActsSummary extends SummaryStatistics {
     switch (_aggregationType) {
       case AggregationType.count:
         return amount.count.toDouble();
-      case AggregationType.sum:
+      case AggregationType.time:
         return amount.recorded.inSeconds.toDouble();
     }
   }

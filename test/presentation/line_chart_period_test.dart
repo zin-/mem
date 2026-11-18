@@ -26,14 +26,17 @@ const _memId = 1;
 // 時間。期間の内外は開始時刻で決まり、打点には正の長さがあれば足りる
 const _actLength = Duration(hours: 1);
 
-// 時。表示は 1h 2m 3s
+// 時。1桁なので 01 h 02 m では0で埋まる
 const _elapsedHours = 1;
 
-// 分。表示は 1h 2m 3s
+// 分。1桁なので 01 h 02 m では0で埋まる
 const _elapsedMinutes = 2;
 
-// 秒。表示は 1h 2m 3s
+// 秒。1時間以上は出さない。1時間2分3秒は 01 h 02 m
 const _elapsedSeconds = 3;
+
+// 1時間2分3秒。1時間以上24時間未満は分まで
+const _elapsedClock = '01 h 02 m';
 
 // 未保存の id は 0。保存済みは 1 から振る
 const _firstSavedActId = 1;
@@ -101,14 +104,14 @@ void main() {
     );
 
     testWidgets(
-      'shows elapsed time for sum.',
+      'shows elapsed time.',
       (tester) async {
         final start =
             Period.aWeek.toPeriod(DateAndTime.now(), defaultStartOfDay)!.start;
 
         await _pumpPeriod(
           tester,
-          aggregationType: AggregationType.sum,
+          aggregationType: AggregationType.time,
           acts: [
             FinishedAct(
               _memId,
@@ -126,11 +129,7 @@ void main() {
           ],
         );
 
-        expect(
-          find.text(
-              '${_elapsedHours}h ${_elapsedMinutes}m ${_elapsedSeconds}s'),
-          findsAtLeastNWidgets(1),
-        );
+        expect(find.text(_elapsedClock), findsAtLeastNWidgets(1));
       },
     );
   });

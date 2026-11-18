@@ -10,7 +10,7 @@ Issue に着手するときは、実装の前に最新の `main` からローカ
 ## 前提
 
 - 作業ツリーはクリーン。未コミットの変更があるときはブランチを切らず、状態を報告する
-- 今のウィンドウが別の Issue のブランチで作業中であるとき、または Issue のリンクと worktree の使用を一緒に頼まれたときは、このディレクトリのブランチを切り替えず `workflow_worktree` に従う
+- 別の Issue のブランチにいるときは `workflow_worktree` の作業中の確認に従い、作業中と確認できたとき、または Issue のリンクと worktree の使用を一緒に頼まれたときは、このディレクトリのブランチを切り替えない
 - `main` に切り替えて `git pull` し、`origin/main` の最新にしてから切る。fast-forward でないときは切らず、状態を報告する
 - 作成はローカルのみ。`git push` はしない
 
@@ -30,4 +30,4 @@ git checkout -b feat/683-hours-after-last-act
 ## Relations(関連)
 
 - `safety-guardrails`（push などの外部書き込みはしない）
-- `workflow_worktree`（今のウィンドウが別の Issue のブランチで作業中であるとき、または Issue のリンクと worktree の使用を一緒に頼まれたときはそちらに従う）
+- `workflow_worktree`（別の Issue のブランチにいるときは、そちらの作業中の確認に従う）

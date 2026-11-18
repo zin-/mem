@@ -197,10 +197,15 @@ void main() {
         ),
         PausedAct(1, DateTime(2026, 10, 2, 12)),
       ];
-      final summary = ActsSummary(acts, AggregationType.sum);
+      final summary = ActsSummary(acts, AggregationType.time);
 
-      expect(summary.getValue(acts), 3723);
-      expect(AggregationType.sum.format(3723), '1h 2m 3s');
+      // 秒。10:00 から 11:02:03 まで。format は double を受ける
+      const elapsedSeconds = 3723.0;
+      // 1時間2分3秒。1時間以上は分まで出す
+      const elapsedClock = '01 h 02 m';
+
+      expect(summary.getValue(acts), elapsedSeconds);
+      expect(AggregationType.time.format(elapsedSeconds), elapsedClock);
     });
   });
 }

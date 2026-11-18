@@ -1,9 +1,20 @@
 ---
-description: 今のウィンドウが別の Issue のブランチで作業中であるとき、または Issue のリンクと worktree の使用を一緒に頼まれたとき、兄弟ディレクトリの worktree を使い回す
+description: 別の Issue のブランチにいるときは、Issue と対応する PR の完了を確認して作業中かを判断する。作業中のとき、または Issue のリンクと worktree の使用を一緒に頼まれたときは、兄弟ディレクトリの worktree を使い回す
 alwaysApply: false
 ---
 
 # Issue のリンクと worktree
+
+## 作業中
+
+作業中かは、次の順で判断する。条件が当てはまる段で決め、当てはまらなければ次へ進む。今のウィンドウにも、`mem-beta` 以降を次の名前へ進める判定にも、同じ手順を使う。
+
+1. これから着手する Issue のブランチにいるときは、作業中ではない。そのディレクトリを使う
+2. 未コミットの変更があるときは作業中
+3. `main` にいるときは作業中ではない
+4. ブランチ名から Issue 番号が取れないときは作業中とする
+5. ブランチ名の Issue の状態と対応する PR を見る。Issue が開いている、対応する PR が未マージ、またはマージ済みと確認できないときは作業中
+6. Issue が閉じていて、対応する PR がマージ済みで、未コミットが無いときは作業中ではない。今のウィンドウなら、このディレクトリで `workflow_branch` に従う
 
 次のどちらかのときは、今開いているディレクトリの外でその Issue を進める。
 
@@ -12,13 +23,13 @@ alwaysApply: false
 
 リンクだけ、または worktree という語だけで、今のウィンドウが別の Issue の作業中でないときは、今のディレクトリで `workflow_branch` に従う。
 
-今開いているディレクトリのブランチは切り替えない。同じフォルダを別の Cursor ウィンドウで開かない。ウィンドウは分かれていても checkout は一つで、ブランチを切り替えると今のウィンドウに出ているファイルが入れ替わる。
+外で進めるときは、今開いているディレクトリのブランチは切り替えない。同じフォルダを別の Cursor ウィンドウで開かない。ウィンドウは分かれていても checkout は一つで、ブランチを切り替えると今のウィンドウに出ているファイルが入れ替わる。
 
 `git worktree add` は依頼のたびに呼ばない。alpha は今のウィンドウのディレクトリなので使わない。リポジトリの親の `mem-beta` を使い回し、そこが別の Issue の作業中なら `mem-gamma`、`mem-delta` と次の名前にする。`-2` は付けない。
 
 名前はこの順。beta gamma delta epsilon zeta eta theta iota kappa lambda mu nu xi omicron pi rho sigma tau upsilon phi chi psi omega
 
-作業中とは、未コミットの変更があるか、別の Issue のブランチにいること。その名前のディレクトリが無いときだけ、`git fetch` のあと作る。最初の名前なら `git worktree add ../mem-beta origin/main`。`main` にいて未コミットが無いとき、またはこれから着手する Issue のブランチにいるときは、そこを使う。
+この手順で作業中なら次の名前にする。作業中ではないときは、そのディレクトリを使う。その名前のディレクトリが無いときだけ、`git fetch` のあと作る。最初の名前なら `git worktree add ../mem-beta origin/main`。
 
 ブランチはその中で切る。名前は `workflow_branch` に従い、番号はリンクの Issue から取る。`main` 上では実装しない。`git push` はしない。
 
@@ -28,7 +39,9 @@ alwaysApply: false
 
 ## Example(具体例)
 
-**❌ 今開いているディレクトリで別ブランチに切り替える:**
+**❌ 作業中の別 Issue にいるのに、今開いているディレクトリで別ブランチに切り替える:**
+
+今のウィンドウは `feat/683-hours-after-last-act` で、未コミットの変更がある。
 
 ```bash
 git checkout main
@@ -44,9 +57,9 @@ git worktree add ../mem-673 origin/main
 git worktree add ../mem-beta-2 origin/main
 ```
 
-**✅ 今のウィンドウが別の Issue にいて、`mem-beta` が無いので作ってその中で切る:**
+**✅ 作業中の別 Issue にいて、`mem-beta` が無いので作ってその中で切る:**
 
-今のウィンドウは `feat/683-hours-after-last-act`。`https://github.com/zin-/mem/issues/673` を worktree を使って進めて
+今のウィンドウは `feat/683-hours-after-last-act` で、未コミットの変更がある。`https://github.com/zin-/mem/issues/673` を worktree を使って進めて
 
 ```bash
 git fetch
@@ -59,6 +72,36 @@ git -C ../mem-beta checkout -b fix/673-foreground-task-builtin-kotlin
 ```bash
 git -C ../mem-beta pull
 git -C ../mem-beta checkout -b fix/673-foreground-task-builtin-kotlin
+```
+
+**❌ #676 は閉じていて、対応する PR #779 はマージ済み、未コミットが無いのに `mem-gamma` を作る:**
+
+今のウィンドウは `fix/676-sentry-flutter-builtin-kotlin`。
+
+```bash
+git fetch
+git worktree add ../mem-gamma origin/main
+```
+
+**✅ 確認したあと、今のディレクトリで `main` からブランチを切る:**
+
+```bash
+git checkout main
+git pull
+git checkout -b refactor/698-aggregation-time
+```
+
+**✅ 作ってしまった `mem-gamma` は、変更を残してから `git worktree remove` で消す:**
+
+同じブランチを二つのディレクトリで checkout しないよう、消してから今のディレクトリへ移し、残した変更を戻す。
+
+```bash
+git -C ../mem-gamma stash push -u -m "keep mem-gamma changes"
+git worktree remove ../mem-gamma
+git checkout main
+git pull
+git checkout refactor/698-aggregation-time
+git stash pop
 ```
 
 ## Relations(関連)

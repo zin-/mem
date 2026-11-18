@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/framework/date_and_time/period.dart';
 import 'package:mem/features/acts/list/view.dart';
-import 'package:mem/features/acts/list/duration.dart';
+import 'package:mem/framework/date_and_time/duration_ext.dart';
 import 'package:mem/features/acts/list/item/total_act_time_item.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/mem_entity.dart';
@@ -20,9 +20,9 @@ const _memId = 2;
 const _memName = 'mem-a';
 const _midnight = TimeOfDay(hour: 0, minute: 0);
 const _fiveAm = TimeOfDay(hour: 5, minute: 0);
-// 時間。reloadShown 1回目の表示。formatHHmm は 1:00
+// 時間。reloadShown 1回目の表示。1時間は 01 h 00 m
 const _hoursOnFirstReload = 1;
-// 時間。引き下げ（2回目）の表示。3回目はこれより長く、2:00 は残らない
+// 時間。引き下げ（2回目）の表示。3回目はこれより長く、02 h 00 m は残らない
 const _hoursOnRefresh = 2;
 
 class _FakeMemEntities extends MemEntities {
@@ -135,7 +135,11 @@ void main() {
       );
 
       expect(find.byType(TotalActTimeListItem), findsOneWidget);
-      expect(find.text('1:00'), findsOneWidget);
+      expect(
+        find.text(const Duration(hours: 1).format()),
+        // 小見出しと行が同じ合計を出す
+        findsNWidgets(2),
+      );
       expect(find.text(_memName), findsOneWidget);
 
       final tile = tester.widget<ListTile>(find.byType(ListTile));
@@ -305,11 +309,13 @@ void main() {
       );
 
       expect(
-        find.text(const Duration(hours: _hoursOnFirstReload).formatHHmm()),
-        findsOneWidget,
+        find.text(
+            const Duration(hours: _hoursOnFirstReload).format()),
+        // 小見出しと行が同じ合計を出す
+        findsNWidgets(2),
       );
       expect(
-        find.text(const Duration(hours: _hoursOnRefresh).formatHHmm()),
+        find.text(const Duration(hours: _hoursOnRefresh).format()),
         findsNothing,
       );
 
@@ -323,11 +329,13 @@ void main() {
       await tester.pump(refreshIndicatorSettle);
 
       expect(
-        find.text(const Duration(hours: _hoursOnRefresh).formatHHmm()),
-        findsOneWidget,
+        find.text(const Duration(hours: _hoursOnRefresh).format()),
+        // 小見出しと行が同じ合計を出す
+        findsNWidgets(2),
       );
       expect(
-        find.text(const Duration(hours: _hoursOnFirstReload).formatHHmm()),
+        find.text(
+            const Duration(hours: _hoursOnFirstReload).format()),
         findsNothing,
       );
     },

@@ -1,5 +1,5 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:mem/features/acts/list/duration.dart';
+import 'package:mem/framework/date_and_time/duration_ext.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/home/habitual_mems.dart';
 
@@ -35,7 +35,7 @@ class _HabitualRankChunk extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => v(
-        () => Text('${_time.formatHHmm()}, $_count'),
+        () => Text('${_time.format()}, $_count'),
         {
           '_time': _time,
           '_count': _count,

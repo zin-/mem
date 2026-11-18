@@ -4,7 +4,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_amount.dart';
 import 'package:mem/framework/date_and_time/period.dart';
-import 'package:mem/features/acts/list/duration.dart';
+import 'package:mem/framework/date_and_time/duration_ext.dart';
 import 'package:mem/features/acts/period_view.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/targets/target.dart';
@@ -42,7 +42,7 @@ class TargetProgressLabel extends StatefulWidget {
 
   String _currentText(DateTime now) => switch (_target.targetUnit) {
         TargetUnit.count => _amount.count.toString(),
-        TargetUnit.time => _recordedAt(now).formatHHmm(),
+        TargetUnit.time => _recordedAt(now).format(),
       };
 
   TargetShownValue? _shownValue() {
@@ -59,7 +59,7 @@ class TargetProgressLabel extends StatefulWidget {
   String _targetText() {
     String textOf(int value) => switch (_target.targetUnit) {
           TargetUnit.count => value.toString(),
-          TargetUnit.time => Duration(seconds: value).formatHHmm(),
+          TargetUnit.time => Duration(seconds: value).format(),
         };
 
     final shown = _shownValue();

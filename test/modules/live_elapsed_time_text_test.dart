@@ -1,34 +1,35 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/framework/date_and_time/duration_ext.dart';
 import 'package:mem/modules/live_elapsed_time_text.dart';
 
 void main() {
-  group('formatElapsedTime', () {
+  group('format', () {
     test('< 1h as mm m ss s', () {
       expect(
-        formatElapsedTime(const Duration(minutes: 5, seconds: 3)),
+        const Duration(minutes: 5, seconds: 3).format(),
         '05 m 03 s',
       );
     });
 
     test('1h to 24h as hh h mm m', () {
       expect(
-        formatElapsedTime(const Duration(hours: 1, minutes: 5)),
+        const Duration(hours: 1, minutes: 5).format(),
         '01 h 05 m',
       );
       expect(
-        formatElapsedTime(const Duration(hours: 23, minutes: 59)),
+        const Duration(hours: 23, minutes: 59).format(),
         '23 h 59 m',
       );
     });
 
     test('>= 24h as n d hh h', () {
       expect(
-        formatElapsedTime(const Duration(hours: 24)),
+        const Duration(hours: 24).format(),
         '1 d 00 h',
       );
       expect(
-        formatElapsedTime(const Duration(hours: 25)),
+        const Duration(hours: 25).format(),
         '1 d 01 h',
       );
     });
