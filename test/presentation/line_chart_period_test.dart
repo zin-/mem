@@ -101,14 +101,14 @@ void main() {
     );
 
     testWidgets(
-      'shows elapsed time for sum.',
+      'shows elapsed time.',
       (tester) async {
         final start =
             Period.aWeek.toPeriod(DateAndTime.now(), defaultStartOfDay)!.start;
 
         await _pumpPeriod(
           tester,
-          aggregationType: AggregationType.sum,
+          aggregationType: AggregationType.time,
           acts: [
             FinishedAct(
               _memId,

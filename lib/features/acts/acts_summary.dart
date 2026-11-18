@@ -9,7 +9,7 @@ import 'package:mem/framework/statistics/summary_statistics.dart';
 
 enum AggregationType {
   count,
-  sum,
+  time,
 }
 
 extension AggregationTypeFormat on AggregationType {
@@ -17,7 +17,7 @@ extension AggregationTypeFormat on AggregationType {
     switch (this) {
       case AggregationType.count:
         return value.toStringAsFixed(1);
-      case AggregationType.sum:
+      case AggregationType.time:
         final hours = (value / 3600).floor();
         final minutes = ((value % 3600) / 60).floor();
         final seconds = (value % 60).floor();
@@ -49,7 +49,7 @@ class ActsSummary extends SummaryStatistics {
     switch (_aggregationType) {
       case AggregationType.count:
         return amount.count.toDouble();
-      case AggregationType.sum:
+      case AggregationType.time:
         return amount.recorded.inSeconds.toDouble();
     }
   }

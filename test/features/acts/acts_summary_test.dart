@@ -197,10 +197,10 @@ void main() {
         ),
         PausedAct(1, DateTime(2026, 10, 2, 12)),
       ];
-      final summary = ActsSummary(acts, AggregationType.sum);
+      final summary = ActsSummary(acts, AggregationType.time);
 
       expect(summary.getValue(acts), 3723);
-      expect(AggregationType.sum.format(3723), '1h 2m 3s');
+      expect(AggregationType.time.format(3723), '1h 2m 3s');
     });
   });
 }

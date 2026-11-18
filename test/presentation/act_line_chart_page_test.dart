@@ -155,9 +155,9 @@ void main() {
     );
 
     testWidgets(
-      'selects sum and shows it in the title.',
+      'selects time and shows it in the title.',
       (tester) async {
-        final memName = 'memName - sum';
+        final memName = 'memName - time';
 
         await _pumpPage(
           tester,
@@ -167,11 +167,11 @@ void main() {
 
         await tester.tap(find.byIcon(Icons.more_vert));
         await tester.pumpAndSettle();
-        await tester.tap(find.text(AggregationType.sum.name));
+        await tester.tap(find.text(AggregationType.time.name));
         await tester.pumpAndSettle();
 
         expect(
-          find.text('$memName : ${AggregationType.sum.name}'),
+          find.text('$memName : ${AggregationType.time.name}'),
           findsOneWidget,
         );
       },
