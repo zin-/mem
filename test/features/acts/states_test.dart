@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_query_service.dart';
+import 'package:mem/features/acts/client.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/framework/date_and_time/period.dart';
 import 'package:mem/features/settings/preference/keys.dart';
@@ -130,6 +131,27 @@ class _FakeActEntities extends ActEntities {
       remove(ids);
 }
 
+// 時間。終了のある act にするため。ページ順は start の新しい順で、この長さは使わない
+const _closedActLength = Duration(hours: 1);
+
+Future<AppDatabase> _openMemoryDatabase() async {
+  final db = AppDatabase.memory();
+  addTearDown(() async {
+    await db.close();
+    DriftDatabaseAccessor.reset();
+    Singleton.reset<ActQueryService>();
+    ActsClient.resetSingleton();
+  });
+  await Migrator(db).createAll();
+  DriftDatabaseAccessor.reset();
+  Singleton.reset<ActQueryService>();
+  ActsClient.resetSingleton();
+  Singleton.override<DriftDatabaseAccessor>(
+    DriftDatabaseAccessor.withDatabase(db),
+  );
+  return db;
+}
+
 void main() {
   setUpAll(() {
     TestWidgetsFlutterBinding.ensureInitialized();
@@ -225,6 +247,86 @@ void main() {
         [insideId],
       );
     });
+
+    test('reloadShown puts the only act in state on the first page', () async {
+      final db = await _openMemoryDatabase();
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      // ページ。currentPage の初期値。act が1件なら maxPage もこのページになる
+      const firstPage = 1;
+      final now = DateTime.now();
+      final mem = await db.into(db.mems).insertReturning(
+            MemsCompanion.insert(name: 'm', createdAt: now),
+          );
+      final actId = await db.into(db.acts).insert(
+            ActsCompanion.insert(
+              memId: mem.id,
+              createdAt: now,
+              start: Value(now),
+              end: Value(now.add(_closedActLength)),
+            ),
+          );
+
+      container.listen(isLoading(mem.id), (_, __) {});
+      container.listen(isUpdating(mem.id), (_, __) {});
+      expect(container.read(currentPage(mem.id)), firstPage);
+
+      await container.read(actEntitiesProvider.notifier).reloadShown(mem.id);
+
+      expect(
+        container.read(actEntitiesProvider).map((act) => act.id),
+        [actId],
+      );
+      expect(container.read(isLoading(mem.id)), isFalse);
+      expect(container.read(isUpdating(mem.id)), isTrue);
+      expect(container.read(maxPage(mem.id)), firstPage);
+    });
+
+    test(
+      'reloadShown puts the newest and oldest acts in state when the second page is shown',
+      () async {
+        final db = await _openMemoryDatabase();
+        final container = ProviderContainer();
+        addTearDown(container.dispose);
+
+        // 件。ActsClient.fetch の1ページ。1件多いと一番古い act が次のページに入る
+        const actsPerPage = 50;
+        final actCount = actsPerPage + 1;
+        final secondPage = (actCount / actsPerPage).ceil();
+        final now = DateTime.now();
+        final mem = await db.into(db.mems).insertReturning(
+              MemsCompanion.insert(name: 'm', createdAt: now),
+            );
+
+        final ids = <int>[];
+        for (var minute = 0; minute < actCount; minute++) {
+          final start = now.add(Duration(minutes: minute));
+          ids.add(
+            await db.into(db.acts).insert(
+                  ActsCompanion.insert(
+                    memId: mem.id,
+                    createdAt: now,
+                    start: Value(start),
+                    end: Value(start.add(_closedActLength)),
+                  ),
+                ),
+          );
+        }
+
+        container.read(currentPage(mem.id).notifier).updatedBy(secondPage);
+
+        await container.read(actEntitiesProvider.notifier).reloadShown(mem.id);
+
+        final oldestId = ids.first;
+        final newestId = ids.last;
+        expect(
+          container.read(actEntitiesProvider).map((act) => act.id),
+          containsAll([newestId, oldestId]),
+        );
+        expect(container.read(maxPage(mem.id)), secondPage);
+      },
+    );
 
     test('startActby calls client and upserts result', () async {
       final container = ProviderContainer(

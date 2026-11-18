@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
-import 'package:mem/features/acts/list/act_list.dart';
+import 'package:mem/features/acts/list/view.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/widgets/scroll_controllable_widget.dart';
 import 'package:mem/framework/view/drawer.dart';

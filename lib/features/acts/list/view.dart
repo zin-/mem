@@ -88,6 +88,9 @@ class _ActListState extends ConsumerState<ActList> {
             listed?.map((e) => e.toDomain()).toList() ?? const [],
             targets,
             widget.scrollController,
+            () async {
+              await ref.read(actEntitiesProvider.notifier).reloadShown(memId);
+            },
           );
         },
         {
@@ -107,6 +110,7 @@ class _ActList extends StatelessWidget {
   final List<Mem> _memList;
   final List<Target> _targetList;
   final ScrollController? _scrollController;
+  final Future<void> Function() _onRefresh;
 
   const _ActList(
     this._memId,
@@ -119,44 +123,49 @@ class _ActList extends StatelessWidget {
     this._memList,
     this._targetList,
     this._scrollController,
+    this._onRefresh,
   );
 
   @override
   Widget build(BuildContext context) => v(
-        () => CustomScrollView(
-          controller: _scrollController,
-          slivers: [
-            ActListAppBar(
-              _memId,
-              _groupUnit,
-              _changeGroupUnit,
-              _view,
-              _changeView,
-            ),
-            ..._groupedActs().entries.map(
-                  (e) => SliverStickyHeader(
-                    header: ActListSubHeader(
-                      e.key,
-                      e.value.map((act) => act.value).toList(),
-                    ),
-                    sliver: SliverList(
-                      delegate: () {
-                        final builder = ActListItemBuilder(
-                          e,
-                          _memList,
-                          _view,
-                          _targetList,
-                        );
+        () => RefreshIndicator(
+          onRefresh: _onRefresh,
+          child: CustomScrollView(
+            controller: _scrollController,
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              ActListAppBar(
+                _memId,
+                _groupUnit,
+                _changeGroupUnit,
+                _view,
+                _changeView,
+              ),
+              ..._groupedActs().entries.map(
+                    (e) => SliverStickyHeader(
+                      header: ActListSubHeader(
+                        e.key,
+                        e.value.map((act) => act.value).toList(),
+                      ),
+                      sliver: SliverList(
+                        delegate: () {
+                          final builder = ActListItemBuilder(
+                            e,
+                            _memList,
+                            _view,
+                            _targetList,
+                          );
 
-                        return SliverChildBuilderDelegate(
-                          builder.build,
-                          childCount: builder.childCount,
-                        );
-                      }(),
+                          return SliverChildBuilderDelegate(
+                            builder.build,
+                            childCount: builder.childCount,
+                          );
+                        }(),
+                      ),
                     ),
                   ),
-                )
-          ],
+            ],
+          ),
         ),
         {
           '_memId': _memId,

@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/framework/date_and_time/period.dart';
-import 'package:mem/features/acts/list/act_list.dart';
+import 'package:mem/features/acts/list/view.dart';
+import 'package:mem/features/acts/list/duration.dart';
 import 'package:mem/features/acts/list/item/total_act_time_item.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/mem_entity.dart';
@@ -11,6 +12,7 @@ import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/preference/preference_key.dart';
 import 'package:mem/features/settings/states.dart';
+import 'package:mem/widgets/infinite_scroll.dart';
 
 import '../../entity_factories.dart';
 
@@ -18,6 +20,10 @@ const _memId = 2;
 const _memName = 'mem-a';
 const _midnight = TimeOfDay(hour: 0, minute: 0);
 const _fiveAm = TimeOfDay(hour: 5, minute: 0);
+// 時間。reloadShown 1回目の表示。formatHHmm は 1:00
+const _hoursOnFirstReload = 1;
+// 時間。引き下げ（2回目）の表示。3回目はこれより長く、2:00 は残らない
+const _hoursOnRefresh = 2;
 
 class _FakeMemEntities extends MemEntities {
   final Iterable<MemEntity> _initial;
@@ -37,6 +43,33 @@ class _FakePreference extends Preference<TimeOfDay> {
   TimeOfDay build(PreferenceKey<TimeOfDay> key) => startOfDay;
 }
 
+class _ReloadShownActEntities extends ActEntities {
+  int _reloadCount = 0;
+
+  @override
+  Future<void> reloadShown(int? memId) async {
+    _reloadCount += 1;
+    final hours = _reloadCount == 1
+        ? _hoursOnFirstReload
+        : _reloadCount == 2
+            ? _hoursOnRefresh
+            : _reloadCount;
+    // upsert より先にしないと、actList が isUpdating false のまま再スケジュールする
+    ref.read(isUpdating(memId).notifier).updatedBy(true);
+    final start = DateTime(2026, 10, 13, 10);
+    // 同じ id を置き換える。行が増えると時間が足されて回数と表示がずれる
+    upsert([
+      savedAct(
+        id: 1,
+        memId: memId ?? _memId,
+        start: start,
+        end: start.add(Duration(hours: hours)),
+        createdAt: start,
+      ),
+    ]);
+  }
+}
+
 DateTime _anotherDayThisMonth() {
   final now = DateTime.now();
   return DateTime(now.year, now.month, now.day == 1 ? 2 : 1, 10);
@@ -52,9 +85,10 @@ SavedActEntityV1 _act(int id, DateTime start) => savedAct(
 
 Future<void> _pumpActList(
   WidgetTester tester, {
-  required List<SavedActEntityV1> acts,
+  List<SavedActEntityV1> acts = const [],
   required TimeOfDay startOfDay,
   Period group = Period.aDay,
+  ActEntities? actEntities,
 }) async {
   await tester.binding.setSurfaceSize(const Size(390, 844));
   addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -70,7 +104,10 @@ Future<void> _pumpActList(
             savedMem(id: _memId, name: _memName),
           ]),
         ),
-        actListProvider(_memId).overrideWith((ref) => acts),
+        if (actEntities != null)
+          actEntitiesProvider.overrideWith(() => actEntities)
+        else
+          actListProvider(_memId).overrideWith((ref) => acts),
       ],
       child: MaterialApp(
         locale: const Locale('en'),
@@ -248,6 +285,51 @@ void main() {
       expect(find.text('2026'), findsOneWidget);
       expect(find.byIcon(Icons.calendar_today), findsOneWidget);
       expect(find.byIcon(Icons.calendar_view_day), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'pull to refresh reloads the shown act time',
+    (tester) async {
+      // px。中身が短くても overscroll して RefreshIndicator が走る
+      const reloadFlingDistance = 300.0;
+      // px/秒。引き下げとして扱われる速度
+      const reloadFlingSpeed = 1000.0;
+      // RefreshIndicator が閉じるまで。pumpAndSettle はインジケータが残ると終わらない
+      const refreshIndicatorSettle = Duration(seconds: 1);
+
+      await _pumpActList(
+        tester,
+        startOfDay: _midnight,
+        actEntities: _ReloadShownActEntities(),
+      );
+
+      expect(
+        find.text(const Duration(hours: _hoursOnFirstReload).formatHHmm()),
+        findsOneWidget,
+      );
+      expect(
+        find.text(const Duration(hours: _hoursOnRefresh).formatHHmm()),
+        findsNothing,
+      );
+
+      await tester.fling(
+        find.byType(CustomScrollView),
+        const Offset(0, reloadFlingDistance),
+        reloadFlingSpeed,
+      );
+      await tester.pump();
+      await tester.pump(refreshIndicatorSettle);
+      await tester.pump(refreshIndicatorSettle);
+
+      expect(
+        find.text(const Duration(hours: _hoursOnRefresh).formatHHmm()),
+        findsOneWidget,
+      );
+      expect(
+        find.text(const Duration(hours: _hoursOnFirstReload).formatHHmm()),
+        findsNothing,
+      );
     },
   );
 }
