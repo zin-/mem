@@ -1,23 +1,23 @@
 ---
-description: 今の checkout を残すときは worktree に別の HEAD を置く
+description: Issue のリンクと worktree の使用を一緒に頼まれたとき、兄弟ディレクトリで進める
 alwaysApply: true
 ---
 
-# 今の checkout を残すときの worktree
+# Issue のリンクと worktree
 
-今の checkout がレビュー中、または残す必要があるとき、そこで `git checkout` しない。同じフォルダを別の Cursor ウィンドウで開かない。ウィンドウは分かれていても checkout は一つで、ブランチを切り替えるとレビュー中のファイルが入れ替わる。
+Issue のリンクと、worktree を使うこと、の両方が依頼にあるときだけ、今開いているディレクトリの外でその Issue を進める。リンクだけ、または worktree という語だけのときは、今のディレクトリで `workflow_branch` に従う。
 
-`git fetch` のあと `git worktree add` で、兄弟ディレクトリに `origin/main` を載せる。作業はそのパスで続ける。見るときだけそのフォルダを別ウィンドウで開く。同じ作業を別エージェントに渡さない。
+今開いているディレクトリのブランチは切り替えない。同じフォルダを別の Cursor ウィンドウで開かない。ウィンドウは分かれていても checkout は一つで、ブランチを切り替えると今のウィンドウに出ているファイルが入れ替わる。
 
-ブランチは worktree の中で `workflow_branch` の名前に従って切る。`main` 上では実装しない。`git push` はしない。
+`git fetch` のあと `git worktree add` で、兄弟ディレクトリに `origin/main` を載せる。ブランチはその中で切る。名前は `workflow_branch` に従い、番号はリンクの Issue から取る。`main` 上では実装しない。`git push` はしない。
 
-`android/local.properties` など gitignore の手元ファイルは、今の checkout からコピーしてからビルドする。
+作業はそのパスで続ける。今のウィンドウに出ているファイルは動かさない。見るときだけ、そのフォルダを別ウィンドウで開く。同じ作業を別のエージェントに渡さない。
 
-checkout が空いていて残す必要が無いときは、`workflow_branch` に従う。
+`android/local.properties` など gitignore の手元ファイルは、今のディレクトリからコピーしてからビルドする。
 
 ## Example(具体例)
 
-**❌ レビュー中の checkout で別ブランチに切り替える:**
+**❌ 今開いているディレクトリで別ブランチに切り替える:**
 
 ```bash
 git checkout main
@@ -25,7 +25,9 @@ git pull
 git checkout -b fix/673-foreground-task-builtin-kotlin
 ```
 
-**✅ 兄弟ディレクトリに `origin/main` を載せて、その中で切る:**
+**✅ リンクと worktree の使用が揃ったとき、兄弟ディレクトリに `origin/main` を載せて、その中で切る:**
+
+`https://github.com/zin-/mem/issues/673` を worktree を使って進めて
 
 ```bash
 git fetch
@@ -35,5 +37,5 @@ git -C ../mem-673 checkout -b fix/673-foreground-task-builtin-kotlin
 
 ## Relations(関連)
 
-- `workflow_branch`（空いている checkout ではそちらに従う）
+- `workflow_branch`（リンクだけ、または worktree という語だけのときはそちらに従う）
 - `safety-guardrails`（push などの外部書き込みはしない）
