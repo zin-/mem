@@ -1,15 +1,26 @@
 ---
-description: Issue のリンクと worktree の使用を一緒に頼まれたとき、兄弟ディレクトリで進める
-alwaysApply: true
+description: 今のウィンドウが別の Issue のブランチで作業中であるとき、または Issue のリンクと worktree の使用を一緒に頼まれたとき、兄弟ディレクトリの worktree を使い回す
+alwaysApply: false
 ---
 
 # Issue のリンクと worktree
 
-Issue のリンクと、worktree を使うこと、の両方が依頼にあるときだけ、今開いているディレクトリの外でその Issue を進める。リンクだけ、または worktree という語だけのときは、今のディレクトリで `workflow_branch` に従う。
+次のどちらかのときは、今開いているディレクトリの外でその Issue を進める。
+
+- 今のウィンドウが別の Issue のブランチで作業中である
+- Issue のリンクと、worktree を使うこと、の両方が依頼にある
+
+リンクだけ、または worktree という語だけで、今のウィンドウが別の Issue の作業中でないときは、今のディレクトリで `workflow_branch` に従う。
 
 今開いているディレクトリのブランチは切り替えない。同じフォルダを別の Cursor ウィンドウで開かない。ウィンドウは分かれていても checkout は一つで、ブランチを切り替えると今のウィンドウに出ているファイルが入れ替わる。
 
-`git fetch` のあと `git worktree add` で、兄弟ディレクトリに `origin/main` を載せる。ブランチはその中で切る。名前は `workflow_branch` に従い、番号はリンクの Issue から取る。`main` 上では実装しない。`git push` はしない。
+`git worktree add` は依頼のたびに呼ばない。alpha は今のウィンドウのディレクトリなので使わない。リポジトリの親の `mem-beta` を使い回し、そこが別の Issue の作業中なら `mem-gamma`、`mem-delta` と次の名前にする。`-2` は付けない。
+
+名前はこの順。beta gamma delta epsilon zeta eta theta iota kappa lambda mu nu xi omicron pi rho sigma tau upsilon phi chi psi omega
+
+作業中とは、未コミットの変更があるか、別の Issue のブランチにいること。その名前のディレクトリが無いときだけ、`git fetch` のあと作る。最初の名前なら `git worktree add ../mem-beta origin/main`。`main` にいて未コミットが無いとき、またはこれから着手する Issue のブランチにいるときは、そこを使う。
+
+ブランチはその中で切る。名前は `workflow_branch` に従い、番号はリンクの Issue から取る。`main` 上では実装しない。`git push` はしない。
 
 作業はそのパスで続ける。今のウィンドウに出ているファイルは動かさない。見るときだけ、そのフォルダを別ウィンドウで開く。同じ作業を別のエージェントに渡さない。
 
@@ -25,17 +36,32 @@ git pull
 git checkout -b fix/673-foreground-task-builtin-kotlin
 ```
 
-**✅ リンクと worktree の使用が揃ったとき、兄弟ディレクトリに `origin/main` を載せて、その中で切る:**
-
-`https://github.com/zin-/mem/issues/673` を worktree を使って進めて
+**❌ 依頼のたびに worktree を増やし、`-2` を付ける:**
 
 ```bash
 git fetch
 git worktree add ../mem-673 origin/main
-git -C ../mem-673 checkout -b fix/673-foreground-task-builtin-kotlin
+git worktree add ../mem-beta-2 origin/main
+```
+
+**✅ 今のウィンドウが別の Issue にいて、`mem-beta` が無いので作ってその中で切る:**
+
+今のウィンドウは `feat/683-hours-after-last-act`。`https://github.com/zin-/mem/issues/673` を worktree を使って進めて
+
+```bash
+git fetch
+git worktree add ../mem-beta origin/main
+git -C ../mem-beta checkout -b fix/673-foreground-task-builtin-kotlin
+```
+
+**✅ `mem-beta` が `main` で未コミットが無いので、作らずそこを使う:**
+
+```bash
+git -C ../mem-beta pull
+git -C ../mem-beta checkout -b fix/673-foreground-task-builtin-kotlin
 ```
 
 ## Relations(関連)
 
-- `workflow_branch`（リンクだけ、または worktree という語だけのときはそちらに従う）
+- `workflow_branch`（リンクだけ、または worktree という語だけで、今のウィンドウが別の Issue の作業中でないときはそちらに従う）
 - `safety-guardrails`（push などの外部書き込みはしない）
