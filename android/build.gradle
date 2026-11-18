@@ -35,12 +35,6 @@ subprojects {
       force "androidx.test.espresso:espresso-idling-resource:3.6.1"
     }
   }
-  // sentry_flutter が languageVersion 1.6 を指定するが Kotlin 2.4 では 2.0 未満は非対応
-  project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-    compilerOptions {
-      languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0)
-    }
-  }
 }
 subprojects { subproject ->
   subproject.plugins.withId("com.android.library") {
@@ -50,7 +44,7 @@ subprojects { subproject ->
         && !subproject.fileTree(dir: "${subproject.projectDir}/src", includes: ["**/*.kt"]).isEmpty()) {
       subproject.plugins.apply("org.jetbrains.kotlin.android")
     }
-    // 一部プラグイン（例: sentry_flutter）が compileSdk 34 のまま。依存は requiredCompileSdk 以上を要求する
+    // 一部プラグインの compileSdk が requiredCompileSdk 未満（sentry_flutter 10.3.0 は 36）。依存は requiredCompileSdk 以上を要求する
     // afterEvaluate では変更が too late になるため finalizeDsl で引き上げる
     subproject.androidComponents.finalizeDsl { extension ->
       def requiredCompileSdk = rootProject.ext.requiredCompileSdk
