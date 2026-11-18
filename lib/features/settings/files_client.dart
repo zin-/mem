@@ -15,15 +15,9 @@ class FilesClient {
   factory FilesClient() => _instance ??= FilesClient._();
 
   Future<List<XFile>?> pick() => v(() async {
-        final result = await FilePicker.pickFiles();
-        if (result == null) return null;
-        return result.files.map((f) {
-          final path = f.path;
-          if (path != null) return XFile(path);
-          final bytes = f.bytes;
-          if (bytes != null) return XFile.fromData(bytes, name: f.name);
-          throw StateError('PlatformFile has no path or bytes: ${f.name}');
-        }).toList();
+        final file = await FilePicker.pickFile();
+        if (file == null) return null;
+        return [file.xFile];
       });
 
   Future<String> saveOrShare(File file) => v(
