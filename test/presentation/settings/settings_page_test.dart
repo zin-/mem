@@ -1,6 +1,8 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/features/settings/app_version.dart';
+import 'package:mem/features/settings/app_version_client.dart';
 import 'package:mem/features/settings/constants.dart';
 import 'package:mem/features/settings/page.dart';
 import 'package:mem/features/settings/preference/keys.dart';
@@ -33,7 +35,14 @@ class _TestConstants {
   // 日。初期値 28 ではなく、ピッカーの 1〜90 に入る
   static const int selectedHabitualMemsLookback = 10;
   static const int resetNotificationLabelIndex = 10;
-  static const int appBarTitleIndex = 14;
+  static const int appBarTitleIndex = 16;
+  // 回。バージョンのタイルを1回タップする
+  static const int versionTileTapCount = 1;
+  // pubspec の version。build と `+` でつないでタイルに出す
+  static const version = '0.5.36';
+  // pubspec の build number。空でないのでタイルに出す
+  static const buildNumber = '1';
+  static const shownVersion = '$version+$buildNumber';
 }
 
 Widget _createTestWidget() {
@@ -55,12 +64,33 @@ void _verifyMultipleTextWidgets(WidgetTester tester, List<int> indices) {
   }
 }
 
+class _StubAppVersionClient implements AppVersionClient {
+  int openStoreCount = 0;
+  AppVersion? version;
+
+  @override
+  Future<AppVersion?> current() async => version;
+
+  @override
+  Future<void> openStore() async {
+    openStoreCount++;
+  }
+}
+
+final _stubAppVersionClient = _StubAppVersionClient();
+
 void main() {
   final mockedPreferenceRepository = MockPreferenceRepository();
 
   PreferenceRepository(mock: mockedPreferenceRepository);
+  AppVersionClient(mock: _stubAppVersionClient);
 
   setUp(() {
+    _stubAppVersionClient.openStoreCount = 0;
+    _stubAppVersionClient.version = AppVersion.of(
+      version: _TestConstants.version,
+      buildNumber: _TestConstants.buildNumber,
+    );
     reset(mockedPreferenceRepository);
 
     when(mockedPreferenceRepository.shipByKey(startOfDayKey))
@@ -154,6 +184,17 @@ void main() {
           equals(l10n.settingsPageTitle),
         );
 
+        expect(find.text(l10n.versionLabel), findsOneWidget);
+        expect(find.text(_TestConstants.shownVersion), findsOneWidget);
+
+        await tester.tap(find.text(l10n.versionLabel));
+        await tester.pumpAndSettle();
+
+        expect(
+          _stubAppVersionClient.openStoreCount,
+          _TestConstants.versionTileTapCount,
+        );
+
         _verifyMultipleTextWidgets(tester, [
           _TestConstants.startOfDayValueIndex,
           _TestConstants.notifyAfterInactivityValueIndex,
@@ -161,6 +202,15 @@ void main() {
           _TestConstants.habitualMemsTimeRadiusValueIndex,
           _TestConstants.habitualMemsLookbackValueIndex,
         ]);
+      });
+
+      testWidgets('no version when it is absent.', (tester) async {
+        _stubAppVersionClient.version = null;
+        final l10n = buildL10n();
+
+        await _pumpAndSettle(tester);
+
+        expect(find.text(l10n.versionLabel), findsNothing);
       });
 
       testWidgets('correct values.', (tester) async {

@@ -49,6 +49,8 @@ dependencies:
   timezone: any
   path: any
   path_provider: any
+  package_info_plus: any
+  url_launcher: any
   idb_shim: any
   drift: any
   drift_flutter: any
@@ -77,6 +79,7 @@ dev_dependencies:
   riverpod_lint: any
   flutter_launcher_icons: any
   drift_dev: any
+  url_launcher_platform_interface: any
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
