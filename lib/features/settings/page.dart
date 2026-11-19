@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/settings/app_version.dart';
 import 'package:mem/features/settings/constants.dart';
 import 'package:mem/features/settings/habitual_mems_count.dart';
 import 'package:mem/features/settings/notify_after_inactivity.dart';
@@ -85,6 +86,7 @@ class SettingsPage extends ConsumerWidget {
               'picked': picked,
             },
           ),
+          ref.watch(appVersionProvider).value,
         ),
       );
 }
@@ -100,6 +102,7 @@ class _SettingsPage extends StatelessWidget {
   final void Function(int? picked) _onHabitualMemsTimeRadiusChanged;
   final int? _habitualMemsLookback;
   final void Function(int? picked) _onHabitualMemsLookbackChanged;
+  final AppVersion? _appVersion;
 
   const _SettingsPage(
     this._startOfDay,
@@ -112,12 +115,14 @@ class _SettingsPage extends StatelessWidget {
     this._onHabitualMemsTimeRadiusChanged,
     this._habitualMemsLookback,
     this._onHabitualMemsLookbackChanged,
+    this._appVersion,
   );
 
   @override
   Widget build(BuildContext context) => v(
         () {
           final l10n = buildL10n(context);
+          final appVersion = _appVersion;
 
           return Scaffold(
             appBar: AppBar(
@@ -168,6 +173,15 @@ class _SettingsPage extends StatelessWidget {
                     ],
                   ),
                   buildBackupSection(context),
+                  if (appVersion != null)
+                    SettingsSection(
+                      tiles: [
+                        SettingsTile(
+                          title: Text(l10n.versionLabel),
+                          value: Text(appVersion.text),
+                        ),
+                      ],
+                    ),
                 ],
               ),
             ),
@@ -179,6 +193,7 @@ class _SettingsPage extends StatelessWidget {
           '_habitualMemsCount': _habitualMemsCount,
           '_habitualMemsTimeRadius': _habitualMemsTimeRadius,
           '_habitualMemsLookback': _habitualMemsLookback,
+          '_appVersion': _appVersion,
         },
       );
 }

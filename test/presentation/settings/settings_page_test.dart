@@ -1,6 +1,8 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/features/settings/app_version.dart';
+import 'package:mem/features/settings/app_version_client.dart';
 import 'package:mem/features/settings/constants.dart';
 import 'package:mem/features/settings/page.dart';
 import 'package:mem/features/settings/preference/keys.dart';
@@ -33,7 +35,7 @@ class _TestConstants {
   // 日。初期値 28 ではなく、ピッカーの 1〜90 に入る
   static const int selectedHabitualMemsLookback = 10;
   static const int resetNotificationLabelIndex = 10;
-  static const int appBarTitleIndex = 14;
+  static const int appBarTitleIndex = 16;
 }
 
 Widget _createTestWidget() {
@@ -55,10 +57,19 @@ void _verifyMultipleTextWidgets(WidgetTester tester, List<int> indices) {
   }
 }
 
+class _StubAppVersionClient implements AppVersionClient {
+  @override
+  Future<AppVersion?> current() async => AppVersion.of(
+        version: '0.5.36',
+        buildNumber: '1',
+      );
+}
+
 void main() {
   final mockedPreferenceRepository = MockPreferenceRepository();
 
   PreferenceRepository(mock: mockedPreferenceRepository);
+  AppVersionClient(mock: _StubAppVersionClient());
 
   setUp(() {
     reset(mockedPreferenceRepository);
@@ -153,6 +164,9 @@ void main() {
               .data,
           equals(l10n.settingsPageTitle),
         );
+
+        expect(find.text(l10n.versionLabel), findsOneWidget);
+        expect(find.text('0.5.36+1'), findsOneWidget);
 
         _verifyMultipleTextWidgets(tester, [
           _TestConstants.startOfDayValueIndex,

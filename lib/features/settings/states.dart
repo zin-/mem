@@ -1,4 +1,6 @@
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/settings/app_version.dart';
+import 'package:mem/features/settings/app_version_client.dart';
 import 'package:mem/features/settings/setting_entities.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -40,3 +42,8 @@ class Preference<T> extends _$Preference<T> {
         {"key": key},
       );
 }
+
+@riverpod
+Future<AppVersion?> appVersion(Ref ref) => v(
+      () => AppVersionClient().current(),
+    );

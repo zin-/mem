@@ -111,6 +111,7 @@
   "completedRestoreBackup": "Completed restore backup by '{backupFileName}'.",
   "resetNotificationLabel": "Reset Notification",
   "completeResetNotification": "Complete Reset Notification",
+  "versionLabel": "Version",
 
   "reminderName": "Reminder",
   "reminderDescription": "To remind at specific time.",
