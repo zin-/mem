@@ -25,11 +25,22 @@ class LeadingIconButton extends ConsumerWidget {
           final hasNotifications = _hasEnabledNotifications(ref, memId);
           final hasUndoneChildren = _hasUndoneChildren(ref, _mem.id);
           if (hasNotifications) {
-            return _alongAct(
+            if (latestAct is ActiveAct) {
+              return _iconButton(
+                Icons.pause,
+                () => _acts(ref).pauseByMemId(memId),
+              );
+            }
+            if (latestAct is PausedAct) {
+              return _iconButton(
+                Icons.close,
+                () => _acts(ref).closeByMemId(memId),
+              );
+            }
+            return _stopButton(
               context,
               ref,
               memId,
-              latestAct,
               enableSkip: true,
             );
           }
@@ -41,46 +52,22 @@ class LeadingIconButton extends ConsumerWidget {
           if (doneEdit == null) {
             return const Icon(Icons.account_tree);
           }
-          if (latestAct is ActiveAct || latestAct is PausedAct) {
-            return _alongAct(
-              context,
-              ref,
-              memId,
-              latestAct,
-              enableSkip: false,
+          if (latestAct is ActiveAct) {
+            return _iconButton(
+              Icons.pause,
+              () => _acts(ref).pauseByMemId(memId),
+            );
+          }
+          if (latestAct is PausedAct) {
+            return _iconButton(
+              Icons.close,
+              () => _acts(ref).closeByMemId(memId),
             );
           }
           return MemDoneCheckbox(_mem, doneEdit.onChanged);
         },
         {'_mem': _mem},
       );
-
-  Widget _alongAct(
-    BuildContext context,
-    WidgetRef ref,
-    int memId,
-    Act? latestAct, {
-    required bool enableSkip,
-  }) {
-    if (latestAct is ActiveAct) {
-      return _iconButton(
-        Icons.pause,
-        () => _acts(ref).pauseByMemId(memId),
-      );
-    }
-    if (latestAct is PausedAct) {
-      return _iconButton(
-        Icons.close,
-        () => _acts(ref).closeByMemId(memId),
-      );
-    }
-    return _stopButton(
-      context,
-      ref,
-      memId,
-      enableSkip: enableSkip,
-    );
-  }
 }
 
 class TrailingIconButton extends ConsumerWidget {
