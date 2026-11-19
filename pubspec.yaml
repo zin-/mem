@@ -49,6 +49,7 @@ dependencies:
   timezone: any
   path: any
   path_provider: any
+  package_info_plus: any
   idb_shim: any
   drift: any
   drift_flutter: any
