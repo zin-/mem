@@ -188,28 +188,46 @@ ListTile _render(
           onPressed: closeAct,
           icon: const Icon(Icons.close),
         );
+        final doneControl = doneEdit == null
+            ? const Icon(Icons.account_tree)
+            : MemDoneCheckbox(
+                mem,
+                doneEdit.onChanged,
+              );
+
+        Widget? trailingUnlessDone(Widget button) => mem.isDone ? null : button;
+
+        final Widget leading;
+        final Widget? trailing;
+        if (hasEnableMemNotifications) {
+          leading = hasActiveAct
+              ? pauseIconButton
+              : hasPausedAct
+                  ? closeIconButton
+                  : stopIconButton;
+          trailing = trailingUnlessDone(
+            hasActiveAct ? stopIconButton : startIconButton,
+          );
+        } else if (doneEdit == null) {
+          leading = doneControl;
+          trailing = null;
+        } else if (hasActiveAct) {
+          leading = pauseIconButton;
+          trailing = trailingUnlessDone(stopIconButton);
+        } else if (hasPausedAct) {
+          leading = closeIconButton;
+          trailing = trailingUnlessDone(startIconButton);
+        } else {
+          leading = doneControl;
+          trailing = trailingUnlessDone(startIconButton);
+        }
 
         return ListTile(
           title: _title(mem, latestActByMem, target, amount),
           onTap: onTap,
-          leading: hasEnableMemNotifications
-              ? hasActiveAct
-                  ? pauseIconButton
-                  : hasPausedAct
-                      ? closeIconButton
-                      : stopIconButton
-              : doneEdit == null
-                  ? const Icon(Icons.account_tree)
-                  : MemDoneCheckbox(
-                      mem,
-                      doneEdit.onChanged,
-                    ),
+          leading: leading,
           tileColor: mem.isArchived ? secondaryGreyColor : null,
-          trailing: !mem.isDone && hasEnableMemNotifications
-              ? hasActiveAct
-                  ? stopIconButton
-                  : startIconButton
-              : null,
+          trailing: trailing,
           subtitle: subtitle ??
               (mem.period == null &&
                       !hasEnableMemNotifications &&
