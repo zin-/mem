@@ -12,7 +12,7 @@ import 'package:mem/features/mems/mems_state.dart';
 
 import 'completion_dialog.dart';
 
-class LeadingIconButton extends ConsumerWidget {
+class LeadingIconButton extends ConsumerWidget with _MemListItemAction {
   final Mem _mem;
 
   const LeadingIconButton(this._mem, {super.key});
@@ -22,8 +22,10 @@ class LeadingIconButton extends ConsumerWidget {
         () {
           final memId = _mem.id as int;
           final latestAct = _mem.latestAct;
-          final hasNotifications = _hasEnabledNotifications(ref, memId);
-          final hasUndoneChildren = _hasUndoneChildren(ref, _mem.id);
+          final hasNotifications =
+              _MemListItemAction._hasEnabledNotifications(ref, memId);
+          final hasUndoneChildren =
+              _MemListItemAction._hasUndoneChildren(ref, _mem.id);
           if (hasNotifications) {
             if (latestAct is ActiveAct) {
               return _iconButton(
@@ -68,9 +70,19 @@ class LeadingIconButton extends ConsumerWidget {
         },
         {'_mem': _mem},
       );
+
+  void _editDone(WidgetRef ref, int memId, bool? value) => v(
+        () => value == true
+            ? ref.read(memEntitiesProvider.notifier).doneMem(memId)
+            : ref.read(memEntitiesProvider.notifier).undoneMem(memId),
+        {
+          'value': value,
+          'memId': memId,
+        },
+      );
 }
 
-class TrailingIconButton extends ConsumerWidget {
+class TrailingIconButton extends ConsumerWidget with _MemListItemAction {
   final Mem _mem;
 
   const TrailingIconButton(this._mem, {super.key});
@@ -104,69 +116,55 @@ class TrailingIconButton extends ConsumerWidget {
 }
 
 Widget? trailingIconButton(WidgetRef ref, Mem mem) {
-  final hasNotifications = _hasEnabledNotifications(ref, mem.id as int);
-  final hasUndoneChildren = _hasUndoneChildren(ref, mem.id);
+  final hasNotifications =
+      _MemListItemAction._hasEnabledNotifications(ref, mem.id as int);
+  final hasUndoneChildren = _MemListItemAction._hasUndoneChildren(ref, mem.id);
   if (mem.isDone || (!hasNotifications && hasUndoneChildren)) {
     return null;
   }
   return TrailingIconButton(mem);
 }
 
-ActEntities _acts(WidgetRef ref) => ref.read(actEntitiesProvider.notifier);
+mixin _MemListItemAction {
+  static bool _hasEnabledNotifications(WidgetRef ref, int memId) => ref
+      .watch(memNotificationsByMemIdProvider(memId))
+      .where(
+        (e) => e is SavedMemNotificationEntityV1 && e.value.isEnabled(),
+      )
+      .isNotEmpty;
 
-bool hasEnabledMemNotifications(
-  Iterable<MemNotificationEntityV1> notifications,
-) =>
-    notifications
-        .where(
-          (e) => e is SavedMemNotificationEntityV1 && e.value.isEnabled(),
-        )
-        .isNotEmpty;
+  static bool _hasUndoneChildren(WidgetRef ref, MemId memId) => ref.watch(
+        parentMemIdsWithUndoneChildrenProvider.select(
+          (ids) => ids.contains(memId),
+        ),
+      );
 
-bool _hasEnabledNotifications(WidgetRef ref, int memId) =>
-    hasEnabledMemNotifications(
-      ref.watch(memNotificationsByMemIdProvider(memId)),
-    );
+  ActEntities _acts(WidgetRef ref) => ref.read(actEntitiesProvider.notifier);
 
-bool _hasUndoneChildren(WidgetRef ref, MemId memId) => ref.watch(
-      parentMemIdsWithUndoneChildrenProvider.select(
-        (ids) => ids.contains(memId),
-      ),
-    );
+  Widget _iconButton(IconData icon, void Function() onPressed) => IconButton(
+        onPressed: onPressed,
+        icon: Icon(icon),
+      );
 
-void _editDone(WidgetRef ref, int memId, bool? value) => v(
-      () => value == true
-          ? ref.read(memEntitiesProvider.notifier).doneMem(memId)
-          : ref.read(memEntitiesProvider.notifier).undoneMem(memId),
-      {
-        'value': value,
-        'memId': memId,
+  Widget _stopButton(
+    BuildContext context,
+    WidgetRef ref,
+    int memId, {
+    required bool enableSkip,
+  }) {
+    void finish() => _acts(ref).finishActby(memId);
+    void skip() => _acts(ref).skipActBy(memId);
+    return memListCompletionStopButton(
+      context: context,
+      onFinish: finish,
+      enableSkipMenu: enableSkip,
+      onShowCompletionDialog: (dialogContext) {
+        showMemListCompletionDialog(
+          dialogContext,
+          onFinish: finish,
+          onSkip: skip,
+        );
       },
     );
-
-Widget _iconButton(IconData icon, void Function() onPressed) => IconButton(
-      onPressed: onPressed,
-      icon: Icon(icon),
-    );
-
-Widget _stopButton(
-  BuildContext context,
-  WidgetRef ref,
-  int memId, {
-  required bool enableSkip,
-}) {
-  void finish() => _acts(ref).finishActby(memId);
-  void skip() => _acts(ref).skipActBy(memId);
-  return memListCompletionStopButton(
-    context: context,
-    onFinish: finish,
-    enableSkipMenu: enableSkip,
-    onShowCompletionDialog: (dialogContext) {
-      showMemListCompletionDialog(
-        dialogContext,
-        onFinish: finish,
-        onSkip: skip,
-      );
-    },
-  );
+  }
 }

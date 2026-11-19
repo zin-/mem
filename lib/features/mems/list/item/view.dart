@@ -98,6 +98,16 @@ ListTile _render(
 ) =>
     v(
       () {
+        bool hasEnabledMemNotifications(
+          Iterable<MemNotificationEntityV1> notifications,
+        ) =>
+            notifications
+                .where(
+                  (e) =>
+                      e is SavedMemNotificationEntityV1 && e.value.isEnabled(),
+                )
+                .isNotEmpty;
+
         final hasEnableMemNotifications = hasEnabledMemNotifications(
           memNotificationEntities,
         );
