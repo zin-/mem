@@ -22,10 +22,8 @@ allprojects {
 rootProject.buildDir = "../build"
 subprojects {
   project.buildDir = "${rootProject.buildDir}/${project.name}"
-  // home_widget が glance-appwidget:1.+ を引く。1.+ は 1.3.0-alpha01 に解決され AGP 9.2.0+ が必要になるため 1.2.0-rc01 に固定
   project.configurations.configureEach {
     resolutionStrategy {
-      force "androidx.glance:glance-appwidget:1.2.0-rc01"
       // integration_test が Espresso 3.2.x を引くと espresso-core と idling-resource の namespace が重複し AGP 9 でマージ失敗する
       // runner / rules / monitor / espresso を互換バージョンへ固定（rules は Maven 上 1.6.2 が無いため 1.6.1）
       force "androidx.test:runner:1.6.2"
@@ -59,8 +57,6 @@ subprojects { subproject ->
     }
     // プラグインごとに Java targetCompatibility と Kotlin jvmTarget がずれる（例: Java 17 / Kotlin 1.8）
     // 全ライブラリへの Java 17 強制はプラグインごとの Java 設定と競合するため行わず、既存 Java 設定に jvmTarget を合わせる
-    // home_widget は JVM 1.8 のままだと work-runtime-ktx (JVM 11) のインラインで失敗する
-    // compileOptions は afterEvaluate では finalized 済みのため、home_widget のみタスク側で 11 に揃える
     subproject.afterEvaluate {
       if (!subproject.plugins.hasPlugin("org.jetbrains.kotlin.android")) {
         return
@@ -69,16 +65,8 @@ subprojects { subproject ->
       if (javaTarget == null) {
         return
       }
-      def effectiveTarget = javaTarget
-      if (subproject.name == "home_widget" && javaTarget < JavaVersion.VERSION_11) {
-        effectiveTarget = JavaVersion.VERSION_11
-        subproject.tasks.withType(JavaCompile).configureEach {
-          sourceCompatibility = effectiveTarget.toString()
-          targetCompatibility = effectiveTarget.toString()
-        }
-      }
       subproject.android.kotlinOptions {
-        jvmTarget = effectiveTarget.toString()
+        jvmTarget = javaTarget.toString()
       }
     }
   }
