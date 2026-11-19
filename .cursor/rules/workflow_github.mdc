@@ -1,0 +1,26 @@
+---
+description: GitHub の参照は gh を使い、GitKraken の認証を求めない
+alwaysApply: true
+---
+
+# GitHub は gh
+
+Issue、PR、Actions、リポジトリの参照は `gh` で行う。
+
+GitKraken と GitLens の MCP（`user-eamodio.gitlens-extension-GitKraken`）、`gk` は呼ばない。未ログインでも `gk auth login` は実行せず、サインインを求めない。
+
+## Example(具体例)
+
+**❌ GitKraken で Issue を取り、サインインを求める:**
+
+`issues_get_detail` を呼び、失敗したら `gk auth login` を案内する。
+
+**✅ gh で Issue を取る:**
+
+```bash
+gh issue view 437 --repo zin-/mem
+```
+
+## Relations(関連)
+
+- `safety-guardrails`（`gh` の書き込みはそちらに従う）
