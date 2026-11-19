@@ -14,8 +14,6 @@ import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/mems/transitions.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/detail/states.dart';
-import 'package:mem/features/mems/list/item/completion_dialog.dart';
-import 'package:mem/features/mems/mem_done_checkbox.dart';
 import 'package:mem/features/mems/mem_done_edit.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
@@ -26,6 +24,7 @@ import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/values/colors.dart';
 
+import 'actions.dart';
 import 'subtitle.dart';
 
 class MemListItemView extends ConsumerWidget {
@@ -146,88 +145,36 @@ ListTile _render(
 ) =>
     v(
       () {
-        final hasActiveAct =
-            latestActByMem != null && latestActByMem is ActiveAct;
-        final hasPausedAct =
-            latestActByMem != null && latestActByMem is PausedAct;
         final hasEnableMemNotifications = memNotificationEntities
             .where(
               (e) => e is SavedMemNotificationEntityV1 && e.value.isEnabled(),
             )
             .isNotEmpty;
-        final enableSkipMenu = hasEnableMemNotifications && !hasActiveAct;
         final doneEdit = MemDoneEdit.of(
           hasUndoneChildren: hasUndoneChildren,
           isDone: mem.isDone,
           onChanged: (value) => onMemDoneCheckboxTapped(value, mem.id as int),
         );
-
-        void showCompletionDialog(BuildContext dialogContext) {
-          showMemListCompletionDialog(
-            dialogContext,
-            onFinish: finishAct,
-            onSkip: skipAct,
-          );
-        }
-
-        final stopIconButton = memListCompletionStopButton(
+        final actions = MemListItemActions.of(
           context: context,
-          onFinish: finishAct,
-          enableSkipMenu: enableSkipMenu,
-          onShowCompletionDialog: showCompletionDialog,
+          mem: mem,
+          latestAct: latestActByMem,
+          hasEnableMemNotifications: hasEnableMemNotifications,
+          doneEdit: doneEdit,
+          startAct: startAct,
+          resumeAct: resumeAct,
+          finishAct: finishAct,
+          skipAct: skipAct,
+          pauseAct: pauseAct,
+          closeAct: closeAct,
         );
-        final startIconButton = IconButton(
-          onPressed: () => hasPausedAct ? resumeAct() : startAct(),
-          icon: const Icon(Icons.play_arrow),
-        );
-        final pauseIconButton = IconButton(
-          onPressed: pauseAct,
-          icon: const Icon(Icons.pause),
-        );
-        final closeIconButton = IconButton(
-          onPressed: closeAct,
-          icon: const Icon(Icons.close),
-        );
-        final doneControl = doneEdit == null
-            ? const Icon(Icons.account_tree)
-            : MemDoneCheckbox(
-                mem,
-                doneEdit.onChanged,
-              );
-
-        Widget? trailingUnlessDone(Widget button) => mem.isDone ? null : button;
-
-        final Widget leading;
-        final Widget? trailing;
-        if (hasEnableMemNotifications) {
-          leading = hasActiveAct
-              ? pauseIconButton
-              : hasPausedAct
-                  ? closeIconButton
-                  : stopIconButton;
-          trailing = trailingUnlessDone(
-            hasActiveAct ? stopIconButton : startIconButton,
-          );
-        } else if (doneEdit == null) {
-          leading = doneControl;
-          trailing = null;
-        } else if (hasActiveAct) {
-          leading = pauseIconButton;
-          trailing = trailingUnlessDone(stopIconButton);
-        } else if (hasPausedAct) {
-          leading = closeIconButton;
-          trailing = trailingUnlessDone(startIconButton);
-        } else {
-          leading = doneControl;
-          trailing = trailingUnlessDone(startIconButton);
-        }
 
         return ListTile(
           title: _title(mem, latestActByMem, target, amount),
           onTap: onTap,
-          leading: leading,
+          leading: actions.leading,
           tileColor: mem.isArchived ? secondaryGreyColor : null,
-          trailing: trailing,
+          trailing: actions.trailing,
           subtitle: subtitle ??
               (mem.period == null &&
                       !hasEnableMemNotifications &&
