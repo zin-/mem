@@ -12,6 +12,7 @@ import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/framework/date_and_time/period.dart';
+import 'package:mem/features/mems/list/item/actions.dart';
 import 'package:mem/features/mems/list/item/view.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/settings/preference/keys.dart';
@@ -1918,8 +1919,14 @@ void main() {
 
       void expectParentIconLeading(WidgetTester tester) {
         final leading = tester.widget<ListTile>(find.byType(ListTile)).leading;
-        expect(leading, isA<Icon>());
-        expect((leading! as Icon).icon, Icons.account_tree);
+        expect(leading, isA<LeadingIconButton>());
+        expect(
+          find.descendant(
+            of: find.byWidget(leading!),
+            matching: find.byIcon(Icons.account_tree),
+          ),
+          findsOneWidget,
+        );
       }
 
       testWidgets(

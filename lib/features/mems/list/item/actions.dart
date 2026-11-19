@@ -1,127 +1,185 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/acts/states.dart';
+import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
+import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_done_checkbox.dart';
 import 'package:mem/features/mems/mem_done_edit.dart';
+import 'package:mem/features/mems/mems_state.dart';
 
 import 'completion_dialog.dart';
 
-class MemListItemActions {
-  final Widget leading;
-  final Widget? trailing;
+class LeadingIconButton extends ConsumerWidget {
+  final Mem _mem;
 
-  MemListItemActions._({
-    required this.leading,
-    this.trailing,
-  });
+  const LeadingIconButton(this._mem, {super.key});
 
-  static MemListItemActions of({
-    required BuildContext context,
-    required Mem mem,
-    required Act? latestAct,
-    required bool hasEnableMemNotifications,
-    required MemDoneEdit? doneEdit,
-    required void Function() startAct,
-    required void Function() resumeAct,
-    required void Function() finishAct,
-    required void Function() skipAct,
-    required void Function() pauseAct,
-    required void Function() closeAct,
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => v(
+        () {
+          final memId = _mem.id as int;
+          final latestAct = _mem.latestAct;
+          final hasNotifications = _hasEnabledNotifications(ref, memId);
+          final hasUndoneChildren = _hasUndoneChildren(ref, _mem.id);
+          if (hasNotifications) {
+            return _alongAct(
+              context,
+              ref,
+              memId,
+              latestAct,
+              enableSkip: true,
+            );
+          }
+          final doneEdit = MemDoneEdit.of(
+            hasUndoneChildren: hasUndoneChildren,
+            isDone: _mem.isDone,
+            onChanged: (value) => _editDone(ref, memId, value),
+          );
+          if (doneEdit == null) {
+            return const Icon(Icons.account_tree);
+          }
+          if (latestAct is ActiveAct || latestAct is PausedAct) {
+            return _alongAct(
+              context,
+              ref,
+              memId,
+              latestAct,
+              enableSkip: false,
+            );
+          }
+          return MemDoneCheckbox(_mem, doneEdit.onChanged);
+        },
+        {'_mem': _mem},
+      );
+
+  Widget _alongAct(
+    BuildContext context,
+    WidgetRef ref,
+    int memId,
+    Act? latestAct, {
+    required bool enableSkip,
   }) {
-    final controls = _MemListItemControls(
-      context: context,
-      mem: mem,
-      latestAct: latestAct,
-      startAct: startAct,
-      resumeAct: resumeAct,
-      finishAct: finishAct,
-      skipAct: skipAct,
-      pauseAct: pauseAct,
-      closeAct: closeAct,
-    );
-    if (hasEnableMemNotifications) {
-      return controls.alongAct(enableSkip: true);
-    }
-    if (doneEdit == null) {
-      return MemListItemActions._(leading: const Icon(Icons.account_tree));
-    }
-    if (controls.isRunning) {
-      return controls.alongAct(enableSkip: false);
-    }
-    return controls.idle(doneEdit);
-  }
-}
-
-class _MemListItemControls {
-  final BuildContext context;
-  final Mem mem;
-  final Act? latestAct;
-  final void Function() startAct;
-  final void Function() resumeAct;
-  final void Function() finishAct;
-  final void Function() skipAct;
-  final void Function() pauseAct;
-  final void Function() closeAct;
-
-  _MemListItemControls({
-    required this.context,
-    required this.mem,
-    required this.latestAct,
-    required this.startAct,
-    required this.resumeAct,
-    required this.finishAct,
-    required this.skipAct,
-    required this.pauseAct,
-    required this.closeAct,
-  });
-
-  bool get isRunning => latestAct is ActiveAct || latestAct is PausedAct;
-
-  MemListItemActions alongAct({required bool enableSkip}) {
     if (latestAct is ActiveAct) {
-      return _open(
-        _iconButton(Icons.pause, pauseAct),
-        _stop(enableSkip: false),
+      return _iconButton(
+        Icons.pause,
+        () => _acts(ref).pauseByMemId(memId),
       );
     }
     if (latestAct is PausedAct) {
-      return _open(
-        _iconButton(Icons.close, closeAct),
-        _iconButton(Icons.play_arrow, resumeAct),
+      return _iconButton(
+        Icons.close,
+        () => _acts(ref).closeByMemId(memId),
       );
     }
-    return _open(
-      _stop(enableSkip: enableSkip),
-      _iconButton(Icons.play_arrow, startAct),
+    return _stopButton(
+      context,
+      ref,
+      memId,
+      enableSkip: enableSkip,
     );
   }
+}
 
-  MemListItemActions idle(MemDoneEdit doneEdit) => _open(
-        MemDoneCheckbox(mem, doneEdit.onChanged),
-        _iconButton(Icons.play_arrow, startAct),
-      );
+class TrailingIconButton extends ConsumerWidget {
+  final Mem _mem;
 
-  MemListItemActions _open(Widget leading, Widget trailing) =>
-      MemListItemActions._(
-        leading: leading,
-        trailing: mem.isDone ? null : trailing,
-      );
+  const TrailingIconButton(this._mem, {super.key});
 
-  Widget _iconButton(IconData icon, void Function() onPressed) => IconButton(
-        onPressed: onPressed,
-        icon: Icon(icon),
-      );
-
-  Widget _stop({required bool enableSkip}) => memListCompletionStopButton(
-        context: context,
-        onFinish: finishAct,
-        enableSkipMenu: enableSkip,
-        onShowCompletionDialog: (dialogContext) {
-          showMemListCompletionDialog(
-            dialogContext,
-            onFinish: finishAct,
-            onSkip: skipAct,
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => v(
+        () {
+          final memId = _mem.id as int;
+          final latestAct = _mem.latestAct;
+          if (latestAct is ActiveAct) {
+            return _stopButton(
+              context,
+              ref,
+              memId,
+              enableSkip: false,
+            );
+          }
+          if (latestAct is PausedAct) {
+            return _iconButton(
+              Icons.play_arrow,
+              () => _acts(ref).resumeActBy(memId),
+            );
+          }
+          return _iconButton(
+            Icons.play_arrow,
+            () => _acts(ref).startActby(memId),
           );
         },
+        {'_mem': _mem},
       );
+}
+
+Widget? trailingIconButton(WidgetRef ref, Mem mem) {
+  final hasNotifications = _hasEnabledNotifications(ref, mem.id as int);
+  final hasUndoneChildren = _hasUndoneChildren(ref, mem.id);
+  if (mem.isDone || (!hasNotifications && hasUndoneChildren)) {
+    return null;
+  }
+  return TrailingIconButton(mem);
+}
+
+ActEntities _acts(WidgetRef ref) => ref.read(actEntitiesProvider.notifier);
+
+bool hasEnabledMemNotifications(
+  Iterable<MemNotificationEntityV1> notifications,
+) =>
+    notifications
+        .where(
+          (e) => e is SavedMemNotificationEntityV1 && e.value.isEnabled(),
+        )
+        .isNotEmpty;
+
+bool _hasEnabledNotifications(WidgetRef ref, int memId) =>
+    hasEnabledMemNotifications(
+      ref.watch(memNotificationsByMemIdProvider(memId)),
+    );
+
+bool _hasUndoneChildren(WidgetRef ref, MemId memId) => ref.watch(
+      parentMemIdsWithUndoneChildrenProvider.select(
+        (ids) => ids.contains(memId),
+      ),
+    );
+
+void _editDone(WidgetRef ref, int memId, bool? value) => v(
+      () => value == true
+          ? ref.read(memEntitiesProvider.notifier).doneMem(memId)
+          : ref.read(memEntitiesProvider.notifier).undoneMem(memId),
+      {
+        'value': value,
+        'memId': memId,
+      },
+    );
+
+Widget _iconButton(IconData icon, void Function() onPressed) => IconButton(
+      onPressed: onPressed,
+      icon: Icon(icon),
+    );
+
+Widget _stopButton(
+  BuildContext context,
+  WidgetRef ref,
+  int memId, {
+  required bool enableSkip,
+}) {
+  void finish() => _acts(ref).finishActby(memId);
+  void skip() => _acts(ref).skipActBy(memId);
+  return memListCompletionStopButton(
+    context: context,
+    onFinish: finish,
+    enableSkipMenu: enableSkip,
+    onShowCompletionDialog: (dialogContext) {
+      showMemListCompletionDialog(
+        dialogContext,
+        onFinish: finish,
+        onSkip: skip,
+      );
+    },
+  );
 }
