@@ -85,7 +85,22 @@ class LeadingIconButton extends ConsumerWidget with _MemListItemAction {
 class TrailingIconButton extends ConsumerWidget with _MemListItemAction {
   final Mem _mem;
 
-  const TrailingIconButton(this._mem, {super.key});
+  const TrailingIconButton._(this._mem);
+
+  static TrailingIconButton? of(WidgetRef ref, Mem mem) {
+    final hasNotifications = _MemListItemAction._hasEnabledNotifications(
+      ref,
+      mem.id as int,
+    );
+    final hasUndoneChildren = _MemListItemAction._hasUndoneChildren(
+      ref,
+      mem.id,
+    );
+    if (mem.isDone || (!hasNotifications && hasUndoneChildren)) {
+      return null;
+    }
+    return TrailingIconButton._(mem);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
@@ -115,15 +130,8 @@ class TrailingIconButton extends ConsumerWidget with _MemListItemAction {
       );
 }
 
-Widget? trailingIconButton(WidgetRef ref, Mem mem) {
-  final hasNotifications =
-      _MemListItemAction._hasEnabledNotifications(ref, mem.id as int);
-  final hasUndoneChildren = _MemListItemAction._hasUndoneChildren(ref, mem.id);
-  if (mem.isDone || (!hasNotifications && hasUndoneChildren)) {
-    return null;
-  }
-  return TrailingIconButton(mem);
-}
+Widget? trailingIconButton(WidgetRef ref, Mem mem) =>
+    TrailingIconButton.of(ref, mem);
 
 mixin _MemListItemAction {
   static bool _hasEnabledNotifications(WidgetRef ref, int memId) => ref
