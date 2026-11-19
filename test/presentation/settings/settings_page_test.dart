@@ -36,6 +36,8 @@ class _TestConstants {
   static const int selectedHabitualMemsLookback = 10;
   static const int resetNotificationLabelIndex = 10;
   static const int appBarTitleIndex = 16;
+  // 回。バージョンのタイルを1回タップする
+  static const int versionTileTapCount = 1;
 }
 
 Widget _createTestWidget() {
@@ -58,20 +60,30 @@ void _verifyMultipleTextWidgets(WidgetTester tester, List<int> indices) {
 }
 
 class _StubAppVersionClient implements AppVersionClient {
+  int openStoreCount = 0;
+
   @override
   Future<AppVersion?> current() async => AppVersion.of(
         version: '0.5.36',
         buildNumber: '1',
       );
+
+  @override
+  Future<void> openStore() async {
+    openStoreCount++;
+  }
 }
+
+final _stubAppVersionClient = _StubAppVersionClient();
 
 void main() {
   final mockedPreferenceRepository = MockPreferenceRepository();
 
   PreferenceRepository(mock: mockedPreferenceRepository);
-  AppVersionClient(mock: _StubAppVersionClient());
+  AppVersionClient(mock: _stubAppVersionClient);
 
   setUp(() {
+    _stubAppVersionClient.openStoreCount = 0;
     reset(mockedPreferenceRepository);
 
     when(mockedPreferenceRepository.shipByKey(startOfDayKey))
@@ -167,6 +179,14 @@ void main() {
 
         expect(find.text(l10n.versionLabel), findsOneWidget);
         expect(find.text('0.5.36+1'), findsOneWidget);
+
+        await tester.tap(find.text(l10n.versionLabel));
+        await tester.pumpAndSettle();
+
+        expect(
+          _stubAppVersionClient.openStoreCount,
+          _TestConstants.versionTileTapCount,
+        );
 
         _verifyMultipleTextWidgets(tester, [
           _TestConstants.startOfDayValueIndex,

@@ -50,6 +50,7 @@ dependencies:
   path: any
   path_provider: any
   package_info_plus: any
+  url_launcher: any
   idb_shim: any
   drift: any
   drift_flutter: any

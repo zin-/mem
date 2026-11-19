@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/settings/app_version.dart';
+import 'package:mem/features/settings/app_version_client.dart';
 import 'package:mem/features/settings/constants.dart';
 import 'package:mem/features/settings/habitual_mems_count.dart';
 import 'package:mem/features/settings/notify_after_inactivity.dart';
@@ -179,6 +180,9 @@ class _SettingsPage extends StatelessWidget {
                         SettingsTile(
                           title: Text(l10n.versionLabel),
                           value: Text(appVersion.text),
+                          onPressed: (_) => v(
+                            () => AppVersionClient().openStore(),
+                          ),
                         ),
                       ],
                     ),
