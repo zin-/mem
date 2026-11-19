@@ -130,9 +130,6 @@ class TrailingIconButton extends ConsumerWidget with _MemListItemAction {
       );
 }
 
-Widget? trailingIconButton(WidgetRef ref, Mem mem) =>
-    TrailingIconButton.of(ref, mem);
-
 mixin _MemListItemAction {
   static bool _hasEnabledNotifications(WidgetRef ref, int memId) => ref
       .watch(memNotificationsByMemIdProvider(memId))

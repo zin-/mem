@@ -117,7 +117,7 @@ ListTile _render(
           onTap: onTap,
           leading: LeadingIconButton(mem),
           tileColor: mem.isArchived ? secondaryGreyColor : null,
-          trailing: trailingIconButton(ref, mem),
+          trailing: TrailingIconButton.of(ref, mem),
           subtitle: subtitle ??
               (mem.period == null &&
                       !hasEnableMemNotifications &&
