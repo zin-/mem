@@ -1,0 +1,42 @@
+---
+description: レビュー指摘は指摘ごとに To-do とコミットを分ける
+alwaysApply: true
+---
+
+# レビュー指摘の直し方
+
+指摘が複数あるとき、指摘ごとに To-do を一つ作る。一つの To-do にまとめない。
+
+コミットも指摘ごと。メッセージはその指摘だけを説明する。
+
+各コミットは、それ単体でテストが通る状態にする。
+
+ルールファイルだけの変更は、指摘のコミットに混ぜない。
+
+## Example(具体例)
+
+**❌ 複数の指摘を一つの To-do にまとめる**
+
+「メソッド名、ドメインの手続き、null 判定をまとめて直す」
+
+**✅ 指摘ごとに To-do を一つ作る**
+
+1. メソッド名が意味を持たないので、分岐を呼び出し元に書く
+2. ドメインの手続きを型のメソッドにする
+3. null を返す判定を生成メソッドに置く
+
+**❌ 1コミットに混ぜる:**
+
+メソッド名の修正、ドメイン手続きの移動、`workflow_review_fix.mdc` の追加
+
+**✅ 分ける:**
+
+1. `Inline the branch so the call site shows what each state does.`
+2. `Move the domain procedure onto the type that owns it.`
+3. `Add a rule to keep each review comment as its own todo and commit.`
+
+## Relations(関連)
+
+- `workflow_commit`（ルール、ドキュメント、開発用設定だけは別コミット。依頼があるまで作らない）
+- `workflow_red_green`（各変更の中でテストを通す）
+- KISS
