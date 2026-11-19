@@ -10,7 +10,10 @@ class MemListItemActions {
   final Widget leading;
   final Widget? trailing;
 
-  MemListItemActions._(this.leading, this.trailing);
+  MemListItemActions._({
+    required this.leading,
+    this.trailing,
+  });
 
   static MemListItemActions of({
     required BuildContext context,
@@ -25,70 +28,100 @@ class MemListItemActions {
     required void Function() pauseAct,
     required void Function() closeAct,
   }) {
-    final hasActiveAct = latestAct != null && latestAct is ActiveAct;
-    final hasPausedAct = latestAct != null && latestAct is PausedAct;
-    final enableSkipMenu = hasEnableMemNotifications && !hasActiveAct;
-
-    void showCompletionDialog(BuildContext dialogContext) {
-      showMemListCompletionDialog(
-        dialogContext,
-        onFinish: finishAct,
-        onSkip: skipAct,
-      );
-    }
-
-    final stopIconButton = memListCompletionStopButton(
+    final controls = _MemListItemControls(
       context: context,
-      onFinish: finishAct,
-      enableSkipMenu: enableSkipMenu,
-      onShowCompletionDialog: showCompletionDialog,
+      mem: mem,
+      latestAct: latestAct,
+      startAct: startAct,
+      resumeAct: resumeAct,
+      finishAct: finishAct,
+      skipAct: skipAct,
+      pauseAct: pauseAct,
+      closeAct: closeAct,
     );
-    final startIconButton = IconButton(
-      onPressed: () => hasPausedAct ? resumeAct() : startAct(),
-      icon: const Icon(Icons.play_arrow),
-    );
-    final pauseIconButton = IconButton(
-      onPressed: pauseAct,
-      icon: const Icon(Icons.pause),
-    );
-    final closeIconButton = IconButton(
-      onPressed: closeAct,
-      icon: const Icon(Icons.close),
-    );
-    final doneControl = doneEdit == null
-        ? const Icon(Icons.account_tree)
-        : MemDoneCheckbox(
-            mem,
-            doneEdit.onChanged,
-          );
-
-    Widget? trailingUnlessDone(Widget button) => mem.isDone ? null : button;
-
-    final Widget leading;
-    final Widget? trailing;
     if (hasEnableMemNotifications) {
-      leading = hasActiveAct
-          ? pauseIconButton
-          : hasPausedAct
-              ? closeIconButton
-              : stopIconButton;
-      trailing = trailingUnlessDone(
-        hasActiveAct ? stopIconButton : startIconButton,
-      );
-    } else if (doneEdit == null) {
-      leading = doneControl;
-      trailing = null;
-    } else if (hasActiveAct) {
-      leading = pauseIconButton;
-      trailing = trailingUnlessDone(stopIconButton);
-    } else if (hasPausedAct) {
-      leading = closeIconButton;
-      trailing = trailingUnlessDone(startIconButton);
-    } else {
-      leading = doneControl;
-      trailing = trailingUnlessDone(startIconButton);
+      return controls.alongAct(enableSkip: true);
     }
-
-    return MemListItemActions._(leading, trailing);
+    if (doneEdit == null) {
+      return MemListItemActions._(leading: const Icon(Icons.account_tree));
+    }
+    if (controls.isRunning) {
+      return controls.alongAct(enableSkip: false);
+    }
+    return controls.idle(doneEdit);
   }
+}
+
+class _MemListItemControls {
+  final BuildContext context;
+  final Mem mem;
+  final Act? latestAct;
+  final void Function() startAct;
+  final void Function() resumeAct;
+  final void Function() finishAct;
+  final void Function() skipAct;
+  final void Function() pauseAct;
+  final void Function() closeAct;
+
+  _MemListItemControls({
+    required this.context,
+    required this.mem,
+    required this.latestAct,
+    required this.startAct,
+    required this.resumeAct,
+    required this.finishAct,
+    required this.skipAct,
+    required this.pauseAct,
+    required this.closeAct,
+  });
+
+  bool get isRunning => latestAct is ActiveAct || latestAct is PausedAct;
+
+  MemListItemActions alongAct({required bool enableSkip}) {
+    if (latestAct is ActiveAct) {
+      return _open(
+        _iconButton(Icons.pause, pauseAct),
+        _stop(enableSkip: false),
+      );
+    }
+    if (latestAct is PausedAct) {
+      return _open(
+        _iconButton(Icons.close, closeAct),
+        _iconButton(Icons.play_arrow, resumeAct),
+      );
+    }
+    return _open(
+      _stop(enableSkip: enableSkip),
+      _iconButton(Icons.play_arrow, startAct),
+    );
+  }
+
+  MemListItemActions idle(MemDoneEdit doneEdit) => _open(
+        MemDoneCheckbox(mem, doneEdit.onChanged),
+        _iconButton(Icons.play_arrow, startAct),
+      );
+
+  MemListItemActions _open(Widget leading, Widget trailing) =>
+      MemListItemActions._(
+        leading: leading,
+        trailing: mem.isDone ? null : trailing,
+      );
+
+  Widget _iconButton(IconData icon, void Function() onPressed) => IconButton(
+        onPressed: onPressed,
+        icon: Icon(icon),
+      );
+
+  Widget _stop({required bool enableSkip}) => memListCompletionStopButton(
+        context: context,
+        onFinish: finishAct,
+        enableSkipMenu: enableSkip,
+        onShowCompletionDialog: (dialogContext) {
+          showMemListCompletionDialog(
+            dialogContext,
+            onFinish: finishAct,
+            onSkip: skipAct,
+          );
+        },
+      );
 }
