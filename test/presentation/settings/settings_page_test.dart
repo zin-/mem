@@ -38,6 +38,11 @@ class _TestConstants {
   static const int appBarTitleIndex = 16;
   // 回。バージョンのタイルを1回タップする
   static const int versionTileTapCount = 1;
+  // pubspec の version。build と `+` でつないでタイルに出す
+  static const version = '0.5.36';
+  // pubspec の build number。空でないのでタイルに出す
+  static const buildNumber = '1';
+  static const shownVersion = '$version+$buildNumber';
 }
 
 Widget _createTestWidget() {
@@ -61,12 +66,10 @@ void _verifyMultipleTextWidgets(WidgetTester tester, List<int> indices) {
 
 class _StubAppVersionClient implements AppVersionClient {
   int openStoreCount = 0;
+  AppVersion? version;
 
   @override
-  Future<AppVersion?> current() async => AppVersion.of(
-        version: '0.5.36',
-        buildNumber: '1',
-      );
+  Future<AppVersion?> current() async => version;
 
   @override
   Future<void> openStore() async {
@@ -84,6 +87,10 @@ void main() {
 
   setUp(() {
     _stubAppVersionClient.openStoreCount = 0;
+    _stubAppVersionClient.version = AppVersion.of(
+      version: _TestConstants.version,
+      buildNumber: _TestConstants.buildNumber,
+    );
     reset(mockedPreferenceRepository);
 
     when(mockedPreferenceRepository.shipByKey(startOfDayKey))
@@ -178,7 +185,7 @@ void main() {
         );
 
         expect(find.text(l10n.versionLabel), findsOneWidget);
-        expect(find.text('0.5.36+1'), findsOneWidget);
+        expect(find.text(_TestConstants.shownVersion), findsOneWidget);
 
         await tester.tap(find.text(l10n.versionLabel));
         await tester.pumpAndSettle();
@@ -195,6 +202,15 @@ void main() {
           _TestConstants.habitualMemsTimeRadiusValueIndex,
           _TestConstants.habitualMemsLookbackValueIndex,
         ]);
+      });
+
+      testWidgets('no version when it is absent.', (tester) async {
+        _stubAppVersionClient.version = null;
+        final l10n = buildL10n();
+
+        await _pumpAndSettle(tester);
+
+        expect(find.text(l10n.versionLabel), findsNothing);
       });
 
       testWidgets('correct values.', (tester) async {

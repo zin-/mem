@@ -79,6 +79,7 @@ dev_dependencies:
   riverpod_lint: any
   flutter_launcher_icons: any
   drift_dev: any
+  url_launcher_platform_interface: any
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
