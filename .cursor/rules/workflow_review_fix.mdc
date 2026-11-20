@@ -1,5 +1,5 @@
 ---
-description: レビュー指摘は指摘ごとに To-do とコミットを分ける
+description: レビュー指摘は指摘ごとに直し、対応した指摘へコミットを返す
 alwaysApply: true
 ---
 
@@ -12,6 +12,14 @@ alwaysApply: true
 各コミットは、それ単体でテストが通る状態にする。
 
 ルールファイルだけの変更は、指摘のコミットに混ぜない。
+
+## 対応した指摘への返信
+
+対応した指摘には、そのスレッドへ返す。返すのはコミットの URL と、その指摘に対して何を変えたか。
+
+まだコミットが無い指摘には返さない。
+
+Approve、PR 本文、無関係なコメントは返さない。
 
 ## Example(具体例)
 
@@ -35,8 +43,17 @@ alwaysApply: true
 2. `Move the domain procedure onto the type that owns it.`
 3. `Add a rule to keep each review comment as its own todo and commit.`
 
+**❌ コミット前の指摘や、Approve に返す**
+
+「直します」とスレッドへ書く。Approve に返信する。
+
+**✅ 対応した指摘のスレッドへ、コミットと変更を返す**
+
+`https://github.com/zin-/mem/commit/9720cde`。ListTile の leading / trailing の分岐を `MemListItemActions` に出した。
+
 ## Relations(関連)
 
 - `workflow_commit`（ルール、ドキュメント、開発用設定だけは別コミット。依頼があるまで作らない）
 - `workflow_red_green`（各変更の中でテストを通す）
+- `safety-guardrails`（Approve、PR 本文、無関係なコメントは返さない）
 - KISS
