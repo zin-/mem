@@ -15,7 +15,11 @@ alwaysApply: true
 
 ## 対応した指摘への返信
 
-対応した指摘には、そのスレッドへ返す。返すのはコミットの URL と、その指摘に対して何を変えたか。
+対応した指摘には、そのスレッドへ返す。返すのはコミットへのリンクと、その指摘に対して何を変えたか。
+
+コミットへのリンクは `[コミットメッセージ](URL)` にする。URL の直書きや、ハッシュだけのラベルにはしない。
+
+レビュースレッドは Resolve しない。返信しても、会話を resolve する API も UI 操作もしない。
 
 まだコミットが無い指摘には返さない。
 
@@ -47,9 +51,13 @@ Approve、PR 本文、無関係なコメントは返さない。
 
 「直します」とスレッドへ書く。Approve に返信する。
 
+**❌ URL を直書きし、スレッドを Resolve する**
+
+`https://github.com/zin-/mem/commit/9720cde`。返信したスレッドを Resolve する。
+
 **✅ 対応した指摘のスレッドへ、コミットと変更を返す**
 
-`https://github.com/zin-/mem/commit/9720cde`。ListTile の leading / trailing の分岐を `MemListItemActions` に出した。
+[Add MemListItemActions class for improved ListTile action handling](https://github.com/zin-/mem/commit/9720cde)。ListTile の leading / trailing の分岐を `MemListItemActions` に出した。
 
 ## Relations(関連)
 
