@@ -5,7 +5,7 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
 
 import 'mem_list_item_action.dart';
-import 'play_button.dart';
+import 'start_button.dart';
 import 'stop_button.dart';
 
 class TrailingIconButton extends StatelessWidget {
@@ -34,7 +34,7 @@ class TrailingIconButton extends StatelessWidget {
           if (_mem.latestAct is ActiveAct) {
             return StopButton(_mem);
           }
-          return PlayButton(_mem);
+          return StartButton(_mem);
         },
         {'_mem': _mem},
       );
