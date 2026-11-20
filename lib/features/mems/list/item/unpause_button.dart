@@ -4,17 +4,17 @@ import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
 
-class CloseButton extends ConsumerWidget {
+class UnpauseButton extends ConsumerWidget {
   final Mem _mem;
 
-  const CloseButton(this._mem, {super.key});
+  const UnpauseButton(this._mem, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => IconButton(
           onPressed: () => ref
               .read(actEntitiesProvider.notifier)
-              .closeByMemId(_mem.id as int),
+              .unpauseByMemId(_mem.id as int),
           icon: const Icon(Icons.close),
         ),
         {'_mem': _mem},

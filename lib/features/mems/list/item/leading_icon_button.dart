@@ -1,4 +1,4 @@
-import 'package:material_ui/material_ui.dart' hide CloseButton;
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
@@ -6,7 +6,7 @@ import 'package:mem/features/mems/mem_done_checkbox.dart';
 import 'package:mem/features/mems/mem_status.dart';
 import 'package:mem/features/mems/mems_state.dart';
 
-import 'close_button.dart';
+import 'unpause_button.dart';
 import 'mem_list_item_action.dart';
 import 'pause_button.dart';
 import 'finish_button.dart';
@@ -49,7 +49,7 @@ class LeadingIconButton extends ConsumerWidget {
   Widget _forProgress(ActProgress progress, {required Widget whenIdle}) =>
       switch (progress) {
         ActProgress.active => PauseButton(_mem),
-        ActProgress.paused => CloseButton(_mem),
+        ActProgress.paused => UnpauseButton(_mem),
         ActProgress.idle => whenIdle,
       };
 

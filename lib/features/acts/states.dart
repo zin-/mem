@@ -152,12 +152,12 @@ class ActEntities extends _$ActEntities
         },
       );
 
-  Future<void> closeByMemId(int memId) => v(
+  Future<void> unpauseByMemId(int memId) => v(
         () async {
-          final closedActEntities = await ActsClient().close(memId);
+          final unpausedActEntities = await ActsClient().unpause(memId);
 
-          if (closedActEntities.isNotEmpty) {
-            remove(closedActEntities.map((e) => e.id));
+          if (unpausedActEntities.isNotEmpty) {
+            remove(unpausedActEntities.map((e) => e.id));
           }
           await ref
               .read(memEntitiesProvider.notifier)

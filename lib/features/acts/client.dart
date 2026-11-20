@@ -169,13 +169,14 @@ class ActsClient {
         },
       );
 
-  Future<List<ActEntity>> close(int memId) => v(
+  Future<List<ActEntity>> unpause(int memId) => v(
         () async {
-          final closedActEntities = await _actRepository.wastePausedAct(memId);
+          final unpausedActEntities =
+              await _actRepository.wastePausedAct(memId);
 
           _notificationClient.cancelActNotification(memId);
 
-          return closedActEntities;
+          return unpausedActEntities;
         },
         {
           "memId": memId,

@@ -82,7 +82,7 @@ class _FakeActEntities extends ActEntities {
   Future<void> pauseByMemId(int memId) async {}
 
   @override
-  Future<void> closeByMemId(int memId) async {
+  Future<void> unpauseByMemId(int memId) async {
     final act = state.firstWhereOrNull((e) => e.value.memId == memId);
     if (act != null) {
       remove([act.id]);
@@ -386,7 +386,8 @@ void main() {
           isA<Iterable<SavedActEntityV1>>());
     });
 
-    test('closeByMemId calls client and removes result if closed', () async {
+    test('unpauseByMemId calls client and removes result if unpaused',
+        () async {
       final now = DateTime.now();
       final act = savedAct(
           id: 1,
@@ -406,7 +407,7 @@ void main() {
       final notifier = container.read(actEntitiesProvider.notifier);
 
       try {
-        await notifier.closeByMemId(1);
+        await notifier.unpauseByMemId(1);
         expect(container.read(actEntitiesProvider),
             isA<Iterable<SavedActEntityV1>>());
       } catch (e) {
@@ -414,7 +415,7 @@ void main() {
       }
     });
 
-    test('closeByMemId does not remove result if closed is null', () async {
+    test('unpauseByMemId does not remove result if unpaused is null', () async {
       final container = ProviderContainer(
         overrides: [
           actEntitiesProvider.overrideWith(() => _FakeActEntities()),
@@ -424,7 +425,7 @@ void main() {
 
       final notifier = container.read(actEntitiesProvider.notifier);
 
-      await notifier.closeByMemId(1);
+      await notifier.unpauseByMemId(1);
       expect(container.read(actEntitiesProvider), isEmpty);
     });
 

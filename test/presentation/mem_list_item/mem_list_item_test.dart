@@ -150,13 +150,13 @@ class _FakeActEntities extends ActEntities {
   int finishActbyCallCount = 0;
   int skipActByCallCount = 0;
   int pauseByMemIdCallCount = 0;
-  int closeByMemIdCallCount = 0;
+  int unpauseByMemIdCallCount = 0;
   int? lastStartActbyMemId;
   int? lastResumeActByMemId;
   int? lastFinishActbyMemId;
   int? lastSkipActByMemId;
   int? lastPauseByMemId;
-  int? lastCloseByMemId;
+  int? lastUnpauseByMemId;
 
   @override
   Iterable<SavedActEntityV1> build() => [];
@@ -192,9 +192,9 @@ class _FakeActEntities extends ActEntities {
   }
 
   @override
-  Future<void> closeByMemId(int memId) async {
-    closeByMemIdCallCount++;
-    lastCloseByMemId = memId;
+  Future<void> unpauseByMemId(int memId) async {
+    unpauseByMemIdCallCount++;
+    lastUnpauseByMemId = memId;
   }
 }
 
@@ -1122,7 +1122,7 @@ void main() {
         expect(fakeActEntities.lastPauseByMemId, memId);
       });
 
-      testWidgets('calls closeByMemId when close button is tapped',
+      testWidgets('calls unpauseByMemId when unpause button is tapped',
           (tester) async {
         final pausedAct = PausedAct(
             memId, DateTime.now().subtract(const Duration(minutes: 5)));
@@ -1160,8 +1160,8 @@ void main() {
         await tester.tap(find.byIcon(Icons.close));
         await tester.pump();
 
-        expect(fakeActEntities.closeByMemIdCallCount, 1);
-        expect(fakeActEntities.lastCloseByMemId, memId);
+        expect(fakeActEntities.unpauseByMemIdCallCount, 1);
+        expect(fakeActEntities.lastUnpauseByMemId, memId);
       });
 
       testWidgets('calls onTap when ListTile is tapped', (tester) async {
