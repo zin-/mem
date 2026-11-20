@@ -6,17 +6,14 @@ import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_status_labels.dart';
 import 'package:mem/features/acts/act_amount.dart';
 import 'package:mem/framework/date_and_time/period.dart';
-import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/acts/target_progress_label.dart';
 import 'package:mem/features/mems/count_target.dart';
 import 'package:mem/features/mems/mem.dart';
+import 'package:mem/features/mems/mem_status.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/mems/transitions.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/detail/states.dart';
-import 'package:mem/features/mems/list/item/completion_dialog.dart';
-import 'package:mem/features/mems/mem_done_checkbox.dart';
-import 'package:mem/features/mems/mem_done_edit.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:mem/features/mems/list/list_frame_count.dart';
@@ -26,7 +23,9 @@ import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/values/colors.dart';
 
+import 'leading_icon_button.dart';
 import 'subtitle.dart';
+import 'trailing_icon_button.dart';
 
 class MemListItemView extends ConsumerWidget {
   final Mem _mem;
@@ -51,6 +50,20 @@ class MemListItemView extends ConsumerWidget {
           );
           final notifications =
               ref.watch(memNotificationsByMemIdProvider(_mem.id as int));
+          final hasEnabledNotifications = notifications
+              .where(
+                (e) => e is SavedMemNotificationEntityV1 && e.value.isEnabled(),
+              )
+              .isNotEmpty;
+          final hasUndoneChildren = ref.watch(
+            parentMemIdsWithUndoneChildrenProvider.select(
+              (ids) => ids.contains(_mem.id),
+            ),
+          );
+          final status = _mem.status(
+            hasEnabledNotifications: hasEnabledNotifications,
+            hasUndoneChildren: hasUndoneChildren,
+          );
           final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
           final periodCount = _periodCount(ref, _mem.id as int);
           final amount = _labelAmount(
@@ -70,52 +83,15 @@ class MemListItemView extends ConsumerWidget {
                     periodCount: periodCount ?? 0,
                   )
                   ?.at;
-          final hasUndoneChildren = ref.watch(
-            parentMemIdsWithUndoneChildrenProvider.select(
-              (ids) => ids.contains(_mem.id),
-            ),
-          );
           return _render(
-            context,
             _mem,
             () => showMemDetailPage(context, ref, _mem.id as int),
-            (bool? value, int memId) => v(
-              () => value == true
-                  ? ref
-                      .read(memEntitiesProvider.notifier)
-                      .doneMem(_mem.id as int)
-                  : ref
-                      .read(memEntitiesProvider.notifier)
-                      .undoneMem(_mem.id as int),
-              {
-                'value': value,
-                'memId': memId,
-              },
-            ),
             _mem.latestAct,
-            () => ref
-                .read(actEntitiesProvider.notifier)
-                .startActby(_mem.id as int),
-            () => ref
-                .read(actEntitiesProvider.notifier)
-                .resumeActBy(_mem.id as int),
-            () => ref
-                .read(actEntitiesProvider.notifier)
-                .finishActby(_mem.id as int),
-            () => ref
-                .read(actEntitiesProvider.notifier)
-                .skipActBy(_mem.id as int),
-            () => ref
-                .read(actEntitiesProvider.notifier)
-                .pauseByMemId(_mem.id as int),
-            () => ref
-                .read(actEntitiesProvider.notifier)
-                .closeByMemId(_mem.id as int),
-            notifications,
+            status,
+            hasEnabledNotifications,
             target,
             amount,
             listAt,
-            hasUndoneChildren,
             _subtitle,
           );
         },
@@ -126,109 +102,38 @@ class MemListItemView extends ConsumerWidget {
 }
 
 ListTile _render(
-  BuildContext context,
   Mem mem,
   void Function() onTap,
-  void Function(bool? value, int memId) onMemDoneCheckboxTapped,
   Act? latestActByMem,
-  void Function() startAct,
-  void Function() resumeAct,
-  void Function() finishAct,
-  void Function() skipAct,
-  void Function() pauseAct,
-  void Function() closeAct,
-  Iterable<MemNotificationEntityV1> memNotificationEntities,
+  MemStatus status,
+  bool hasEnabledNotifications,
   Target? target,
   ActAmount? amount,
   DateTime? listAt,
-  bool hasUndoneChildren,
   Widget? subtitle,
 ) =>
     v(
-      () {
-        final hasActiveAct =
-            latestActByMem != null && latestActByMem is ActiveAct;
-        final hasPausedAct =
-            latestActByMem != null && latestActByMem is PausedAct;
-        final hasEnableMemNotifications = memNotificationEntities
-            .where(
-              (e) => e is SavedMemNotificationEntityV1 && e.value.isEnabled(),
-            )
-            .isNotEmpty;
-        final enableSkipMenu = hasEnableMemNotifications && !hasActiveAct;
-        final doneEdit = MemDoneEdit.of(
-          hasUndoneChildren: hasUndoneChildren,
-          isDone: mem.isDone,
-          onChanged: (value) => onMemDoneCheckboxTapped(value, mem.id as int),
-        );
-
-        void showCompletionDialog(BuildContext dialogContext) {
-          showMemListCompletionDialog(
-            dialogContext,
-            onFinish: finishAct,
-            onSkip: skipAct,
-          );
-        }
-
-        final stopIconButton = memListCompletionStopButton(
-          context: context,
-          onFinish: finishAct,
-          enableSkipMenu: enableSkipMenu,
-          onShowCompletionDialog: showCompletionDialog,
-        );
-        final startIconButton = IconButton(
-          onPressed: () => hasPausedAct ? resumeAct() : startAct(),
-          icon: const Icon(Icons.play_arrow),
-        );
-        final pauseIconButton = IconButton(
-          onPressed: pauseAct,
-          icon: const Icon(Icons.pause),
-        );
-        final closeIconButton = IconButton(
-          onPressed: closeAct,
-          icon: const Icon(Icons.close),
-        );
-
-        return ListTile(
-          title: _title(mem, latestActByMem, target, amount),
-          onTap: onTap,
-          leading: hasEnableMemNotifications
-              ? hasActiveAct
-                  ? pauseIconButton
-                  : hasPausedAct
-                      ? closeIconButton
-                      : stopIconButton
-              : doneEdit == null
-                  ? const Icon(Icons.account_tree)
-                  : MemDoneCheckbox(
-                      mem,
-                      doneEdit.onChanged,
-                    ),
-          tileColor: mem.isArchived ? secondaryGreyColor : null,
-          trailing: !mem.isDone && hasEnableMemNotifications
-              ? hasActiveAct
-                  ? stopIconButton
-                  : startIconButton
-              : null,
-          subtitle: subtitle ??
-              (mem.period == null &&
-                      !hasEnableMemNotifications &&
-                      listAt == null
-                  ? null
-                  : MemListItemSubtitle(mem.id as int, listAt)),
-          isThreeLine: subtitle == null &&
-              mem.period != null &&
-              hasEnableMemNotifications,
-        );
-      },
+      () => ListTile(
+        title: _title(mem, latestActByMem, target, amount),
+        onTap: onTap,
+        leading: LeadingIconButton(mem, status),
+        tileColor: mem.isArchived ? secondaryGreyColor : null,
+        trailing: TrailingIconButton.of(mem, status),
+        subtitle: subtitle ??
+            (mem.period == null && !hasEnabledNotifications && listAt == null
+                ? null
+                : MemListItemSubtitle(mem.id as int, listAt)),
+        isThreeLine:
+            subtitle == null && mem.period != null && hasEnabledNotifications,
+      ),
       {
         'mem': mem,
         'latestActByMem': latestActByMem,
-        'memNotificationEntities': memNotificationEntities,
+        'status': status,
+        'hasEnabledNotifications': hasEnabledNotifications,
         'target': target,
         'amount': amount,
         'listAt': listAt,
-        'hasUndoneChildren': hasUndoneChildren,
       },
     );
 

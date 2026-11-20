@@ -95,7 +95,7 @@ class _FakeActEntities extends ActEntities {
   int resumeActByCallCount = 0;
   int finishActbyCallCount = 0;
   int pauseByMemIdCallCount = 0;
-  int closeByMemIdCallCount = 0;
+  int unpauseByMemIdCallCount = 0;
   int? lastMemId;
 
   @override
@@ -126,8 +126,8 @@ class _FakeActEntities extends ActEntities {
   }
 
   @override
-  Future<void> closeByMemId(int memId) async {
-    closeByMemIdCallCount++;
+  Future<void> unpauseByMemId(int memId) async {
+    unpauseByMemIdCallCount++;
     lastMemId = memId;
   }
 }
@@ -337,7 +337,7 @@ void main() {
       expect(acts.lastMemId, _memId);
     });
 
-    testWidgets('shows resume and close while paused', (tester) async {
+    testWidgets('shows resume and unpause while paused', (tester) async {
       final acts = _FakeActEntities();
       await pumpItem(
         tester,
@@ -355,7 +355,7 @@ void main() {
 
       await tester.tap(find.byIcon(Icons.close));
       await tester.pump();
-      expect(acts.closeByMemIdCallCount, 1);
+      expect(acts.unpauseByMemIdCallCount, 1);
       expect(acts.lastMemId, _memId);
 
       await tester.tap(find.byIcon(Icons.play_arrow));

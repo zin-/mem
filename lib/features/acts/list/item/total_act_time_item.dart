@@ -149,7 +149,7 @@ class TotalActTimeListItem extends ConsumerWidget {
           trailing: button(Icons.stop, () => acts().finishActby(memId)),
         ),
       PausedAct() => (
-          leading: button(Icons.close, () => acts().closeByMemId(memId)),
+          leading: button(Icons.close, () => acts().unpauseByMemId(memId)),
           trailing: button(Icons.play_arrow, () => acts().resumeActBy(memId)),
         ),
       _ => (

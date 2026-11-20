@@ -1,0 +1,67 @@
+---
+description: レビュー指摘は指摘ごとに直し、対応した指摘へコミットを返す
+alwaysApply: true
+---
+
+# レビュー指摘の直し方
+
+指摘が複数あるとき、指摘ごとに To-do を一つ作る。一つの To-do にまとめない。
+
+コミットも指摘ごと。メッセージはその指摘だけを説明する。
+
+各コミットは、それ単体でテストが通る状態にする。
+
+ルールファイルだけの変更は、指摘のコミットに混ぜない。
+
+## 対応した指摘への返信
+
+対応した指摘には、そのスレッドへ返す。返すのはコミットへのリンクと、その指摘に対して何を変えたか。
+
+コミットへのリンクは `[コミットメッセージ](URL)` にする。URL の直書きや、ハッシュだけのラベルにはしない。
+
+レビュースレッドは Resolve しない。返信しても、会話を resolve する API も UI 操作もしない。
+
+まだコミットが無い指摘には返さない。
+
+Approve、PR 本文、無関係なコメントは返さない。
+
+## Example(具体例)
+
+**❌ 複数の指摘を一つの To-do にまとめる**
+
+「メソッド名、ドメインの手続き、null 判定をまとめて直す」
+
+**✅ 指摘ごとに To-do を一つ作る**
+
+1. メソッド名が意味を持たないので、分岐を呼び出し元に書く
+2. ドメインの手続きを型のメソッドにする
+3. null を返す判定を生成メソッドに置く
+
+**❌ 1コミットに混ぜる:**
+
+メソッド名の修正、ドメイン手続きの移動、`workflow_review_fix.mdc` の追加
+
+**✅ 分ける:**
+
+1. `Inline the branch so the call site shows what each state does.`
+2. `Move the domain procedure onto the type that owns it.`
+3. `Add a rule to keep each review comment as its own todo and commit.`
+
+**❌ コミット前の指摘や、Approve に返す**
+
+「直します」とスレッドへ書く。Approve に返信する。
+
+**❌ URL を直書きし、スレッドを Resolve する**
+
+`https://github.com/zin-/mem/commit/9720cde`。返信したスレッドを Resolve する。
+
+**✅ 対応した指摘のスレッドへ、コミットと変更を返す**
+
+[Add MemListItemActions class for improved ListTile action handling](https://github.com/zin-/mem/commit/9720cde)。ListTile の leading / trailing の分岐を `MemListItemActions` に出した。
+
+## Relations(関連)
+
+- `workflow_commit`（ルール、ドキュメント、開発用設定だけは別コミット。依頼があるまで作らない）
+- `workflow_red_green`（各変更の中でテストを通す）
+- `safety-guardrails`（Approve、PR 本文、無関係なコメントは返さない）
+- KISS

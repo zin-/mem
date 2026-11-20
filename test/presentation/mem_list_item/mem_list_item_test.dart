@@ -12,6 +12,7 @@ import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/framework/date_and_time/period.dart';
+import 'package:mem/features/mems/list/item/leading_icon_button.dart';
 import 'package:mem/features/mems/list/item/view.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/settings/preference/keys.dart';
@@ -149,13 +150,13 @@ class _FakeActEntities extends ActEntities {
   int finishActbyCallCount = 0;
   int skipActByCallCount = 0;
   int pauseByMemIdCallCount = 0;
-  int closeByMemIdCallCount = 0;
+  int unpauseByMemIdCallCount = 0;
   int? lastStartActbyMemId;
   int? lastResumeActByMemId;
   int? lastFinishActbyMemId;
   int? lastSkipActByMemId;
   int? lastPauseByMemId;
-  int? lastCloseByMemId;
+  int? lastUnpauseByMemId;
 
   @override
   Iterable<SavedActEntityV1> build() => [];
@@ -191,9 +192,9 @@ class _FakeActEntities extends ActEntities {
   }
 
   @override
-  Future<void> closeByMemId(int memId) async {
-    closeByMemIdCallCount++;
-    lastCloseByMemId = memId;
+  Future<void> unpauseByMemId(int memId) async {
+    unpauseByMemIdCallCount++;
+    lastUnpauseByMemId = memId;
   }
 }
 
@@ -205,14 +206,15 @@ void main() {
     testWidgets(
         'mem name, checkbox, subtitle, and start button are displayed when no act and no notifications',
         (tester) async {
+      final fakeActEntities = _FakeActEntities();
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
             memNotificationsByMemIdProvider(memId).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
-            // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(
                 () => _FakeMemEntities([savedMemFromDomain(baseMem)])),
+            actEntitiesProvider.overrideWith(() => fakeActEntities),
           ],
           child: MaterialApp(
             home: Scaffold(
@@ -227,12 +229,18 @@ void main() {
       expect(find.text('Test Mem'), findsOneWidget);
       expect(find.text(' / '), findsNothing);
       expect(find.byType(MemDoneCheckbox), findsOneWidget);
-      expect(find.byIcon(Icons.play_arrow), findsNothing);
+      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
       expect(find.byIcon(Icons.timer), findsNothing);
       expect(find.byIcon(Icons.notifications_active), findsNothing);
       expect(find.byIcon(Icons.pause), findsNothing);
       expect(find.byIcon(Icons.stop), findsNothing);
       expect(find.byIcon(Icons.close), findsNothing);
+
+      await tester.tap(find.byIcon(Icons.play_arrow));
+      await tester.pump();
+
+      expect(fakeActEntities.startActbyCallCount, 1);
+      expect(fakeActEntities.lastStartActbyMemId, memId);
     });
 
     testWidgets(
@@ -243,6 +251,7 @@ void main() {
           DateAndTime.from(
               DateTime.now().subtract(const Duration(minutes: 5))));
       final mem = Mem(memId, 'Test Mem', null, null, latestAct: activeAct);
+      final fakeActEntities = _FakeActEntities();
 
       await tester.pumpWidget(
         ProviderScope(
@@ -251,6 +260,7 @@ void main() {
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
             memEntitiesProvider.overrideWith(
                 () => _FakeMemEntities([savedMemFromDomain(mem)])),
+            actEntitiesProvider.overrideWith(() => fakeActEntities),
           ],
           child: MaterialApp(
             home: Scaffold(
@@ -262,10 +272,23 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(LiveElapsedTimeText), findsOneWidget);
-      expect(find.byIcon(Icons.stop), findsNothing);
-      expect(find.byIcon(Icons.pause), findsNothing);
+      expect(find.byIcon(Icons.pause), findsOneWidget);
+      expect(find.byIcon(Icons.stop), findsOneWidget);
+      expect(find.byType(MemDoneCheckbox), findsNothing);
       expect(find.byIcon(Icons.close), findsNothing);
       expect(find.byIcon(Icons.play_arrow), findsNothing);
+
+      await tester.tap(find.byIcon(Icons.pause));
+      await tester.pump();
+
+      expect(fakeActEntities.pauseByMemIdCallCount, 1);
+      expect(fakeActEntities.lastPauseByMemId, memId);
+
+      await tester.tap(find.byIcon(Icons.stop));
+      await tester.pump();
+
+      expect(fakeActEntities.finishActbyCallCount, 1);
+      expect(fakeActEntities.lastFinishActbyMemId, memId);
     });
 
     testWidgets('displays play/close buttons when act is paused',
@@ -273,6 +296,7 @@ void main() {
       final pausedAct =
           PausedAct(memId, DateTime.now().subtract(const Duration(minutes: 5)));
       final mem = Mem(memId, 'Test Mem', null, null, latestAct: pausedAct);
+      final fakeActEntities = _FakeActEntities();
 
       await tester.pumpWidget(
         ProviderScope(
@@ -281,6 +305,7 @@ void main() {
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
             memEntitiesProvider.overrideWith(
                 () => _FakeMemEntities([savedMemFromDomain(mem)])),
+            actEntitiesProvider.overrideWith(() => fakeActEntities),
           ],
           child: MaterialApp(
             home: Scaffold(
@@ -292,11 +317,19 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(LiveElapsedTimeText), findsOneWidget);
-      expect(find.byIcon(Icons.play_arrow), findsNothing);
-      expect(find.byIcon(Icons.close), findsNothing);
+      expect(find.byIcon(Icons.close), findsOneWidget);
+      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+      expect(find.byType(MemDoneCheckbox), findsNothing);
       expect(find.byIcon(Icons.timer), findsNothing);
       expect(find.byIcon(Icons.stop), findsNothing);
       expect(find.byIcon(Icons.pause), findsNothing);
+
+      await tester.tap(find.byIcon(Icons.play_arrow));
+      await tester.pump();
+
+      expect(fakeActEntities.resumeActByCallCount, 1);
+      expect(fakeActEntities.lastResumeActByMemId, memId);
+      expect(fakeActEntities.startActbyCallCount, 0);
     });
 
     testWidgets(
@@ -398,6 +431,7 @@ void main() {
 
       final checkbox = tester.widget<Checkbox>(find.byType(Checkbox));
       expect(checkbox.value, isTrue);
+      expect(find.byIcon(Icons.play_arrow), findsNothing);
     });
 
     testWidgets('displays empty checkbox when mem is not done', (tester) async {
@@ -1088,7 +1122,7 @@ void main() {
         expect(fakeActEntities.lastPauseByMemId, memId);
       });
 
-      testWidgets('calls closeByMemId when close button is tapped',
+      testWidgets('calls unpauseByMemId when unpause button is tapped',
           (tester) async {
         final pausedAct = PausedAct(
             memId, DateTime.now().subtract(const Duration(minutes: 5)));
@@ -1126,8 +1160,8 @@ void main() {
         await tester.tap(find.byIcon(Icons.close));
         await tester.pump();
 
-        expect(fakeActEntities.closeByMemIdCallCount, 1);
-        expect(fakeActEntities.lastCloseByMemId, memId);
+        expect(fakeActEntities.unpauseByMemIdCallCount, 1);
+        expect(fakeActEntities.lastUnpauseByMemId, memId);
       });
 
       testWidgets('calls onTap when ListTile is tapped', (tester) async {
@@ -1885,8 +1919,14 @@ void main() {
 
       void expectParentIconLeading(WidgetTester tester) {
         final leading = tester.widget<ListTile>(find.byType(ListTile)).leading;
-        expect(leading, isA<Icon>());
-        expect((leading! as Icon).icon, Icons.account_tree);
+        expect(leading, isA<LeadingIconButton>());
+        expect(
+          find.descendant(
+            of: find.byWidget(leading!),
+            matching: find.byIcon(Icons.account_tree),
+          ),
+          findsOneWidget,
+        );
       }
 
       testWidgets(
@@ -1983,6 +2023,29 @@ void main() {
       });
 
       testWidgets(
+          'hides pause and stop while an act is active and the id is in the set without a notification',
+          (tester) async {
+        final mem = Mem(
+          memId,
+          'Test Mem',
+          null,
+          null,
+          latestAct: ActiveAct(
+            memId,
+            DateAndTime.from(
+              DateTime.now().subtract(const Duration(minutes: 5)),
+            ),
+          ),
+        );
+        await pump(tester, mem: mem);
+
+        expectParentIconLeading(tester);
+        expect(find.byIcon(Icons.pause), findsNothing);
+        expect(find.byIcon(Icons.stop), findsNothing);
+        expect(find.byIcon(Icons.play_arrow), findsNothing);
+      });
+
+      testWidgets(
           'keeps close and play while an act is paused and the id is in the set',
           (tester) async {
         final mem = Mem(
@@ -2008,6 +2071,7 @@ void main() {
         await pump(tester, mem: baseMem, parentIds: {memId + 1});
 
         expect(find.byType(MemDoneCheckbox), findsOneWidget);
+        expect(find.byIcon(Icons.play_arrow), findsOneWidget);
         expect(find.byIcon(Icons.account_tree), findsNothing);
         expect(find.byIcon(Icons.stop), findsNothing);
       });
