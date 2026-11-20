@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_done_checkbox.dart';
@@ -22,13 +23,11 @@ class LeadingIconButton extends ConsumerWidget {
           final status = _status(ref);
           return switch (status) {
             UndoneParentMemStatus() => const Icon(Icons.account_tree),
-            NotifiedMemStatus(:final progress) => _forProgress(
-                progress,
-                whenIdle: FinishButton(_mem),
+            NotifiedMemStatus() => _forLatestAct(
+                whenOther: FinishButton(_mem),
               ),
-            DoneableMemStatus(:final progress) => _forProgress(
-                progress,
-                whenIdle: MemDoneCheckbox(
+            DoneableMemStatus() => _forLatestAct(
+                whenOther: MemDoneCheckbox(
                   _mem,
                   (value) => _editDone(ref, _mem.id as int, value),
                 ),
@@ -46,11 +45,10 @@ class LeadingIconButton extends ConsumerWidget {
         hasUndoneChildren: MemListItemAction.hasUndoneChildren(ref, _mem.id),
       );
 
-  Widget _forProgress(ActProgress progress, {required Widget whenIdle}) =>
-      switch (progress) {
-        ActProgress.active => PauseButton(_mem),
-        ActProgress.paused => UnpauseButton(_mem),
-        ActProgress.idle => whenIdle,
+  Widget _forLatestAct({required Widget whenOther}) => switch (_mem.latestAct) {
+        ActiveAct() => PauseButton(_mem),
+        PausedAct() => UnpauseButton(_mem),
+        _ => whenOther,
       };
 
   void _editDone(WidgetRef ref, int memId, bool? value) => v(

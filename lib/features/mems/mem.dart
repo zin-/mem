@@ -183,7 +183,6 @@ class Mem {
   }) =>
       v(
         () => MemStatus.of(
-          latestAct: latestAct,
           isDone: isDone,
           hasEnabledNotifications: hasEnabledNotifications,
           hasUndoneChildren: hasUndoneChildren,

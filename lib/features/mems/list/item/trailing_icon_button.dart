@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_status.dart';
@@ -29,17 +30,18 @@ class TrailingIconButton extends StatelessWidget {
     );
     return switch (status) {
       UndoneParentMemStatus() => null,
-      NotifiedMemStatus(:final progress, :final isDone) =>
-        _forProgress(mem, progress, isDone),
-      DoneableMemStatus(:final progress, :final isDone) =>
-        _forProgress(mem, progress, isDone),
+      NotifiedMemStatus(:final isDone) => _forLatestAct(mem, isDone),
+      DoneableMemStatus(:final isDone) => _forLatestAct(mem, isDone),
     };
   }
 
-  static Widget? _forProgress(Mem mem, ActProgress progress, bool isDone) {
+  static Widget? _forLatestAct(Mem mem, bool isDone) {
     if (isDone) return null;
-    if (progress == ActProgress.active) return FinishButton(mem);
-    return StartButton(mem);
+    return switch (mem.latestAct) {
+      ActiveAct() => FinishButton(mem),
+      PausedAct() => StartButton(mem),
+      _ => StartButton(mem),
+    };
   }
 
   @override
