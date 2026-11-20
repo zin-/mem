@@ -16,6 +16,7 @@ import 'package:mem/features/mem_notifications/mem_notification_repository.dart'
 import 'package:mem/features/mem_parents/mem_parent.dart';
 import 'package:mem/features/mems/detail/body.dart';
 import 'package:mem/features/mems/detail/page.dart';
+import 'package:mem/features/mems/list/item/view.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_done_checkbox.dart';
 import 'package:mem/features/mems/mem_entity.dart';
@@ -351,6 +352,7 @@ void main() {
 
     expect(find.text('親'), findsNothing);
     expect(find.text('子'), findsNothing);
+    expect(find.byType(MemListItemView), findsNWidgets(2));
     expect(find.byIcon(Icons.subdirectory_arrow_right), findsNWidgets(2));
     expect(find.text('Child A'), findsOneWidget);
     expect(find.text('Child B'), findsOneWidget);
@@ -781,7 +783,7 @@ void main() {
   });
 
   testWidgets(
-      'shows child done checkboxes and disables one with an undone grandchild',
+      'shows child done checkboxes and a tree icon when a grandchild is undone',
       (tester) async {
     final parent = await insertMem('Parent');
     final open = await insertMem('Open');
@@ -831,9 +833,20 @@ void main() {
     expect(doneCheckbox.onChanged, isNotNull);
     expect(nameText('Done').style?.decoration, TextDecoration.lineThrough);
 
-    final blockedCheckbox = checkboxOn('Blocked');
-    expect(blockedCheckbox.value, isFalse);
-    expect(blockedCheckbox.onChanged, isNull);
+    expect(
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'Blocked'),
+        matching: find.byIcon(Icons.account_tree),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'Blocked'),
+        matching: find.byType(Checkbox),
+      ),
+      findsNothing,
+    );
     expect(nameText('Blocked').style?.decoration, isNull);
 
     expect(find.text('Grand'), findsNothing);
@@ -845,6 +858,7 @@ void main() {
       findsNothing,
     );
 
+    expect(find.byType(MemListItemView), findsNWidgets(3));
     for (final name in ['Open', 'Done', 'Blocked']) {
       final tile = find.widgetWithText(ListTile, name);
       expect(
@@ -864,14 +878,16 @@ void main() {
       expect(
         find.descendant(
           of: tile,
-          matching: find.byType(MemDoneCheckbox),
+          matching: find.byType(MemNameText),
         ),
         findsOneWidget,
       );
+    }
+    for (final name in ['Open', 'Done']) {
       expect(
         find.descendant(
-          of: tile,
-          matching: find.byType(MemNameText),
+          of: find.widgetWithText(ListTile, name),
+          matching: find.byType(MemDoneCheckbox),
         ),
         findsOneWidget,
       );
@@ -923,7 +939,7 @@ void main() {
   });
 
   testWidgets(
-      'starts and finishes a habit child and hides controls without a notification',
+      'starts a child without a notification and starts and finishes a habit child',
       (tester) async {
     final parent = await insertMem('Parent');
     final habit = await insertMem('Habit');
@@ -953,15 +969,30 @@ void main() {
 
     final container = await pumpDetail(tester, parent.id);
 
+    expect(find.byType(MemListItemView), findsNWidgets(3));
     expect(iconOn('Habit', Icons.play_arrow), findsOneWidget);
     expect(iconOn('Habit', Icons.stop), findsOneWidget);
     expect(iconOn('Habit', Icons.pause), findsNothing);
+    expect(
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'Habit'),
+        matching: find.byType(Checkbox),
+      ),
+      findsNothing,
+    );
     expect(iconOn('Habit', Icons.subdirectory_arrow_right), findsOneWidget);
     expect(iconOn('Habit', Icons.close), findsOneWidget);
-    expect(iconOn('Plain', Icons.play_arrow), findsNothing);
+    expect(iconOn('Plain', Icons.play_arrow), findsOneWidget);
     expect(iconOn('Plain', Icons.stop), findsNothing);
     expect(iconOn('Done habit', Icons.play_arrow), findsNothing);
-    expect(iconOn('Done habit', Icons.stop), findsNothing);
+    expect(iconOn('Done habit', Icons.stop), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'Done habit'),
+        matching: find.byType(Checkbox),
+      ),
+      findsNothing,
+    );
 
     await tester.tap(iconOn('Habit', Icons.play_arrow));
     await settle(tester);
@@ -1001,14 +1032,29 @@ void main() {
 
     await pumpDetail(tester, parent.id);
 
+    expect(find.byType(MemListItemView), findsNWidgets(2));
     expect(iconOn('Active', Icons.stop), findsOneWidget);
     expect(iconOn('Active', Icons.play_arrow), findsNothing);
     expect(iconOn('Active', Icons.pause), findsNothing);
     expect(iconOn('Active', Icons.close), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'Active'),
+        matching: find.byType(Checkbox),
+      ),
+      findsNothing,
+    );
 
     expect(iconOn('Paused', Icons.play_arrow), findsOneWidget);
     expect(iconOn('Paused', Icons.stop), findsNothing);
     expect(iconOn('Paused', Icons.pause), findsNothing);
     expect(iconOn('Paused', Icons.close), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'Paused'),
+        matching: find.byType(Checkbox),
+      ),
+      findsNothing,
+    );
   });
 }

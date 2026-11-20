@@ -14,37 +14,51 @@ import 'finish_button.dart';
 class LeadingIconButton extends ConsumerWidget {
   final Mem _mem;
   final MemStatus _status;
+  final bool _showPause;
 
-  const LeadingIconButton(this._mem, this._status, {super.key});
+  const LeadingIconButton(
+    this._mem,
+    this._status, {
+    bool showPause = true,
+    super.key,
+  }) : _showPause = showPause;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () {
-          Widget forLatestAct({required Widget whenOther}) =>
-              switch (_mem.latestAct) {
-                ActiveAct() => PauseButton(_mem),
-                PausedAct() => UnpauseButton(_mem),
-                _ => whenOther,
-              };
-
-          return switch (_status) {
-            MemStatus.undoneParent => const Icon(Icons.account_tree),
-            MemStatus.notified => forLatestAct(
-                whenOther: FinishButton(_mem, enableSkip: true),
+        () => switch (_status) {
+          MemStatus.undoneParent => const Icon(Icons.account_tree),
+          MemStatus.notified => _notifiedLeading(),
+          MemStatus.doneable => _pauseButton() ??
+              MemDoneCheckbox(
+                _mem,
+                (value) => _editDone(ref, _mem.id as int, value),
               ),
-            MemStatus.doneable => forLatestAct(
-                whenOther: MemDoneCheckbox(
-                  _mem,
-                  (value) => _editDone(ref, _mem.id as int, value),
-                ),
-              ),
-          };
         },
         {
           '_mem': _mem,
           '_status': _status,
+          '_showPause': _showPause,
         },
       );
+
+  Widget? _pauseButton() {
+    if (!_showPause) return null;
+    return switch (_mem.latestAct) {
+      ActiveAct() => PauseButton(_mem),
+      PausedAct() => UnpauseButton(_mem),
+      _ => null,
+    };
+  }
+
+  Widget _notifiedLeading() {
+    final pause = _pauseButton();
+    if (pause != null) return pause;
+    // 一時停止を出さないとき、実行中の終了と一時停止中の開始は trailing だけ
+    return switch (_mem.latestAct) {
+      ActiveAct() || PausedAct() => const SizedBox.shrink(),
+      _ => FinishButton(_mem, enableSkip: true),
+    };
+  }
 
   void _editDone(WidgetRef ref, int memId, bool? value) => v(
         () => value == true

@@ -30,12 +30,24 @@ import 'trailing_icon_button.dart';
 class MemListItemView extends ConsumerWidget {
   final Mem _mem;
   final Widget? _subtitle;
+  final bool _showPause;
+  final Widget? _beforeLeading;
+  final Widget? _afterTrailing;
+  final EdgeInsetsGeometry? _contentPadding;
 
   const MemListItemView(
     this._mem, {
     Widget? subtitle,
+    bool showPause = true,
+    Widget? beforeLeading,
+    Widget? afterTrailing,
+    EdgeInsetsGeometry? contentPadding,
     super.key,
-  }) : _subtitle = subtitle;
+  })  : _subtitle = subtitle,
+        _showPause = showPause,
+        _beforeLeading = beforeLeading,
+        _afterTrailing = afterTrailing,
+        _contentPadding = contentPadding;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
@@ -93,10 +105,15 @@ class MemListItemView extends ConsumerWidget {
             amount,
             listAt,
             _subtitle,
+            showPause: _showPause,
+            beforeLeading: _beforeLeading,
+            afterTrailing: _afterTrailing,
+            contentPadding: _contentPadding,
           );
         },
         {
           '_mem': _mem,
+          '_showPause': _showPause,
         },
       );
 }
@@ -110,22 +127,44 @@ ListTile _render(
   Target? target,
   ActAmount? amount,
   DateTime? listAt,
-  Widget? subtitle,
-) =>
+  Widget? subtitle, {
+  required bool showPause,
+  Widget? beforeLeading,
+  Widget? afterTrailing,
+  EdgeInsetsGeometry? contentPadding,
+}) =>
     v(
-      () => ListTile(
-        title: _title(mem, latestActByMem, target, amount),
-        onTap: onTap,
-        leading: LeadingIconButton(mem, status),
-        tileColor: mem.isArchived ? secondaryGreyColor : null,
-        trailing: TrailingIconButton.of(mem, status),
-        subtitle: subtitle ??
-            (mem.period == null && !hasEnabledNotifications && listAt == null
-                ? null
-                : MemListItemSubtitle(mem.id as int, listAt)),
-        isThreeLine:
-            subtitle == null && mem.period != null && hasEnabledNotifications,
-      ),
+      () {
+        Widget? place(Widget? first, Widget? second) {
+          final children = <Widget>[
+            if (first != null) first,
+            if (second != null) second,
+          ];
+          return switch (children.length) {
+            0 => null,
+            1 => children.single,
+            _ => Row(mainAxisSize: MainAxisSize.min, children: children),
+          };
+        }
+
+        return ListTile(
+          contentPadding: contentPadding,
+          title: _title(mem, latestActByMem, target, amount),
+          onTap: onTap,
+          leading: place(
+            beforeLeading,
+            LeadingIconButton(mem, status, showPause: showPause),
+          ),
+          tileColor: mem.isArchived ? secondaryGreyColor : null,
+          trailing: place(TrailingIconButton.of(mem, status), afterTrailing),
+          subtitle: subtitle ??
+              (mem.period == null && !hasEnabledNotifications && listAt == null
+                  ? null
+                  : MemListItemSubtitle(mem.id as int, listAt)),
+          isThreeLine:
+              subtitle == null && mem.period != null && hasEnabledNotifications,
+        );
+      },
       {
         'mem': mem,
         'latestActByMem': latestActByMem,
@@ -134,6 +173,7 @@ ListTile _render(
         'target': target,
         'amount': amount,
         'listAt': listAt,
+        'showPause': showPause,
       },
     );
 
