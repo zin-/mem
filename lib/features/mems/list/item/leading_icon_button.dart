@@ -1,10 +1,9 @@
 import 'package:material_ui/material_ui.dart' hide CloseButton;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_done_checkbox.dart';
-import 'package:mem/features/mems/mem_done_edit.dart';
+import 'package:mem/features/mems/mem_status.dart';
 import 'package:mem/features/mems/mems_state.dart';
 
 import 'close_button.dart';
@@ -20,39 +19,39 @@ class LeadingIconButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
-          final memId = _mem.id as int;
-          final latestAct = _mem.latestAct;
-          final hasNotifications =
-              MemListItemAction.hasEnabledNotifications(ref, memId);
-          final hasUndoneChildren =
-              MemListItemAction.hasUndoneChildren(ref, _mem.id);
-          if (hasNotifications) {
-            if (latestAct is ActiveAct) {
-              return PauseButton(_mem);
-            }
-            if (latestAct is PausedAct) {
-              return CloseButton(_mem);
-            }
-            return StopButton(_mem);
-          }
-          final doneEdit = MemDoneEdit.of(
-            hasUndoneChildren: hasUndoneChildren,
-            isDone: _mem.isDone,
-            onChanged: (value) => _editDone(ref, memId, value),
-          );
-          if (doneEdit == null) {
-            return const Icon(Icons.account_tree);
-          }
-          if (latestAct is ActiveAct) {
-            return PauseButton(_mem);
-          }
-          if (latestAct is PausedAct) {
-            return CloseButton(_mem);
-          }
-          return MemDoneCheckbox(_mem, doneEdit.onChanged);
+          final status = _status(ref);
+          return switch (status) {
+            UndoneParentMemStatus() => const Icon(Icons.account_tree),
+            NotifiedMemStatus(:final progress) => _forProgress(
+                progress,
+                whenIdle: StopButton(_mem),
+              ),
+            DoneableMemStatus(:final progress) => _forProgress(
+                progress,
+                whenIdle: MemDoneCheckbox(
+                  _mem,
+                  (value) => _editDone(ref, _mem.id as int, value),
+                ),
+              ),
+          };
         },
         {'_mem': _mem},
       );
+
+  MemStatus _status(WidgetRef ref) => _mem.status(
+        hasEnabledNotifications: MemListItemAction.hasEnabledNotifications(
+          ref,
+          _mem.id as int,
+        ),
+        hasUndoneChildren: MemListItemAction.hasUndoneChildren(ref, _mem.id),
+      );
+
+  Widget _forProgress(ActProgress progress, {required Widget whenIdle}) =>
+      switch (progress) {
+        ActProgress.active => PauseButton(_mem),
+        ActProgress.paused => CloseButton(_mem),
+        ActProgress.idle => whenIdle,
+      };
 
   void _editDone(WidgetRef ref, int memId, bool? value) => v(
         () => value == true

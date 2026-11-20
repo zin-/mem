@@ -5,6 +5,7 @@ import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_list_at.dart';
 import 'package:mem/features/mems/mem_notify_at.dart';
+import 'package:mem/features/mems/mem_status.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/framework/notifications/notification/type.dart';
@@ -173,6 +174,24 @@ class Mem {
         {
           'this': this,
           'startOfDay': startOfDay,
+        },
+      );
+
+  MemStatus status({
+    required bool hasEnabledNotifications,
+    required bool hasUndoneChildren,
+  }) =>
+      v(
+        () => MemStatus.of(
+          latestAct: latestAct,
+          isDone: isDone,
+          hasEnabledNotifications: hasEnabledNotifications,
+          hasUndoneChildren: hasUndoneChildren,
+        ),
+        {
+          'this': this,
+          'hasEnabledNotifications': hasEnabledNotifications,
+          'hasUndoneChildren': hasUndoneChildren,
         },
       );
 }
