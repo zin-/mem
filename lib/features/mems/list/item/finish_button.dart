@@ -8,10 +8,10 @@ import 'package:mem/features/mems/mem.dart';
 import 'completion_dialog.dart';
 import 'mem_list_item_action.dart';
 
-class StopButton extends ConsumerWidget {
+class FinishButton extends ConsumerWidget {
   final Mem _mem;
 
-  const StopButton(this._mem, {super.key});
+  const FinishButton(this._mem, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(

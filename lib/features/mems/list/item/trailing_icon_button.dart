@@ -6,7 +6,7 @@ import 'package:mem/features/mems/mem_status.dart';
 
 import 'mem_list_item_action.dart';
 import 'start_button.dart';
-import 'stop_button.dart';
+import 'finish_button.dart';
 
 class TrailingIconButton extends StatelessWidget {
   final Widget _button;
@@ -38,7 +38,7 @@ class TrailingIconButton extends StatelessWidget {
 
   static Widget? _forProgress(Mem mem, ActProgress progress, bool isDone) {
     if (isDone) return null;
-    if (progress == ActProgress.active) return StopButton(mem);
+    if (progress == ActProgress.active) return FinishButton(mem);
     return StartButton(mem);
   }
 

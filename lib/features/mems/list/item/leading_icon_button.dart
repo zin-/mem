@@ -9,7 +9,7 @@ import 'package:mem/features/mems/mems_state.dart';
 import 'close_button.dart';
 import 'mem_list_item_action.dart';
 import 'pause_button.dart';
-import 'stop_button.dart';
+import 'finish_button.dart';
 
 class LeadingIconButton extends ConsumerWidget {
   final Mem _mem;
@@ -24,7 +24,7 @@ class LeadingIconButton extends ConsumerWidget {
             UndoneParentMemStatus() => const Icon(Icons.account_tree),
             NotifiedMemStatus(:final progress) => _forProgress(
                 progress,
-                whenIdle: StopButton(_mem),
+                whenIdle: FinishButton(_mem),
               ),
             DoneableMemStatus(:final progress) => _forProgress(
                 progress,
