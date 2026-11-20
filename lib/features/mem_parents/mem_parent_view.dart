@@ -3,7 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_parents/mem_parent.dart';
 import 'package:mem/features/mems/mem.dart';
+import 'package:mem/features/mems/mem_done_checkbox.dart';
+import 'package:mem/features/mems/mem_done_edit.dart';
 import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mems/mem_select_dialog.dart';
 import 'package:mem/features/mems/mems_state.dart';
@@ -36,6 +39,8 @@ class MemParentView extends ConsumerWidget {
             for (final childId in mem.childMemIds)
               if (memById(childId) case final child?) child,
           ]..sort((a, b) => a.name.compareTo(b.name));
+          final undoneParentIds =
+              ref.watch(parentMemIdsWithUndoneChildrenProvider);
 
           void disconnect(int memId) {
             if (memId == _memId) {
@@ -54,6 +59,7 @@ class MemParentView extends ConsumerWidget {
             memId: _memId,
             parent: parent,
             children: children,
+            undoneParentIds: undoneParentIds,
             onOpen: (memId) => showMemDetailPage(context, ref, memId),
             onDisconnect: disconnect,
             onSetParent: () => _setParent(context, ref, _memId),
@@ -67,6 +73,7 @@ class _MemParentSection extends StatelessWidget {
   final int _memId;
   final Mem? _parent;
   final List<Mem> _children;
+  final Set<int> _undoneParentIds;
   final void Function(int memId) _onOpen;
   final void Function(int memId) _onDisconnect;
   final VoidCallback _onSetParent;
@@ -75,12 +82,14 @@ class _MemParentSection extends StatelessWidget {
     required int memId,
     required Mem? parent,
     required List<Mem> children,
+    required Set<int> undoneParentIds,
     required void Function(int memId) onOpen,
     required void Function(int memId) onDisconnect,
     required VoidCallback onSetParent,
   })  : _memId = memId,
         _parent = parent,
         _children = children,
+        _undoneParentIds = undoneParentIds,
         _onOpen = onOpen,
         _onDisconnect = onDisconnect,
         _onSetParent = onSetParent;
@@ -94,14 +103,14 @@ class _MemParentSection extends StatelessWidget {
 
           ListTile memRow({
             required IconData icon,
-            required String name,
+            required Widget title,
             required VoidCallback onTap,
             VoidCallback? onDisconnect,
           }) =>
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: Icon(icon),
-                title: Text(name),
+                title: title,
                 onTap: onTap,
                 trailing: onDisconnect == null
                     ? null
@@ -116,7 +125,7 @@ class _MemParentSection extends StatelessWidget {
             children: [
               memRow(
                 icon: Icons.account_tree,
-                name: parent?.name ?? l10n.parentNone,
+                title: Text(parent?.name ?? l10n.parentNone),
                 onTap:
                     parentId == null ? _onSetParent : () => _onOpen(parentId),
                 onDisconnect:
@@ -126,7 +135,20 @@ class _MemParentSection extends StatelessWidget {
                 if (child.id case final int childId)
                   memRow(
                     icon: Icons.subdirectory_arrow_right,
-                    name: child.name,
+                    title: Row(
+                      children: [
+                        MemDoneCheckbox(
+                          child,
+                          MemDoneEdit.of(
+                            hasUndoneChildren:
+                                _undoneParentIds.contains(childId),
+                            isDone: child.isDone,
+                            onChanged: (_) {},
+                          )?.onChanged,
+                        ),
+                        Expanded(child: MemNameText(childId)),
+                      ],
+                    ),
                     onTap: () => _onOpen(childId),
                     onDisconnect: () => _onDisconnect(childId),
                   ),
@@ -137,6 +159,7 @@ class _MemParentSection extends StatelessWidget {
           'memId': _memId,
           'parent': _parent,
           'children': _children,
+          'undoneParentIds': _undoneParentIds,
         },
       );
 }

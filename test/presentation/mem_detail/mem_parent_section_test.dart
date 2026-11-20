@@ -12,7 +12,9 @@ import 'package:mem/features/mem_parents/mem_parent.dart';
 import 'package:mem/features/mems/detail/body.dart';
 import 'package:mem/features/mems/detail/page.dart';
 import 'package:mem/features/mems/mem.dart';
+import 'package:mem/features/mems/mem_done_checkbox.dart';
 import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/targets/target_repository.dart';
@@ -751,5 +753,103 @@ void main() {
     await tester.pump();
 
     expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isTrue);
+  });
+
+  testWidgets(
+      'shows child done checkboxes and disables one with an undone grandchild',
+      (tester) async {
+    final parent = await insertMem('Parent');
+    final open = await insertMem('Open');
+    final done = await insertMem('Done', doneAt: DateTime.now());
+    final blocked = await insertMem('Blocked');
+    final grand = await insertMem('Grand');
+    await MemRepository().receiveParent(
+      MemParent(memId: open.id, parentMemId: parent.id),
+    );
+    await MemRepository().receiveParent(
+      MemParent(memId: done.id, parentMemId: parent.id),
+    );
+    await MemRepository().receiveParent(
+      MemParent(memId: blocked.id, parentMemId: parent.id),
+    );
+    await MemRepository().receiveParent(
+      MemParent(memId: grand.id, parentMemId: blocked.id),
+    );
+
+    final container = await pumpDetail(tester, parent.id);
+    await container
+        .read(parentMemIdsWithUndoneChildrenProvider.notifier)
+        .refresh();
+    await tester.pump();
+
+    Checkbox checkboxOn(String name) => tester.widget<Checkbox>(
+          find.descendant(
+            of: find.widgetWithText(ListTile, name),
+            matching: find.byType(Checkbox),
+          ),
+        );
+
+    Text nameText(String name) => tester.widget<Text>(
+          find.descendant(
+            of: find.widgetWithText(ListTile, name),
+            matching: find.text(name),
+          ),
+        );
+
+    final openCheckbox = checkboxOn('Open');
+    expect(openCheckbox.value, isFalse);
+    expect(openCheckbox.onChanged, isNotNull);
+    expect(nameText('Open').style?.decoration, isNull);
+
+    final doneCheckbox = checkboxOn('Done');
+    expect(doneCheckbox.value, isTrue);
+    expect(doneCheckbox.onChanged, isNotNull);
+    expect(nameText('Done').style?.decoration, TextDecoration.lineThrough);
+
+    final blockedCheckbox = checkboxOn('Blocked');
+    expect(blockedCheckbox.value, isFalse);
+    expect(blockedCheckbox.onChanged, isNull);
+    expect(nameText('Blocked').style?.decoration, isNull);
+
+    expect(find.text('Grand'), findsNothing);
+    expect(
+      find.descendant(
+        of: find.widgetWithText(ListTile, _l10n.parentNone),
+        matching: find.byType(Checkbox),
+      ),
+      findsNothing,
+    );
+
+    for (final name in ['Open', 'Done', 'Blocked']) {
+      final tile = find.widgetWithText(ListTile, name);
+      expect(
+        find.descendant(
+          of: tile,
+          matching: find.byIcon(Icons.subdirectory_arrow_right),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: tile,
+          matching: find.byIcon(Icons.close),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: tile,
+          matching: find.byType(MemDoneCheckbox),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: tile,
+          matching: find.byType(MemNameText),
+        ),
+        findsOneWidget,
+      );
+    }
   });
 }
