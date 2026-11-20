@@ -22,8 +22,9 @@ import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/values/colors.dart';
 
-import 'actions.dart';
+import 'leading_icon_button.dart';
 import 'subtitle.dart';
+import 'trailing_icon_button.dart';
 
 class MemListItemView extends ConsumerWidget {
   final Mem _mem;
