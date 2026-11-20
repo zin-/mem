@@ -1,5 +1,7 @@
-sealed class MemStatus {
-  const MemStatus._();
+enum MemStatus {
+  notified,
+  doneable,
+  undoneParent;
 
   static MemStatus of({
     required bool isDone,
@@ -7,27 +9,11 @@ sealed class MemStatus {
     required bool hasUndoneChildren,
   }) {
     if (hasEnabledNotifications) {
-      return NotifiedMemStatus._(isDone);
+      return MemStatus.notified;
     }
     if (hasUndoneChildren && !isDone) {
-      return const UndoneParentMemStatus._();
+      return MemStatus.undoneParent;
     }
-    return DoneableMemStatus._(isDone);
+    return MemStatus.doneable;
   }
-}
-
-final class NotifiedMemStatus extends MemStatus {
-  final bool isDone;
-
-  const NotifiedMemStatus._(this.isDone) : super._();
-}
-
-final class DoneableMemStatus extends MemStatus {
-  final bool isDone;
-
-  const DoneableMemStatus._(this.isDone) : super._();
-}
-
-final class UndoneParentMemStatus extends MemStatus {
-  const UndoneParentMemStatus._() : super._();
 }

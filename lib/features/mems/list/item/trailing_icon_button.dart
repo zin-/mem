@@ -28,20 +28,14 @@ class TrailingIconButton extends StatelessWidget {
       ),
       hasUndoneChildren: MemListItemAction.hasUndoneChildren(ref, mem.id),
     );
-    return switch (status) {
-      UndoneParentMemStatus() => null,
-      NotifiedMemStatus(:final isDone) => _forLatestAct(mem, isDone),
-      DoneableMemStatus(:final isDone) => _forLatestAct(mem, isDone),
-    };
-  }
 
-  static Widget? _forLatestAct(Mem mem, bool isDone) {
-    if (isDone) return null;
-    return switch (mem.latestAct) {
-      ActiveAct() => FinishButton(mem),
-      PausedAct() => StartButton(mem),
-      _ => StartButton(mem),
-    };
+    Widget forLatestAct() => switch (mem.latestAct) {
+          ActiveAct() => FinishButton(mem),
+          _ => StartButton(mem),
+        };
+
+    if (status == MemStatus.undoneParent || mem.isDone) return null;
+    return forLatestAct();
   }
 
   @override

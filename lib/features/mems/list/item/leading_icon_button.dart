@@ -21,12 +21,20 @@ class LeadingIconButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
           final status = _status(ref);
+
+          Widget forLatestAct({required Widget whenOther}) =>
+              switch (_mem.latestAct) {
+                ActiveAct() => PauseButton(_mem),
+                PausedAct() => UnpauseButton(_mem),
+                _ => whenOther,
+              };
+
           return switch (status) {
-            UndoneParentMemStatus() => const Icon(Icons.account_tree),
-            NotifiedMemStatus() => _forLatestAct(
+            MemStatus.undoneParent => const Icon(Icons.account_tree),
+            MemStatus.notified => forLatestAct(
                 whenOther: FinishButton(_mem),
               ),
-            DoneableMemStatus() => _forLatestAct(
+            MemStatus.doneable => forLatestAct(
                 whenOther: MemDoneCheckbox(
                   _mem,
                   (value) => _editDone(ref, _mem.id as int, value),
@@ -44,12 +52,6 @@ class LeadingIconButton extends ConsumerWidget {
         ),
         hasUndoneChildren: MemListItemAction.hasUndoneChildren(ref, _mem.id),
       );
-
-  Widget _forLatestAct({required Widget whenOther}) => switch (_mem.latestAct) {
-        ActiveAct() => PauseButton(_mem),
-        PausedAct() => UnpauseButton(_mem),
-        _ => whenOther,
-      };
 
   void _editDone(WidgetRef ref, int memId, bool? value) => v(
         () => value == true
