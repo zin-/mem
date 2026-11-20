@@ -4,9 +4,14 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/databases/database.dart' hide Mem, MemParent;
+import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/acts/act_repository.dart';
+import 'package:mem/features/acts/act_service.dart';
+import 'package:mem/features/acts/client.dart';
 import 'package:mem/features/logger/log.dart';
 import 'package:mem/features/logger/log_repository.dart';
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/features/mem_parents/mem_parent.dart';
 import 'package:mem/features/mems/detail/body.dart';
@@ -19,16 +24,21 @@ import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/targets/target_repository.dart';
 import 'package:mem/framework/database/accessor.dart';
+import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/repository/drift_repository.dart';
 import 'package:mem/framework/singleton.dart';
 import 'package:mem/generated/l10n/app_localizations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../features/acts/skip_act_by_states_test.mocks.dart';
 import '../../helpers.mocks.dart';
 import 'package:mem/l10n/l10n.dart';
 
 final _l10n = lookupAppLocalizations(const Locale('ja'));
+
+// 秒。時刻があるので有効な通知になり、この子は習慣になる
+const _habitNotifyAtSeconds = 5 * 60;
 
 // メモリ DB は tap の中で完了する。mounted の return に入るには、その完了を画面を外すまで止める
 class _PausedDatabase {
@@ -89,6 +99,16 @@ void main() {
   Future<MemEntity> insertMem(String name, {DateTime? doneAt}) =>
       MemRepository().receive(Mem(null, name, doneAt, null));
 
+  Future<void> notifyHabit(int memId) =>
+      MemRepository().receiveRepeatedNotification(
+        MemNotification.by(
+          memId,
+          MemNotificationType.repeat,
+          _habitNotifyAtSeconds,
+          'repeat',
+        ),
+      );
+
   Future<void> settle(WidgetTester tester) => tester.pumpAndSettle(
         const Duration(milliseconds: 50),
         EnginePhase.sendSemanticsUpdate,
@@ -107,6 +127,11 @@ void main() {
 
   MemEntity entity(ProviderContainer container, int id) =>
       container.read(memEntitiesProvider).singleWhere((mem) => mem.id == id);
+
+  Finder iconOn(String name, IconData icon) => find.descendant(
+        of: find.widgetWithText(ListTile, name),
+        matching: find.byIcon(icon),
+      );
 
   Future<ProviderContainer> pumpDetail(
     WidgetTester tester,
@@ -895,5 +920,95 @@ void main() {
     expect(childCheckbox().value, isFalse);
     expect(childName().style?.decoration, isNull);
     expect(entity(container, child.id).doneAt, isNull);
+  });
+
+  testWidgets(
+      'starts and finishes a habit child and hides controls without a notification',
+      (tester) async {
+    final parent = await insertMem('Parent');
+    final habit = await insertMem('Habit');
+    final plain = await insertMem('Plain');
+    final doneHabit = await insertMem('Done habit', doneAt: DateTime.now());
+    for (final memId in [habit.id, plain.id, doneHabit.id]) {
+      await MemRepository().receiveParent(
+        MemParent(memId: memId, parentMemId: parent.id),
+      );
+    }
+    await notifyHabit(habit.id);
+    await notifyHabit(doneHabit.id);
+
+    final notifications = MockNotificationClient();
+    when(notifications.startActNotifications(any)).thenAnswer((_) async {});
+    when(notifications.cancelActNotification(any)).thenAnswer((_) async {});
+    when(notifications.registerMemNotifications(any))
+        .thenAnswer((_) async => null);
+    when(notifications.setNotificationAfterInactivity())
+        .thenAnswer((_) async {});
+    ActsClient(notificationClient: notifications);
+    addTearDown(() {
+      ActsClient.resetSingleton();
+      ActService.resetSingleton();
+      Singleton.reset<ActRepository>();
+    });
+
+    final container = await pumpDetail(tester, parent.id);
+
+    expect(iconOn('Habit', Icons.play_arrow), findsOneWidget);
+    expect(iconOn('Habit', Icons.stop), findsOneWidget);
+    expect(iconOn('Habit', Icons.pause), findsNothing);
+    expect(iconOn('Habit', Icons.subdirectory_arrow_right), findsOneWidget);
+    expect(iconOn('Habit', Icons.close), findsOneWidget);
+    expect(iconOn('Plain', Icons.play_arrow), findsNothing);
+    expect(iconOn('Plain', Icons.stop), findsNothing);
+    expect(iconOn('Done habit', Icons.play_arrow), findsNothing);
+    expect(iconOn('Done habit', Icons.stop), findsNothing);
+
+    await tester.tap(iconOn('Habit', Icons.play_arrow));
+    await settle(tester);
+
+    expect(entity(container, habit.id).latestAct, isA<ActiveAct>());
+    expect(iconOn('Habit', Icons.play_arrow), findsNothing);
+    expect(iconOn('Habit', Icons.stop), findsOneWidget);
+    expect(iconOn('Habit', Icons.pause), findsNothing);
+
+    await tester.tap(iconOn('Habit', Icons.stop));
+    await settle(tester);
+
+    expect(entity(container, habit.id).latestAct, isA<FinishedAct>());
+    expect(iconOn('Habit', Icons.play_arrow), findsOneWidget);
+    expect(iconOn('Habit', Icons.stop), findsOneWidget);
+  });
+
+  testWidgets(
+      'shows finish only while a habit child is active and start only while paused',
+      (tester) async {
+    final parent = await insertMem('Parent');
+    final active = await insertMem('Active');
+    final paused = await insertMem('Paused');
+    for (final memId in [active.id, paused.id]) {
+      await MemRepository().receiveParent(
+        MemParent(memId: memId, parentMemId: parent.id),
+      );
+      await notifyHabit(memId);
+    }
+    await ActRepository().receive(
+      ActiveAct(active.id, DateAndTime.now()),
+    );
+    await ActRepository().receive(
+      PausedAct(paused.id, DateTime.now()),
+    );
+    addTearDown(() => Singleton.reset<ActRepository>());
+
+    await pumpDetail(tester, parent.id);
+
+    expect(iconOn('Active', Icons.stop), findsOneWidget);
+    expect(iconOn('Active', Icons.play_arrow), findsNothing);
+    expect(iconOn('Active', Icons.pause), findsNothing);
+    expect(iconOn('Active', Icons.close), findsOneWidget);
+
+    expect(iconOn('Paused', Icons.play_arrow), findsOneWidget);
+    expect(iconOn('Paused', Icons.stop), findsNothing);
+    expect(iconOn('Paused', Icons.pause), findsNothing);
+    expect(iconOn('Paused', Icons.close), findsOneWidget);
   });
 }

@@ -1,7 +1,12 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_parents/mem_parent.dart';
+import 'package:mem/features/mems/detail/states.dart';
+import 'package:mem/features/mems/list/item/finish_button.dart';
+import 'package:mem/features/mems/list/item/start_button.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_done_checkbox.dart';
 import 'package:mem/features/mems/mem_done_edit.dart';
@@ -9,6 +14,7 @@ import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mems/mem_select_dialog.dart';
+import 'package:mem/features/mems/mem_status.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/mems/transitions.dart';
@@ -141,24 +147,12 @@ class _MemParentSection extends StatelessWidget {
               ),
               for (final child in _children)
                 if (child.id case final int childId)
-                  memRow(
-                    icon: Icons.subdirectory_arrow_right,
-                    title: Row(
-                      children: [
-                        MemDoneCheckbox(
-                          child,
-                          MemDoneEdit.of(
-                            hasUndoneChildren:
-                                _undoneParentIds.contains(childId),
-                            isDone: child.isDone,
-                            onChanged: (value) => _onEditDone(childId, value),
-                          )?.onChanged,
-                        ),
-                        Expanded(child: MemNameText(childId)),
-                      ],
-                    ),
-                    onTap: () => _onOpen(childId),
+                  _ChildMemRow(
+                    child: child,
+                    hasUndoneChildren: _undoneParentIds.contains(childId),
+                    onOpen: () => _onOpen(childId),
                     onDisconnect: () => _onDisconnect(childId),
+                    onEditDone: (value) => _onEditDone(childId, value),
                   ),
             ],
           );
@@ -170,6 +164,87 @@ class _MemParentSection extends StatelessWidget {
           'undoneParentIds': _undoneParentIds,
         },
       );
+}
+
+class _ChildMemRow extends ConsumerWidget {
+  final Mem _child;
+  final bool _hasUndoneChildren;
+  final VoidCallback _onOpen;
+  final VoidCallback _onDisconnect;
+  final void Function(bool? value) _onEditDone;
+
+  const _ChildMemRow({
+    required Mem child,
+    required bool hasUndoneChildren,
+    required VoidCallback onOpen,
+    required VoidCallback onDisconnect,
+    required void Function(bool? value) onEditDone,
+  })  : _child = child,
+        _hasUndoneChildren = hasUndoneChildren,
+        _onOpen = onOpen,
+        _onDisconnect = onDisconnect,
+        _onEditDone = onEditDone;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => v(
+        () {
+          final childId = _child.id as int;
+          final notifications =
+              ref.watch(memNotificationsByMemIdProvider(childId));
+          final hasEnabledNotifications = notifications
+              .where(
+                (notification) =>
+                    notification is SavedMemNotificationEntityV1 &&
+                    notification.value.isEnabled(),
+              )
+              .isNotEmpty;
+          final status = _child.status(
+            hasEnabledNotifications: hasEnabledNotifications,
+            hasUndoneChildren: _hasUndoneChildren,
+          );
+          final l10n = buildL10n(context);
+          return ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.subdirectory_arrow_right),
+            title: Row(
+              children: [
+                MemDoneCheckbox(
+                  _child,
+                  MemDoneEdit.of(
+                    hasUndoneChildren: _hasUndoneChildren,
+                    isDone: _child.isDone,
+                    onChanged: _onEditDone,
+                  )?.onChanged,
+                ),
+                Expanded(child: MemNameText(childId)),
+                ..._habitActions(status),
+              ],
+            ),
+            onTap: _onOpen,
+            trailing: IconButton(
+              onPressed: _onDisconnect,
+              tooltip: l10n.disconnectParentAction,
+              icon: const Icon(Icons.close),
+            ),
+          );
+        },
+        {
+          'child': _child,
+          'hasUndoneChildren': _hasUndoneChildren,
+        },
+      );
+
+  List<Widget> _habitActions(MemStatus status) {
+    if (status != MemStatus.notified || _child.isDone) return const [];
+    return switch (_child.latestAct) {
+      ActiveAct() => [FinishButton(_child, enableSkip: false)],
+      PausedAct() => [StartButton(_child)],
+      _ => [
+          FinishButton(_child, enableSkip: true),
+          StartButton(_child),
+        ],
+    };
+  }
 }
 
 Future<void> _setParent(BuildContext context, WidgetRef ref, int memId) => v(
