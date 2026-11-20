@@ -852,4 +852,48 @@ void main() {
       );
     }
   });
+
+  testWidgets('completes a child from its checkbox and marks it undone again',
+      (tester) async {
+    final parent = await insertMem('Parent');
+    final child = await insertMem('Child');
+    await MemRepository().receiveParent(
+      MemParent(memId: child.id, parentMemId: parent.id),
+    );
+
+    final container = await pumpDetail(tester, parent.id);
+
+    Checkbox childCheckbox() => tester.widget<Checkbox>(
+          find.descendant(
+            of: find.widgetWithText(ListTile, 'Child'),
+            matching: find.byType(Checkbox),
+          ),
+        );
+
+    Text childName() => tester.widget<Text>(
+          find.descendant(
+            of: find.widgetWithText(ListTile, 'Child'),
+            matching: find.text('Child'),
+          ),
+        );
+
+    expect(childCheckbox().value, isFalse);
+    expect(childCheckbox().onChanged, isNotNull);
+    expect(childName().style?.decoration, isNull);
+    expect(entity(container, child.id).doneAt, isNull);
+
+    childCheckbox().onChanged!(true);
+    await settle(tester);
+
+    expect(childCheckbox().value, isTrue);
+    expect(childName().style?.decoration, TextDecoration.lineThrough);
+    expect(entity(container, child.id).doneAt, isNotNull);
+
+    childCheckbox().onChanged!(false);
+    await settle(tester);
+
+    expect(childCheckbox().value, isFalse);
+    expect(childName().style?.decoration, isNull);
+    expect(entity(container, child.id).doneAt, isNull);
+  });
 }

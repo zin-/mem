@@ -55,6 +55,10 @@ class MemParentView extends ConsumerWidget {
             );
           }
 
+          void editDone(int memId, bool? value) => value == true
+              ? ref.read(memEntitiesProvider.notifier).doneMem(memId)
+              : ref.read(memEntitiesProvider.notifier).undoneMem(memId);
+
           return _MemParentSection(
             memId: _memId,
             parent: parent,
@@ -62,6 +66,7 @@ class MemParentView extends ConsumerWidget {
             undoneParentIds: undoneParentIds,
             onOpen: (memId) => showMemDetailPage(context, ref, memId),
             onDisconnect: disconnect,
+            onEditDone: editDone,
             onSetParent: () => _setParent(context, ref, _memId),
           );
         },
@@ -76,6 +81,7 @@ class _MemParentSection extends StatelessWidget {
   final Set<int> _undoneParentIds;
   final void Function(int memId) _onOpen;
   final void Function(int memId) _onDisconnect;
+  final void Function(int memId, bool? value) _onEditDone;
   final VoidCallback _onSetParent;
 
   const _MemParentSection({
@@ -85,6 +91,7 @@ class _MemParentSection extends StatelessWidget {
     required Set<int> undoneParentIds,
     required void Function(int memId) onOpen,
     required void Function(int memId) onDisconnect,
+    required void Function(int memId, bool? value) onEditDone,
     required VoidCallback onSetParent,
   })  : _memId = memId,
         _parent = parent,
@@ -92,6 +99,7 @@ class _MemParentSection extends StatelessWidget {
         _undoneParentIds = undoneParentIds,
         _onOpen = onOpen,
         _onDisconnect = onDisconnect,
+        _onEditDone = onEditDone,
         _onSetParent = onSetParent;
 
   @override
@@ -143,7 +151,7 @@ class _MemParentSection extends StatelessWidget {
                             hasUndoneChildren:
                                 _undoneParentIds.contains(childId),
                             isDone: child.isDone,
-                            onChanged: (_) {},
+                            onChanged: (value) => _onEditDone(childId, value),
                           )?.onChanged,
                         ),
                         Expanded(child: MemNameText(childId)),
