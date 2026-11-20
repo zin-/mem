@@ -8,20 +8,18 @@ import 'package:mem/features/mems/mem_status.dart';
 import 'package:mem/features/mems/mems_state.dart';
 
 import 'unpause_button.dart';
-import 'mem_list_item_action.dart';
 import 'pause_button.dart';
 import 'finish_button.dart';
 
 class LeadingIconButton extends ConsumerWidget {
   final Mem _mem;
+  final MemStatus _status;
 
-  const LeadingIconButton(this._mem, {super.key});
+  const LeadingIconButton(this._mem, this._status, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
-          final status = _status(ref);
-
           Widget forLatestAct({required Widget whenOther}) =>
               switch (_mem.latestAct) {
                 ActiveAct() => PauseButton(_mem),
@@ -29,10 +27,10 @@ class LeadingIconButton extends ConsumerWidget {
                 _ => whenOther,
               };
 
-          return switch (status) {
+          return switch (_status) {
             MemStatus.undoneParent => const Icon(Icons.account_tree),
             MemStatus.notified => forLatestAct(
-                whenOther: FinishButton(_mem),
+                whenOther: FinishButton(_mem, enableSkip: true),
               ),
             MemStatus.doneable => forLatestAct(
                 whenOther: MemDoneCheckbox(
@@ -42,15 +40,10 @@ class LeadingIconButton extends ConsumerWidget {
               ),
           };
         },
-        {'_mem': _mem},
-      );
-
-  MemStatus _status(WidgetRef ref) => _mem.status(
-        hasEnabledNotifications: MemListItemAction.hasEnabledNotifications(
-          ref,
-          _mem.id as int,
-        ),
-        hasUndoneChildren: MemListItemAction.hasUndoneChildren(ref, _mem.id),
+        {
+          '_mem': _mem,
+          '_status': _status,
+        },
       );
 
   void _editDone(WidgetRef ref, int memId, bool? value) => v(

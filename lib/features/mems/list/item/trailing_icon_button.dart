@@ -1,11 +1,9 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_status.dart';
 
-import 'mem_list_item_action.dart';
 import 'start_button.dart';
 import 'finish_button.dart';
 
@@ -14,23 +12,15 @@ class TrailingIconButton extends StatelessWidget {
 
   const TrailingIconButton._(this._button);
 
-  static TrailingIconButton? of(WidgetRef ref, Mem mem) {
-    final button = _buttonFor(ref, mem);
+  static TrailingIconButton? of(Mem mem, MemStatus status) {
+    final button = _buttonFor(mem, status);
     if (button == null) return null;
     return TrailingIconButton._(button);
   }
 
-  static Widget? _buttonFor(WidgetRef ref, Mem mem) {
-    final status = mem.status(
-      hasEnabledNotifications: MemListItemAction.hasEnabledNotifications(
-        ref,
-        mem.id as int,
-      ),
-      hasUndoneChildren: MemListItemAction.hasUndoneChildren(ref, mem.id),
-    );
-
+  static Widget? _buttonFor(Mem mem, MemStatus status) {
     Widget forLatestAct() => switch (mem.latestAct) {
-          ActiveAct() => FinishButton(mem),
+          ActiveAct() => FinishButton(mem, enableSkip: false),
           _ => StartButton(mem),
         };
 

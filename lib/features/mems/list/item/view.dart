@@ -9,6 +9,7 @@ import 'package:mem/framework/date_and_time/period.dart';
 import 'package:mem/features/acts/target_progress_label.dart';
 import 'package:mem/features/mems/count_target.dart';
 import 'package:mem/features/mems/mem.dart';
+import 'package:mem/features/mems/mem_status.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/mems/transitions.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -49,6 +50,20 @@ class MemListItemView extends ConsumerWidget {
           );
           final notifications =
               ref.watch(memNotificationsByMemIdProvider(_mem.id as int));
+          final hasEnabledNotifications = notifications
+              .where(
+                (e) => e is SavedMemNotificationEntityV1 && e.value.isEnabled(),
+              )
+              .isNotEmpty;
+          final hasUndoneChildren = ref.watch(
+            parentMemIdsWithUndoneChildrenProvider.select(
+              (ids) => ids.contains(_mem.id),
+            ),
+          );
+          final status = _mem.status(
+            hasEnabledNotifications: hasEnabledNotifications,
+            hasUndoneChildren: hasUndoneChildren,
+          );
           final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
           final periodCount = _periodCount(ref, _mem.id as int);
           final amount = _labelAmount(
@@ -69,11 +84,11 @@ class MemListItemView extends ConsumerWidget {
                   )
                   ?.at;
           return _render(
-            ref,
             _mem,
             () => showMemDetailPage(context, ref, _mem.id as int),
             _mem.latestAct,
-            notifications,
+            status,
+            hasEnabledNotifications,
             target,
             amount,
             listAt,
@@ -87,53 +102,35 @@ class MemListItemView extends ConsumerWidget {
 }
 
 ListTile _render(
-  WidgetRef ref,
   Mem mem,
   void Function() onTap,
   Act? latestActByMem,
-  Iterable<MemNotificationEntityV1> memNotificationEntities,
+  MemStatus status,
+  bool hasEnabledNotifications,
   Target? target,
   ActAmount? amount,
   DateTime? listAt,
   Widget? subtitle,
 ) =>
     v(
-      () {
-        bool hasEnabledMemNotifications(
-          Iterable<MemNotificationEntityV1> notifications,
-        ) =>
-            notifications
-                .where(
-                  (e) =>
-                      e is SavedMemNotificationEntityV1 && e.value.isEnabled(),
-                )
-                .isNotEmpty;
-
-        final hasEnableMemNotifications = hasEnabledMemNotifications(
-          memNotificationEntities,
-        );
-
-        return ListTile(
-          title: _title(mem, latestActByMem, target, amount),
-          onTap: onTap,
-          leading: LeadingIconButton(mem),
-          tileColor: mem.isArchived ? secondaryGreyColor : null,
-          trailing: TrailingIconButton.of(ref, mem),
-          subtitle: subtitle ??
-              (mem.period == null &&
-                      !hasEnableMemNotifications &&
-                      listAt == null
-                  ? null
-                  : MemListItemSubtitle(mem.id as int, listAt)),
-          isThreeLine: subtitle == null &&
-              mem.period != null &&
-              hasEnableMemNotifications,
-        );
-      },
+      () => ListTile(
+        title: _title(mem, latestActByMem, target, amount),
+        onTap: onTap,
+        leading: LeadingIconButton(mem, status),
+        tileColor: mem.isArchived ? secondaryGreyColor : null,
+        trailing: TrailingIconButton.of(mem, status),
+        subtitle: subtitle ??
+            (mem.period == null && !hasEnabledNotifications && listAt == null
+                ? null
+                : MemListItemSubtitle(mem.id as int, listAt)),
+        isThreeLine:
+            subtitle == null && mem.period != null && hasEnabledNotifications,
+      ),
       {
         'mem': mem,
         'latestActByMem': latestActByMem,
-        'memNotificationEntities': memNotificationEntities,
+        'status': status,
+        'hasEnabledNotifications': hasEnabledNotifications,
         'target': target,
         'amount': amount,
         'listAt': listAt,
