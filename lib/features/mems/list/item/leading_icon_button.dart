@@ -30,7 +30,9 @@ class LeadingIconButton extends ConsumerWidget {
           MemStatus.notified => switch (_mem.latestAct) {
               ActiveAct() when _showPause => PauseButton(_mem),
               PausedAct() when _showPause => UnpauseButton(_mem),
-              _ => _notifiedLeading(),
+              // 一時停止を出さないとき、実行中の終了と一時停止中の開始は trailing だけ
+              ActiveAct() || PausedAct() => const SizedBox.shrink(),
+              _ => FinishButton(_mem, enableSkip: true),
             },
           MemStatus.doneable => switch (_mem.latestAct) {
               ActiveAct() when _showPause => PauseButton(_mem),
@@ -47,14 +49,6 @@ class LeadingIconButton extends ConsumerWidget {
           '_showPause': _showPause,
         },
       );
-
-  Widget _notifiedLeading() {
-    // 一時停止を出さないとき、実行中の終了と一時停止中の開始は trailing だけ
-    return switch (_mem.latestAct) {
-      ActiveAct() || PausedAct() => const SizedBox.shrink(),
-      _ => FinishButton(_mem, enableSkip: true),
-    };
-  }
 
   void _editDone(WidgetRef ref, int memId, bool? value) => v(
         () => value == true
