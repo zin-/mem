@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/framework/date_and_time/period.dart';
+import 'package:mem/features/acts/list/act_list_view.dart';
 import 'package:mem/features/acts/list/view.dart';
 import 'package:mem/framework/date_and_time/duration_ext.dart';
 import 'package:mem/features/acts/list/item/total_act_time_item.dart';
+import 'package:mem/features/acts/list/item/view.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mems_state.dart';
@@ -89,6 +91,7 @@ Future<void> _pumpActList(
   required TimeOfDay startOfDay,
   Period group = Period.aDay,
   ActEntities? actEntities,
+  ActListView? view,
 }) async {
   await tester.binding.setSurfaceSize(const Size(390, 844));
   addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -116,6 +119,7 @@ Future<void> _pumpActList(
             _memId,
             null,
             groupUnit: group,
+            view: view,
           ),
         ),
       ),
@@ -126,12 +130,27 @@ Future<void> _pumpActList(
 
 void main() {
   testWidgets(
+    'shows each act when a mem is open and view is omitted',
+    (tester) async {
+      await _pumpActList(
+        tester,
+        acts: [_act(1, DateTime(2026, 10, 13, 10))],
+        startOfDay: _midnight,
+      );
+
+      expect(find.byType(ActListItemView), findsOneWidget);
+      expect(find.byType(TotalActTimeListItem), findsNothing);
+    },
+  );
+
+  testWidgets(
     'hides actions for another day this month in date and time view',
     (tester) async {
       await _pumpActList(
         tester,
         acts: [_act(1, _anotherDayThisMonth())],
         startOfDay: _midnight,
+        view: ActListView.totalTime,
       );
 
       expect(find.byType(TotalActTimeListItem), findsOneWidget);
@@ -160,6 +179,7 @@ void main() {
           _act(2, DateTime(2026, 10, 13, 10)),
         ],
         startOfDay: _fiveAm,
+        view: ActListView.totalTime,
       );
 
       expect(find.text('10/13/2026'), findsOneWidget);
@@ -179,6 +199,7 @@ void main() {
         ],
         startOfDay: _fiveAm,
         group: Period.aMonth,
+        view: ActListView.totalTime,
       );
 
       expect(find.text('October 2026'), findsOneWidget);
@@ -198,6 +219,7 @@ void main() {
         ],
         startOfDay: _fiveAm,
         group: Period.aWeek,
+        view: ActListView.totalTime,
       );
 
       expect(find.text('10/05/2026 – 10/11/2026'), findsOneWidget);
@@ -217,6 +239,7 @@ void main() {
         ],
         startOfDay: _fiveAm,
         group: Period.threeMonth,
+        view: ActListView.totalTime,
       );
 
       expect(find.text('07/01/2026 – 09/30/2026'), findsOneWidget);
@@ -236,6 +259,7 @@ void main() {
         ],
         startOfDay: _fiveAm,
         group: Period.aYear,
+        view: ActListView.totalTime,
       );
 
       expect(find.text('2025'), findsOneWidget);
@@ -255,6 +279,7 @@ void main() {
         ],
         startOfDay: _fiveAm,
         group: Period.all,
+        view: ActListView.totalTime,
       );
 
       expect(find.text('all'), findsOneWidget);
@@ -271,6 +296,7 @@ void main() {
         tester,
         acts: [_act(1, DateTime(2026, 10, 13, 10))],
         startOfDay: _midnight,
+        view: ActListView.totalTime,
       );
 
       expect(find.byIcon(Icons.calendar_view_day), findsOneWidget);
@@ -306,11 +332,11 @@ void main() {
         tester,
         startOfDay: _midnight,
         actEntities: _ReloadShownActEntities(),
+        view: ActListView.totalTime,
       );
 
       expect(
-        find.text(
-            const Duration(hours: _hoursOnFirstReload).format()),
+        find.text(const Duration(hours: _hoursOnFirstReload).format()),
         // 小見出しと行が同じ合計を出す
         findsNWidgets(2),
       );
@@ -334,8 +360,7 @@ void main() {
         findsNWidgets(2),
       );
       expect(
-        find.text(
-            const Duration(hours: _hoursOnFirstReload).format()),
+        find.text(const Duration(hours: _hoursOnFirstReload).format()),
         findsNothing,
       );
     },
