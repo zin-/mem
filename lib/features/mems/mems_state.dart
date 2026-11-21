@@ -233,14 +233,21 @@ class MemEntities extends _$MemEntities
     final parent = await repository.shipParentByMemId(memId);
     final children = await repository.shipChildrenByParentMemId(memId);
 
+    final childIds = <int>{
+      for (final child in children) child.memId,
+    };
     final relatedIds = <int>{
       if (parent != null) parent.parentMemId,
-      for (final child in children) child.memId,
+      ...childIds,
     };
     final missing = <MemEntity>[];
     for (final id in relatedIds) {
       if (id == memId || _entity(id) != null) continue;
-      final related = await _shipOne(repository, id);
+      final related = await _shipOne(
+        repository,
+        id,
+        loadLatestAct: childIds.contains(id),
+      );
       if (related == null) continue;
       missing.add(related);
     }

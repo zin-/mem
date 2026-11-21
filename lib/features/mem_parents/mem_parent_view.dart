@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/mem_parents/child_mem_row.dart';
 import 'package:mem/features/mem_parents/mem_parent.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
@@ -94,14 +95,14 @@ class _MemParentSection extends StatelessWidget {
 
           ListTile memRow({
             required IconData icon,
-            required String name,
+            required Widget title,
             required VoidCallback onTap,
             VoidCallback? onDisconnect,
           }) =>
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: Icon(icon),
-                title: Text(name),
+                title: title,
                 onTap: onTap,
                 trailing: onDisconnect == null
                     ? null
@@ -116,7 +117,7 @@ class _MemParentSection extends StatelessWidget {
             children: [
               memRow(
                 icon: Icons.account_tree,
-                name: parent?.name ?? l10n.parentNone,
+                title: Text(parent?.name ?? l10n.parentNone),
                 onTap:
                     parentId == null ? _onSetParent : () => _onOpen(parentId),
                 onDisconnect:
@@ -124,10 +125,8 @@ class _MemParentSection extends StatelessWidget {
               ),
               for (final child in _children)
                 if (child.id case final int childId)
-                  memRow(
-                    icon: Icons.subdirectory_arrow_right,
-                    name: child.name,
-                    onTap: () => _onOpen(childId),
+                  ChildMemRow(
+                    child: child,
                     onDisconnect: () => _onDisconnect(childId),
                   ),
             ],

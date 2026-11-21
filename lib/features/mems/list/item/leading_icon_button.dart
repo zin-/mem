@@ -15,30 +15,29 @@ class LeadingIconButton extends ConsumerWidget {
   final Mem _mem;
   final MemStatus _status;
 
-  const LeadingIconButton(this._mem, this._status, {super.key});
+  const LeadingIconButton(
+    this._mem,
+    this._status, {
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () {
-          Widget forLatestAct({required Widget whenOther}) =>
-              switch (_mem.latestAct) {
-                ActiveAct() => PauseButton(_mem),
-                PausedAct() => UnpauseButton(_mem),
-                _ => whenOther,
-              };
-
-          return switch (_status) {
-            MemStatus.undoneParent => const Icon(Icons.account_tree),
-            MemStatus.notified => forLatestAct(
-                whenOther: FinishButton(_mem, enableSkip: true),
-              ),
-            MemStatus.doneable => forLatestAct(
-                whenOther: MemDoneCheckbox(
+        () => switch (_status) {
+          MemStatus.undoneParent => const Icon(Icons.account_tree),
+          MemStatus.notified => switch (_mem.latestAct) {
+              ActiveAct() => PauseButton(_mem),
+              PausedAct() => UnpauseButton(_mem),
+              _ => FinishButton(_mem, enableSkip: true),
+            },
+          MemStatus.doneable => switch (_mem.latestAct) {
+              ActiveAct() => PauseButton(_mem),
+              PausedAct() => UnpauseButton(_mem),
+              _ => MemDoneCheckbox(
                   _mem,
                   (value) => _editDone(ref, _mem.id as int, value),
                 ),
-              ),
-          };
+            },
         },
         {
           '_mem': _mem,

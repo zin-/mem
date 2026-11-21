@@ -4,29 +4,43 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/databases/database.dart' hide Mem, MemParent;
+import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/acts/act_repository.dart';
+import 'package:mem/features/acts/act_service.dart';
+import 'package:mem/features/acts/client.dart';
 import 'package:mem/features/logger/log.dart';
 import 'package:mem/features/logger/log_repository.dart';
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
+import 'package:mem/features/mem_parents/child_mem_row.dart';
 import 'package:mem/features/mem_parents/mem_parent.dart';
 import 'package:mem/features/mems/detail/body.dart';
 import 'package:mem/features/mems/detail/page.dart';
+import 'package:mem/features/mems/list/item/view.dart';
 import 'package:mem/features/mems/mem.dart';
+import 'package:mem/features/mems/mem_done_checkbox.dart';
 import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/targets/target_repository.dart';
 import 'package:mem/framework/database/accessor.dart';
+import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/repository/drift_repository.dart';
 import 'package:mem/framework/singleton.dart';
 import 'package:mem/generated/l10n/app_localizations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../features/acts/skip_act_by_states_test.mocks.dart';
 import '../../helpers.mocks.dart';
 import 'package:mem/l10n/l10n.dart';
 
 final _l10n = lookupAppLocalizations(const Locale('ja'));
+
+// 秒。時刻があるので有効な通知になり、この子は習慣になる
+const _habitNotifyAtSeconds = 5 * 60;
 
 // メモリ DB は tap の中で完了する。mounted の return に入るには、その完了を画面を外すまで止める
 class _PausedDatabase {
@@ -87,6 +101,16 @@ void main() {
   Future<MemEntity> insertMem(String name, {DateTime? doneAt}) =>
       MemRepository().receive(Mem(null, name, doneAt, null));
 
+  Future<void> notifyHabit(int memId) =>
+      MemRepository().receiveRepeatedNotification(
+        MemNotification.by(
+          memId,
+          MemNotificationType.repeat,
+          _habitNotifyAtSeconds,
+          'repeat',
+        ),
+      );
+
   Future<void> settle(WidgetTester tester) => tester.pumpAndSettle(
         const Duration(milliseconds: 50),
         EnginePhase.sendSemanticsUpdate,
@@ -105,6 +129,45 @@ void main() {
 
   MemEntity entity(ProviderContainer container, int id) =>
       container.read(memEntitiesProvider).singleWhere((mem) => mem.id == id);
+
+  Finder iconOn(String name, IconData icon) => find.descendant(
+        of: find.widgetWithText(ListTile, name),
+        matching: find.byIcon(icon),
+      );
+
+  void expectChildAffordancesOutsideListItem(Iterable<String> names) {
+    expect(
+      find.descendant(
+        of: find.byType(MemListItemView),
+        matching: find.byIcon(Icons.subdirectory_arrow_right),
+      ),
+      findsNothing,
+    );
+    expect(
+      find.descendant(
+        of: find.byType(MemListItemView),
+        matching: find.byTooltip(_l10n.disconnectParentAction),
+      ),
+      findsNothing,
+    );
+    for (final name in names) {
+      final row = find.widgetWithText(ChildMemRow, name);
+      expect(
+        find.descendant(
+          of: row,
+          matching: find.byIcon(Icons.subdirectory_arrow_right),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: row,
+          matching: find.byTooltip(_l10n.disconnectParentAction),
+        ),
+        findsOneWidget,
+      );
+    }
+  }
 
   Future<ProviderContainer> pumpDetail(
     WidgetTester tester,
@@ -324,24 +387,12 @@ void main() {
 
     expect(find.text('親'), findsNothing);
     expect(find.text('子'), findsNothing);
+    expect(find.byType(MemListItemView), findsNWidgets(2));
     expect(find.byIcon(Icons.subdirectory_arrow_right), findsNWidgets(2));
     expect(find.text('Child A'), findsOneWidget);
     expect(find.text('Child B'), findsOneWidget);
     expect(find.text('Grandchild'), findsNothing);
-    expect(
-      find.descendant(
-        of: find.widgetWithText(ListTile, 'Child A'),
-        matching: find.byIcon(Icons.subdirectory_arrow_right),
-      ),
-      findsOneWidget,
-    );
-    expect(
-      find.descendant(
-        of: find.widgetWithText(ListTile, 'Child B'),
-        matching: find.byIcon(Icons.subdirectory_arrow_right),
-      ),
-      findsOneWidget,
-    );
+    expectChildAffordancesOutsideListItem(['Child A', 'Child B']);
     expect(
       tester.getTopLeft(find.byIcon(Icons.account_tree)).dy,
       lessThan(tester.getTopLeft(find.text('Child A')).dy),
@@ -371,8 +422,8 @@ void main() {
 
     await tester.tap(
       find.descendant(
-        of: find.widgetWithText(ListTile, 'Child A'),
-        matching: find.byIcon(Icons.close),
+        of: find.widgetWithText(ChildMemRow, 'Child A'),
+        matching: find.byTooltip(_l10n.disconnectParentAction),
       ),
     );
     await tester.pumpAndSettle(
@@ -751,5 +802,267 @@ void main() {
     await tester.pump();
 
     expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isTrue);
+  });
+
+  testWidgets(
+      'shows child done checkboxes and a tree icon when a grandchild is undone',
+      (tester) async {
+    final parent = await insertMem('Parent');
+    final open = await insertMem('Open');
+    final done = await insertMem('Done', doneAt: DateTime.now());
+    final blocked = await insertMem('Blocked');
+    final grand = await insertMem('Grand');
+    await MemRepository().receiveParent(
+      MemParent(memId: open.id, parentMemId: parent.id),
+    );
+    await MemRepository().receiveParent(
+      MemParent(memId: done.id, parentMemId: parent.id),
+    );
+    await MemRepository().receiveParent(
+      MemParent(memId: blocked.id, parentMemId: parent.id),
+    );
+    await MemRepository().receiveParent(
+      MemParent(memId: grand.id, parentMemId: blocked.id),
+    );
+
+    final container = await pumpDetail(tester, parent.id);
+    await container
+        .read(parentMemIdsWithUndoneChildrenProvider.notifier)
+        .refresh();
+    await tester.pump();
+
+    Checkbox checkboxOn(String name) => tester.widget<Checkbox>(
+          find.descendant(
+            of: find.widgetWithText(ListTile, name),
+            matching: find.byType(Checkbox),
+          ),
+        );
+
+    Text nameText(String name) => tester.widget<Text>(
+          find.descendant(
+            of: find.widgetWithText(ListTile, name),
+            matching: find.text(name),
+          ),
+        );
+
+    final openCheckbox = checkboxOn('Open');
+    expect(openCheckbox.value, isFalse);
+    expect(openCheckbox.onChanged, isNotNull);
+    expect(nameText('Open').style?.decoration, isNull);
+
+    final doneCheckbox = checkboxOn('Done');
+    expect(doneCheckbox.value, isTrue);
+    expect(doneCheckbox.onChanged, isNotNull);
+    expect(nameText('Done').style?.decoration, TextDecoration.lineThrough);
+
+    expect(
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'Blocked'),
+        matching: find.byIcon(Icons.account_tree),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'Blocked'),
+        matching: find.byType(Checkbox),
+      ),
+      findsNothing,
+    );
+    expect(nameText('Blocked').style?.decoration, isNull);
+
+    expect(find.text('Grand'), findsNothing);
+    expect(
+      find.descendant(
+        of: find.widgetWithText(ListTile, _l10n.parentNone),
+        matching: find.byType(Checkbox),
+      ),
+      findsNothing,
+    );
+
+    expect(find.byType(MemListItemView), findsNWidgets(3));
+    expectChildAffordancesOutsideListItem(['Open', 'Done', 'Blocked']);
+    for (final name in ['Open', 'Done', 'Blocked']) {
+      expect(
+        find.descendant(
+          of: find.widgetWithText(ListTile, name),
+          matching: find.byType(MemNameText),
+        ),
+        findsOneWidget,
+      );
+    }
+    for (final name in ['Open', 'Done']) {
+      expect(
+        find.descendant(
+          of: find.widgetWithText(ListTile, name),
+          matching: find.byType(MemDoneCheckbox),
+        ),
+        findsOneWidget,
+      );
+    }
+  });
+
+  testWidgets('completes a child from its checkbox and marks it undone again',
+      (tester) async {
+    final parent = await insertMem('Parent');
+    final child = await insertMem('Child');
+    await MemRepository().receiveParent(
+      MemParent(memId: child.id, parentMemId: parent.id),
+    );
+
+    final container = await pumpDetail(tester, parent.id);
+
+    Checkbox childCheckbox() => tester.widget<Checkbox>(
+          find.descendant(
+            of: find.widgetWithText(ListTile, 'Child'),
+            matching: find.byType(Checkbox),
+          ),
+        );
+
+    Text childName() => tester.widget<Text>(
+          find.descendant(
+            of: find.widgetWithText(ListTile, 'Child'),
+            matching: find.text('Child'),
+          ),
+        );
+
+    expect(childCheckbox().value, isFalse);
+    expect(childCheckbox().onChanged, isNotNull);
+    expect(childName().style?.decoration, isNull);
+    expect(entity(container, child.id).doneAt, isNull);
+
+    childCheckbox().onChanged!(true);
+    await settle(tester);
+
+    expect(childCheckbox().value, isTrue);
+    expect(childName().style?.decoration, TextDecoration.lineThrough);
+    expect(entity(container, child.id).doneAt, isNotNull);
+
+    childCheckbox().onChanged!(false);
+    await settle(tester);
+
+    expect(childCheckbox().value, isFalse);
+    expect(childName().style?.decoration, isNull);
+    expect(entity(container, child.id).doneAt, isNull);
+  });
+
+  testWidgets(
+      'starts a child without a notification and starts and finishes a habit child',
+      (tester) async {
+    final parent = await insertMem('Parent');
+    final habit = await insertMem('Habit');
+    final plain = await insertMem('Plain');
+    final doneHabit = await insertMem('Done habit', doneAt: DateTime.now());
+    for (final memId in [habit.id, plain.id, doneHabit.id]) {
+      await MemRepository().receiveParent(
+        MemParent(memId: memId, parentMemId: parent.id),
+      );
+    }
+    await notifyHabit(habit.id);
+    await notifyHabit(doneHabit.id);
+
+    final notifications = MockNotificationClient();
+    when(notifications.startActNotifications(any)).thenAnswer((_) async {});
+    when(notifications.cancelActNotification(any)).thenAnswer((_) async {});
+    when(notifications.registerMemNotifications(any))
+        .thenAnswer((_) async => null);
+    when(notifications.setNotificationAfterInactivity())
+        .thenAnswer((_) async {});
+    ActsClient(notificationClient: notifications);
+    addTearDown(() {
+      ActsClient.resetSingleton();
+      ActService.resetSingleton();
+      Singleton.reset<ActRepository>();
+    });
+
+    final container = await pumpDetail(tester, parent.id);
+
+    expect(find.byType(MemListItemView), findsNWidgets(3));
+    expectChildAffordancesOutsideListItem(['Habit', 'Plain', 'Done habit']);
+    expect(iconOn('Habit', Icons.play_arrow), findsOneWidget);
+    expect(iconOn('Habit', Icons.stop), findsOneWidget);
+    expect(iconOn('Habit', Icons.pause), findsNothing);
+    expect(
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'Habit'),
+        matching: find.byType(Checkbox),
+      ),
+      findsNothing,
+    );
+    expect(iconOn('Plain', Icons.play_arrow), findsOneWidget);
+    expect(iconOn('Plain', Icons.stop), findsNothing);
+    expect(iconOn('Done habit', Icons.play_arrow), findsNothing);
+    expect(iconOn('Done habit', Icons.stop), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'Done habit'),
+        matching: find.byType(Checkbox),
+      ),
+      findsNothing,
+    );
+
+    await tester.tap(iconOn('Habit', Icons.play_arrow));
+    await settle(tester);
+
+    expect(entity(container, habit.id).latestAct, isA<ActiveAct>());
+    expect(iconOn('Habit', Icons.play_arrow), findsNothing);
+    expect(iconOn('Habit', Icons.stop), findsOneWidget);
+    expect(iconOn('Habit', Icons.pause), findsOneWidget);
+
+    await tester.tap(iconOn('Habit', Icons.stop));
+    await settle(tester);
+
+    expect(entity(container, habit.id).latestAct, isA<FinishedAct>());
+    expect(iconOn('Habit', Icons.play_arrow), findsOneWidget);
+    expect(iconOn('Habit', Icons.stop), findsOneWidget);
+  });
+
+  testWidgets(
+      'shows pause and finish while a habit child is active and unpause and start while paused',
+      (tester) async {
+    final parent = await insertMem('Parent');
+    final active = await insertMem('Active');
+    final paused = await insertMem('Paused');
+    for (final memId in [active.id, paused.id]) {
+      await MemRepository().receiveParent(
+        MemParent(memId: memId, parentMemId: parent.id),
+      );
+      await notifyHabit(memId);
+    }
+    await ActRepository().receive(
+      ActiveAct(active.id, DateAndTime.now()),
+    );
+    await ActRepository().receive(
+      PausedAct(paused.id, DateTime.now()),
+    );
+    addTearDown(() => Singleton.reset<ActRepository>());
+
+    await pumpDetail(tester, parent.id);
+
+    expect(find.byType(MemListItemView), findsNWidgets(2));
+    expectChildAffordancesOutsideListItem(['Active', 'Paused']);
+    expect(iconOn('Active', Icons.pause), findsOneWidget);
+    expect(iconOn('Active', Icons.stop), findsOneWidget);
+    expect(iconOn('Active', Icons.play_arrow), findsNothing);
+    expect(iconOn('Active', Icons.close), findsNothing);
+    expect(
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'Active'),
+        matching: find.byType(Checkbox),
+      ),
+      findsNothing,
+    );
+
+    expect(iconOn('Paused', Icons.close), findsOneWidget);
+    expect(iconOn('Paused', Icons.play_arrow), findsOneWidget);
+    expect(iconOn('Paused', Icons.stop), findsNothing);
+    expect(iconOn('Paused', Icons.pause), findsNothing);
+    expect(
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'Paused'),
+        matching: find.byType(Checkbox),
+      ),
+      findsNothing,
+    );
   });
 }
