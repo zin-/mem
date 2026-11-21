@@ -13,6 +13,7 @@ import 'package:mem/features/logger/log_repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
+import 'package:mem/features/mem_parents/child_mem_row.dart';
 import 'package:mem/features/mem_parents/mem_parent.dart';
 import 'package:mem/features/mems/detail/body.dart';
 import 'package:mem/features/mems/detail/page.dart';
@@ -133,6 +134,40 @@ void main() {
         of: find.widgetWithText(ListTile, name),
         matching: find.byIcon(icon),
       );
+
+  void expectChildAffordancesOutsideListItem(Iterable<String> names) {
+    expect(
+      find.descendant(
+        of: find.byType(MemListItemView),
+        matching: find.byIcon(Icons.subdirectory_arrow_right),
+      ),
+      findsNothing,
+    );
+    expect(
+      find.descendant(
+        of: find.byType(MemListItemView),
+        matching: find.byTooltip(_l10n.disconnectParentAction),
+      ),
+      findsNothing,
+    );
+    for (final name in names) {
+      final row = find.widgetWithText(ChildMemRow, name);
+      expect(
+        find.descendant(
+          of: row,
+          matching: find.byIcon(Icons.subdirectory_arrow_right),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: row,
+          matching: find.byTooltip(_l10n.disconnectParentAction),
+        ),
+        findsOneWidget,
+      );
+    }
+  }
 
   Future<ProviderContainer> pumpDetail(
     WidgetTester tester,
@@ -357,20 +392,7 @@ void main() {
     expect(find.text('Child A'), findsOneWidget);
     expect(find.text('Child B'), findsOneWidget);
     expect(find.text('Grandchild'), findsNothing);
-    expect(
-      find.descendant(
-        of: find.widgetWithText(ListTile, 'Child A'),
-        matching: find.byIcon(Icons.subdirectory_arrow_right),
-      ),
-      findsOneWidget,
-    );
-    expect(
-      find.descendant(
-        of: find.widgetWithText(ListTile, 'Child B'),
-        matching: find.byIcon(Icons.subdirectory_arrow_right),
-      ),
-      findsOneWidget,
-    );
+    expectChildAffordancesOutsideListItem(['Child A', 'Child B']);
     expect(
       tester.getTopLeft(find.byIcon(Icons.account_tree)).dy,
       lessThan(tester.getTopLeft(find.text('Child A')).dy),
@@ -400,8 +422,8 @@ void main() {
 
     await tester.tap(
       find.descendant(
-        of: find.widgetWithText(ListTile, 'Child A'),
-        matching: find.byIcon(Icons.close),
+        of: find.widgetWithText(ChildMemRow, 'Child A'),
+        matching: find.byTooltip(_l10n.disconnectParentAction),
       ),
     );
     await tester.pumpAndSettle(
@@ -859,25 +881,11 @@ void main() {
     );
 
     expect(find.byType(MemListItemView), findsNWidgets(3));
+    expectChildAffordancesOutsideListItem(['Open', 'Done', 'Blocked']);
     for (final name in ['Open', 'Done', 'Blocked']) {
-      final tile = find.widgetWithText(ListTile, name);
       expect(
         find.descendant(
-          of: tile,
-          matching: find.byIcon(Icons.subdirectory_arrow_right),
-        ),
-        findsOneWidget,
-      );
-      expect(
-        find.descendant(
-          of: tile,
-          matching: find.byIcon(Icons.close),
-        ),
-        findsOneWidget,
-      );
-      expect(
-        find.descendant(
-          of: tile,
+          of: find.widgetWithText(ListTile, name),
           matching: find.byType(MemNameText),
         ),
         findsOneWidget,
@@ -970,6 +978,7 @@ void main() {
     final container = await pumpDetail(tester, parent.id);
 
     expect(find.byType(MemListItemView), findsNWidgets(3));
+    expectChildAffordancesOutsideListItem(['Habit', 'Plain', 'Done habit']);
     expect(iconOn('Habit', Icons.play_arrow), findsOneWidget);
     expect(iconOn('Habit', Icons.stop), findsOneWidget);
     expect(iconOn('Habit', Icons.pause), findsNothing);
@@ -980,8 +989,6 @@ void main() {
       ),
       findsNothing,
     );
-    expect(iconOn('Habit', Icons.subdirectory_arrow_right), findsOneWidget);
-    expect(iconOn('Habit', Icons.close), findsOneWidget);
     expect(iconOn('Plain', Icons.play_arrow), findsOneWidget);
     expect(iconOn('Plain', Icons.stop), findsNothing);
     expect(iconOn('Done habit', Icons.play_arrow), findsNothing);
@@ -1000,7 +1007,7 @@ void main() {
     expect(entity(container, habit.id).latestAct, isA<ActiveAct>());
     expect(iconOn('Habit', Icons.play_arrow), findsNothing);
     expect(iconOn('Habit', Icons.stop), findsOneWidget);
-    expect(iconOn('Habit', Icons.pause), findsNothing);
+    expect(iconOn('Habit', Icons.pause), findsOneWidget);
 
     await tester.tap(iconOn('Habit', Icons.stop));
     await settle(tester);
@@ -1011,7 +1018,7 @@ void main() {
   });
 
   testWidgets(
-      'shows finish only while a habit child is active and start only while paused',
+      'shows pause and finish while a habit child is active and unpause and start while paused',
       (tester) async {
     final parent = await insertMem('Parent');
     final active = await insertMem('Active');
@@ -1033,10 +1040,11 @@ void main() {
     await pumpDetail(tester, parent.id);
 
     expect(find.byType(MemListItemView), findsNWidgets(2));
+    expectChildAffordancesOutsideListItem(['Active', 'Paused']);
+    expect(iconOn('Active', Icons.pause), findsOneWidget);
     expect(iconOn('Active', Icons.stop), findsOneWidget);
     expect(iconOn('Active', Icons.play_arrow), findsNothing);
-    expect(iconOn('Active', Icons.pause), findsNothing);
-    expect(iconOn('Active', Icons.close), findsOneWidget);
+    expect(iconOn('Active', Icons.close), findsNothing);
     expect(
       find.descendant(
         of: find.widgetWithText(ListTile, 'Active'),
@@ -1045,10 +1053,10 @@ void main() {
       findsNothing,
     );
 
+    expect(iconOn('Paused', Icons.close), findsOneWidget);
     expect(iconOn('Paused', Icons.play_arrow), findsOneWidget);
     expect(iconOn('Paused', Icons.stop), findsNothing);
     expect(iconOn('Paused', Icons.pause), findsNothing);
-    expect(iconOn('Paused', Icons.close), findsOneWidget);
     expect(
       find.descendant(
         of: find.widgetWithText(ListTile, 'Paused'),

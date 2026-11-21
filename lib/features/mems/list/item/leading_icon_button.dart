@@ -14,29 +14,25 @@ import 'finish_button.dart';
 class LeadingIconButton extends ConsumerWidget {
   final Mem _mem;
   final MemStatus _status;
-  final bool _showPause;
 
   const LeadingIconButton(
     this._mem,
     this._status, {
-    bool showPause = true,
     super.key,
-  }) : _showPause = showPause;
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => switch (_status) {
           MemStatus.undoneParent => const Icon(Icons.account_tree),
           MemStatus.notified => switch (_mem.latestAct) {
-              ActiveAct() when _showPause => PauseButton(_mem),
-              PausedAct() when _showPause => UnpauseButton(_mem),
-              // 一時停止を出さないとき、実行中の終了と一時停止中の開始は trailing だけ
-              ActiveAct() || PausedAct() => const SizedBox.shrink(),
+              ActiveAct() => PauseButton(_mem),
+              PausedAct() => UnpauseButton(_mem),
               _ => FinishButton(_mem, enableSkip: true),
             },
           MemStatus.doneable => switch (_mem.latestAct) {
-              ActiveAct() when _showPause => PauseButton(_mem),
-              PausedAct() when _showPause => UnpauseButton(_mem),
+              ActiveAct() => PauseButton(_mem),
+              PausedAct() => UnpauseButton(_mem),
               _ => MemDoneCheckbox(
                   _mem,
                   (value) => _editDone(ref, _mem.id as int, value),
@@ -46,7 +42,6 @@ class LeadingIconButton extends ConsumerWidget {
         {
           '_mem': _mem,
           '_status': _status,
-          '_showPause': _showPause,
         },
       );
 

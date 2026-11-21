@@ -19,16 +19,16 @@ class ChildMemRow extends StatelessWidget {
   Widget build(BuildContext context) => v(
         () {
           final l10n = buildL10n(context);
-          return MemListItemView(
-            _child,
-            showPause: false,
-            beforeLeading: const Icon(Icons.subdirectory_arrow_right),
-            afterTrailing: IconButton(
-              onPressed: _onDisconnect,
-              tooltip: l10n.disconnectParentAction,
-              icon: const Icon(Icons.close),
-            ),
-            contentPadding: EdgeInsets.zero,
+          return Row(
+            children: [
+              const Icon(Icons.subdirectory_arrow_right),
+              Expanded(child: MemListItemView(_child)),
+              IconButton(
+                onPressed: _onDisconnect,
+                tooltip: l10n.disconnectParentAction,
+                icon: const Icon(Icons.close),
+              ),
+            ],
           );
         },
         _child,
