@@ -46,6 +46,27 @@ void main() {
       expect(amount.count, 0);
       expect(amount.recorded, Duration.zero);
     });
+
+    test('ignores a skipped act', () {
+      // 1時間。スキップ側も同じ長さで、足すと実績が2時間になる
+      const finished = Duration(hours: 1);
+      final amount = ActAmount.of([
+        FinishedAct(
+          1,
+          DateAndTime(2026, 10, 2, 10),
+          DateAndTime(2026, 10, 2, 11),
+        ),
+        FinishedAct(
+          1,
+          DateAndTime(2026, 10, 2, 12),
+          DateAndTime(2026, 10, 2, 13),
+          actKind: ActKind.skipped,
+        ),
+      ]);
+
+      expect(amount.count, 1);
+      expect(amount.recorded, finished);
+    });
   });
 
   group('viewedDayActAmount', () {
