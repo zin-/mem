@@ -27,12 +27,19 @@ class LeadingIconButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => switch (_status) {
           MemStatus.undoneParent => const Icon(Icons.account_tree),
-          MemStatus.notified => _notifiedLeading(),
-          MemStatus.doneable => _pauseButton() ??
-              MemDoneCheckbox(
-                _mem,
-                (value) => _editDone(ref, _mem.id as int, value),
-              ),
+          MemStatus.notified => switch (_mem.latestAct) {
+              ActiveAct() when _showPause => PauseButton(_mem),
+              PausedAct() when _showPause => UnpauseButton(_mem),
+              _ => _notifiedLeading(),
+            },
+          MemStatus.doneable => switch (_mem.latestAct) {
+              ActiveAct() when _showPause => PauseButton(_mem),
+              PausedAct() when _showPause => UnpauseButton(_mem),
+              _ => MemDoneCheckbox(
+                  _mem,
+                  (value) => _editDone(ref, _mem.id as int, value),
+                ),
+            },
         },
         {
           '_mem': _mem,
@@ -41,18 +48,7 @@ class LeadingIconButton extends ConsumerWidget {
         },
       );
 
-  Widget? _pauseButton() {
-    if (!_showPause) return null;
-    return switch (_mem.latestAct) {
-      ActiveAct() => PauseButton(_mem),
-      PausedAct() => UnpauseButton(_mem),
-      _ => null,
-    };
-  }
-
   Widget _notifiedLeading() {
-    final pause = _pauseButton();
-    if (pause != null) return pause;
     // 一時停止を出さないとき、実行中の終了と一時停止中の開始は trailing だけ
     return switch (_mem.latestAct) {
       ActiveAct() || PausedAct() => const SizedBox.shrink(),
