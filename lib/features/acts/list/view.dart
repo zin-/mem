@@ -46,7 +46,8 @@ class _ActListState extends ConsumerState<ActList> {
   void initState() {
     super.initState();
     _groupUnit = widget.groupUnit;
-    _view = widget.view ?? ActListView.totalTime;
+    _view = widget.view ??
+        (widget.memId == null ? ActListView.totalTime : ActListView.eachAct);
     if (widget.scrollController != null) {
       _infiniteScrollController = InfiniteScrollController(
         scrollController: widget.scrollController!,
