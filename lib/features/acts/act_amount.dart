@@ -23,6 +23,8 @@ class ActAmount {
     var count = 0;
     var recorded = Duration.zero;
     for (final act in acts) {
+      // スキップは記録として残るが、実績ではない
+      if (act.isSkipped) continue;
       count += 1;
       recorded += act.period?.duration ?? Duration.zero;
     }
