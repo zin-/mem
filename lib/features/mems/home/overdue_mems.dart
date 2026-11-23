@@ -1,23 +1,63 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/features/mems/home/home_mems.dart';
+import 'package:mem/features/acts/act_query_service.dart';
+import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/home/mems_by_notify_at.dart';
+import 'package:mem/features/mems/list/list_period_count.dart';
 import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mems/mem_repository.dart';
+import 'package:mem/features/settings/preference/keys.dart';
+import 'package:mem/features/settings/states.dart';
+import 'package:mem/framework/date_and_time/date_time_ext.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final overdueMemsProvider =
-    FutureProvider.autoDispose<List<MemEntity>>((ref) async {
-  return HomeMems.of(
-    ref,
-    (mems, savedMemNotifications, {
-      required DateTime now,
-      required DateTime startOfToday,
-      Map<int, int> periodCountByMemId = const {},
-    }) =>
-        MemsByNotifyAt.of(
+part 'overdue_mems.g.dart';
+
+@riverpod
+Future<List<MemEntity>> overdueMems(Ref ref) => v(
+      () async {
+        final now = DateTime.now();
+        final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
+        final startOfToday = DateTimeExt.startOfToday(startOfDay, now);
+
+        final repository = MemRepository();
+        final candidateIds = await repository.shipOverdueCandidateIds(now: now);
+        if (candidateIds.isEmpty) return const [];
+
+        final mems = await repository.shipOverdueMaterials(candidateIds);
+
+        // 間隔目標だけ回数を読んでから選ぶ。未取得を 0 扱いにしない
+        final periodCountByMemId =
+            await ActQueryService().listPeriodCountsByMemId(
+          mems: [
+            for (final mem in mems)
+              if (mem.target?.secondsAfterLastAct != null)
+                (
+                  id: mem.id,
+                  target: mem.target,
+                  period: ListPeriodCount.period(
+                    target: mem.target!,
+                    latestAct: mem.latestAct,
+                    scheduleAnchorAct: mem.scheduleAnchorAct,
+                    startOfDay: startOfDay,
+                    now: now,
+                  ),
+                ),
+          ],
+        );
+
+        final notifications = [
+          for (final mem in mems)
+            for (final notification
+                in mem.repeatedNotifications ?? const <MemNotificationEntity>[])
+              SavedMemNotificationEntityV1.fromEntityV2(notification),
+        ];
+
+        return MemsByNotifyAt.of(
           mems,
-          savedMemNotifications,
+          notifications,
           startOfToday: startOfToday,
           periodCountByMemId: periodCountByMemId,
           include: (notifyAt) => notifyAt.isBefore(now),
-        ).mems,
-  );
-});
+        ).mems;
+      },
+    );

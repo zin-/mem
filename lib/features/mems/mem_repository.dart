@@ -402,6 +402,90 @@ class MemRepository extends DriftRepository {
         },
       );
 
+  Future<Set<int>> shipOverdueCandidateIds({required DateTime now}) => v(
+        () async {
+          final memId = driftDb.mems.id;
+          final active = driftDb.mems.doneAt.isNull() &
+              driftDb.mems.archivedAt.isNull();
+
+          final byPeriod = await (driftDb.selectOnly(driftDb.mems)
+                ..addColumns([memId])
+                ..where(
+                  active &
+                      (driftDb.mems.notifyOn.isSmallerThanValue(now) |
+                          driftDb.mems.notifyAt.isSmallerThanValue(now) |
+                          driftDb.mems.endOn.isSmallerThanValue(now) |
+                          driftDb.mems.endAt.isSmallerThanValue(now)),
+                ))
+              .get();
+
+          final byNotification = await (driftDb.selectOnly(driftDb.mems)
+                ..addColumns([memId])
+                ..join([
+                  drift.innerJoin(
+                    driftDb.memRepeatedNotifications,
+                    driftDb.memRepeatedNotifications.memId.equalsExp(memId),
+                  ),
+                ])
+                ..where(
+                  active &
+                      driftDb.memRepeatedNotifications.archivedAt.isNull() &
+                      driftDb.memRepeatedNotifications.type
+                          .equals(MemNotificationType.afterActStarted.name)
+                          .not(),
+                ))
+              .get();
+
+          final byIntervalTarget = await (driftDb.selectOnly(driftDb.mems)
+                ..addColumns([memId])
+                ..join([
+                  drift.innerJoin(
+                    driftDb.targets,
+                    driftDb.targets.memId.equalsExp(memId),
+                  ),
+                ])
+                ..where(
+                  active & driftDb.targets.secondsAfterLastAct.isNotNull(),
+                ))
+              .get();
+
+          return {
+            for (final row in byPeriod) row.read(memId)!,
+            for (final row in byNotification) row.read(memId)!,
+            for (final row in byIntervalTarget) row.read(memId)!,
+          };
+        },
+        {'now': now},
+      );
+
+  // items / prepost / act 履歴は Overdue 確定に不要なので読まない
+  Future<List<MemEntity>> shipOverdueMaterials(Iterable<int> ids) => v(
+        () async {
+          final idList = ids.toSet().toList();
+          if (idList.isEmpty) return const [];
+
+          final rows = await (driftDb.select(driftDb.mems)
+                ..where((t) => t.id.isIn(idList)))
+              .get();
+          final notificationsByMemId =
+              await _repeatedNotificationsByMemId(idList);
+          final targetsByMemId = await _targetsByMemId(idList);
+          final entities = [
+            for (final row in rows)
+              MemEntity.fromTuple(
+                row,
+                children: {
+                  'mem_repeated_notifications': notificationsByMemId[row.id] ??
+                      const <MemNotificationEntity>[],
+                  'target': targetsByMemId[row.id],
+                },
+              ),
+          ];
+          return _attachLatestActs(entities);
+        },
+        {'ids': ids},
+      );
+
   Future<List<MemParent>> wasteParents({int? memId}) => v(
         () async {
           var query = driftDb.delete(driftDb.memParents);
