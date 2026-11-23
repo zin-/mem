@@ -23,12 +23,14 @@ class ActList extends ConsumerStatefulWidget {
   final int? memId;
   final ScrollController? scrollController;
   final Period groupUnit;
+  final ActListView? view;
 
   const ActList(
     this.memId,
     this.scrollController, {
     super.key,
     this.groupUnit = Period.aDay,
+    this.view,
   });
 
   @override
@@ -37,13 +39,15 @@ class ActList extends ConsumerStatefulWidget {
 
 class _ActListState extends ConsumerState<ActList> {
   late Period _groupUnit;
-  ActListView _view = ActListView.totalTime;
+  late ActListView _view;
   InfiniteScrollController? _infiniteScrollController;
 
   @override
   void initState() {
     super.initState();
     _groupUnit = widget.groupUnit;
+    _view = widget.view ??
+        (widget.memId == null ? ActListView.totalTime : ActListView.eachAct);
     if (widget.scrollController != null) {
       _infiniteScrollController = InfiniteScrollController(
         scrollController: widget.scrollController!,
