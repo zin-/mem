@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/framework/date_and_time/period.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
-import 'package:mem/features/mems/home/overdue_mems.dart';
+import 'package:mem/features/mems/home/mems_by_notify_at.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
@@ -44,15 +44,15 @@ void main() {
     Iterable<SavedMemNotificationEntityV1> savedMemNotifications = const [],
     Map<int, int> periodCountByMemId = const {},
   ]) =>
-      overdueMems(
+      MemsByNotifyAt.of(
         mems,
         savedMemNotifications,
-        now: now,
         startOfToday: startOfToday,
         periodCountByMemId: periodCountByMemId,
-      ).map((mem) => mem.id).toList();
+        include: (notifyAt) => notifyAt.isBefore(now),
+      ).mems.map((mem) => mem.id).toList();
 
-  group('overdueMems', () {
+  group('MemsByNotifyAt overdue', () {
     test('returns every notifyAt before now in ascending order', () {
       expect(
         ids([
