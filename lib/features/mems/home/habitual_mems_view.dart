@@ -16,7 +16,8 @@ class HabitualMemsView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
           final shownIds = <int>{
-            for (final mem in ref.watch(overdueMemsProvider)) mem.id,
+            for (final mem in ref.watch(overdueMemsProvider).value ?? const [])
+              mem.id,
             for (final mem in ref.watch(upcomingMemsProvider)) mem.id,
           };
           final count = ref.watch(preferenceProvider(habitualMemsCountKey));
