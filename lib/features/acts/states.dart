@@ -233,6 +233,26 @@ class ActEntities extends _$ActEntities
       );
 }
 
+@Riverpod()
+class ActsGroundedByMemIdByDate extends _$ActsGroundedByMemIdByDate {
+  @override
+  Map<int, Iterable<SavedActEntityV1>> build(DateTime date) => d(
+        () {
+          final acts = ref.watch(actEntitiesProvider);
+
+          return acts.fold(
+            <int, Iterable<SavedActEntityV1>>{},
+            (map, act) => map
+              ..putIfAbsent(
+                act.value.memId,
+                () => [...(map[act.value.memId] ?? []), act],
+              ),
+          );
+        },
+        {'date': date},
+      );
+}
+
 @riverpod
 Future<void> loadActList(Ref ref, int memId, Period period, int offset) => v(
       () async {
