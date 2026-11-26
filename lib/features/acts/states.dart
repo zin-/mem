@@ -238,6 +238,7 @@ class ActEntities extends _$ActEntities
 @Riverpod(keepAlive: true)
 class ActCountsByMemIdByDate extends _$ActCountsByMemIdByDate {
   bool _loaded = false;
+
   @override
   Map<int, int> build(DateTime date) => v(
         () {
@@ -255,7 +256,7 @@ class ActCountsByMemIdByDate extends _$ActCountsByMemIdByDate {
         {'date': date},
       );
 
-  Future<Map<int, int>> load(DateTime date) => v(
+  Future<Map<int, int>> load() => v(
         () async {
           if (_loaded) return state;
 

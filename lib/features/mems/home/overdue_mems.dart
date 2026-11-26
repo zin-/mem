@@ -63,9 +63,8 @@ class OverdueMems extends _$OverdueMems {
             .shipOverdueMaterials(candidateMems.map((mem) => mem.id));
 
         // 間隔目標だけ回数を読んでから選ぶ。未取得を 0 扱いにしない
-        final actCountsByMemId = await ref
-            .read(actCountsByMemIdByDateProvider(now).notifier)
-            .load(now);
+        final actCountsByMemId =
+            await ref.read(actCountsByMemIdByDateProvider(now).notifier).load();
 
         final notifications = [
           for (final mem in mems)
