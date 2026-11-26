@@ -55,11 +55,12 @@ class OverdueMems extends _$OverdueMems {
         final startOfDay = ref.read(preferenceProvider(startOfDayKey));
         final startOfToday = now.atStartOfDay(startOfDay);
 
-        final candidateIds =
+        final candidateMems =
             await _memRepository.shipOverdueCandidateIds(now: now);
-        if (candidateIds.isEmpty) return const [];
+        if (candidateMems.isEmpty) return const [];
 
-        final mems = await _memRepository.shipOverdueMaterials(candidateIds);
+        final mems = await _memRepository
+            .shipOverdueMaterials(candidateMems.map((mem) => mem.id));
 
         // 間隔目標だけ回数を読んでから選ぶ。未取得を 0 扱いにしない
         final actCountsByMemId = await ref

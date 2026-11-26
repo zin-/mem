@@ -402,16 +402,21 @@ class MemRepository extends DriftRepository {
         },
       );
 
-  Future<Set<int>> shipOverdueCandidateIds({required DateTime now}) => v(
+  // FIXME intだけ返してもしょうがない気がする
+  // パフォーマンスに差がないのであればMemEntityを返すようにする
+  Future<Iterable<MemEntity>> shipOverdueCandidateIds(
+          {required DateTime now}) =>
+      v(
         () async {
           final memId = driftDb.mems.id;
-          final active = driftDb.mems.doneAt.isNull() &
-              driftDb.mems.archivedAt.isNull();
+          final active =
+              driftDb.mems.doneAt.isNull() & driftDb.mems.archivedAt.isNull();
 
-          final byPeriod = await (driftDb.selectOnly(driftDb.mems)
-                ..addColumns([memId])
+          // 単体テーブルは select() を使うと List<Mem>（テーブル行クラス）が直接返る
+          final byPeriod = await (driftDb.select(driftDb.mems)
                 ..where(
-                  active &
+                  (_) =>
+                      active &
                       (driftDb.mems.notifyOn.isSmallerThanValue(now) |
                           driftDb.mems.notifyAt.isSmallerThanValue(now) |
                           driftDb.mems.endOn.isSmallerThanValue(now) |
@@ -419,14 +424,13 @@ class MemRepository extends DriftRepository {
                 ))
               .get();
 
-          final byNotification = await (driftDb.selectOnly(driftDb.mems)
-                ..addColumns([memId])
-                ..join([
-                  drift.innerJoin(
-                    driftDb.memRepeatedNotifications,
-                    driftDb.memRepeatedNotifications.memId.equalsExp(memId),
-                  ),
-                ])
+          // join する場合は select(table).join([...]) にすると readTable() が使える
+          final byNotification = await (driftDb.select(driftDb.mems).join([
+            drift.innerJoin(
+              driftDb.memRepeatedNotifications,
+              driftDb.memRepeatedNotifications.memId.equalsExp(memId),
+            ),
+          ])
                 ..where(
                   active &
                       driftDb.memRepeatedNotifications.archivedAt.isNull() &
@@ -436,24 +440,29 @@ class MemRepository extends DriftRepository {
                 ))
               .get();
 
-          final byIntervalTarget = await (driftDb.selectOnly(driftDb.mems)
-                ..addColumns([memId])
-                ..join([
-                  drift.innerJoin(
-                    driftDb.targets,
-                    driftDb.targets.memId.equalsExp(memId),
-                  ),
-                ])
+          final byIntervalTarget = await (driftDb.select(driftDb.mems).join([
+            drift.innerJoin(
+              driftDb.targets,
+              driftDb.targets.memId.equalsExp(memId),
+            ),
+          ])
                 ..where(
                   active & driftDb.targets.secondsAfterLastAct.isNotNull(),
                 ))
               .get();
 
-          return {
-            for (final row in byPeriod) row.read(memId)!,
-            for (final row in byNotification) row.read(memId)!,
-            for (final row in byIntervalTarget) row.read(memId)!,
+          // 複数条件にヒットした場合や複数通知を持つ場合の重複を id で排除
+          final byId = <int, MemEntity>{
+            for (final row in byPeriod) row.id: MemEntity.fromTuple(row),
+            for (final row in byNotification)
+              row.readTable(driftDb.mems).id:
+                  MemEntity.fromTuple(row.readTable(driftDb.mems)),
+            for (final row in byIntervalTarget)
+              row.readTable(driftDb.mems).id:
+                  MemEntity.fromTuple(row.readTable(driftDb.mems)),
           };
+
+          return byId.values;
         },
         {'now': now},
       );

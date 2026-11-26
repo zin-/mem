@@ -263,11 +263,12 @@ class ActCountsByMemIdByDate extends _$ActCountsByMemIdByDate {
           final startOfDay = ref.read(preferenceProvider(startOfDayKey));
 
           final repository = MemRepository();
-          final candidateIds =
+          final candidateMems =
               await repository.shipOverdueCandidateIds(now: now);
-          if (candidateIds.isEmpty) return <int, int>{};
+          if (candidateMems.isEmpty) return <int, int>{};
 
-          final mems = await repository.shipOverdueMaterials(candidateIds);
+          final mems = await repository
+              .shipOverdueMaterials(candidateMems.map((mem) => mem.id));
 
           final periodCountByMemId =
               await ActQueryService().listPeriodCountsByMemId(
