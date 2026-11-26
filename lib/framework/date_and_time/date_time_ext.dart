@@ -17,6 +17,7 @@ extension DateTimeExt on DateTime {
     return WithStartAndEnd(start, start.shiftCalendarDays(1));
   }
 
+  @Deprecated('Use atStartOfDay instead')
   static DateTime startOfToday(TimeOfDay startOfDay, [DateTime? now]) {
     final current = now ?? DateTime.now();
     return DateTime(

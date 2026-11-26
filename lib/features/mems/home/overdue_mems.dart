@@ -51,7 +51,7 @@ class OverdueMems extends _$OverdueMems {
 
         final now = DateTime.now();
         final startOfDay = ref.read(preferenceProvider(startOfDayKey));
-        final startOfToday = DateTimeExt.startOfToday(startOfDay, now);
+        final startOfToday = now.atStartOfDay(startOfDay);
 
         final repository = MemRepository();
         final candidateIds = await repository.shipOverdueCandidateIds(now: now);
