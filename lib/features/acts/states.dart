@@ -1,6 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/acts/client.dart';
 import 'package:mem/features/mems/list/list_period_count.dart';
@@ -343,28 +341,4 @@ List<SavedActEntityV1> actList(Ref ref, int? memId) => v(
       {
         'memId': memId,
       },
-    );
-
-@riverpod
-Map<int, Act?>? latestActsByMem(Ref ref) => v(
-      () => ref.watch(
-        actEntitiesProvider.select(
-          (value) => value
-              .groupListsBy(
-                (element) => element.value.memId,
-              )
-              .map(
-                (key, value) => MapEntry(
-                  key,
-                  value
-                      .sorted(
-                        (a, b) => (b.value.period?.start ?? b.createdAt)
-                            .compareTo(a.value.period?.start ?? a.createdAt),
-                      )
-                      .firstOrNull
-                      ?.value,
-                ),
-              ),
-        ),
-      ),
     );
