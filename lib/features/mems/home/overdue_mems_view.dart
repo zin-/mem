@@ -5,18 +5,28 @@ import 'package:mem/features/mems/home/home_mems_card.dart';
 import 'package:mem/features/mems/home/overdue_mems.dart';
 import 'package:mem/values/colors.dart';
 
-class OverdueMemsView extends ConsumerWidget {
+class OverdueMemsView extends ConsumerStatefulWidget {
   const OverdueMemsView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => v(
-        () {
-          ref.read(overdueMemsProvider.notifier).load();
+  ConsumerState<OverdueMemsView> createState() => _OverdueMemsViewState();
+}
 
-          return HomeMemsCard(
-            ref.watch(overdueMemsProvider),
-            color: warningSurfaceOn(Theme.of(context).colorScheme.surface),
-          );
-        },
+class _OverdueMemsViewState extends ConsumerState<OverdueMemsView> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(overdueMemsProvider.notifier).load();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => v(
+        () => HomeMemsCard(
+          ref.watch(overdueMemsProvider),
+          color: warningSurfaceOn(Theme.of(context).colorScheme.surface),
+        ),
       );
 }

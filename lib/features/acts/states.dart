@@ -235,7 +235,7 @@ class ActEntities extends _$ActEntities
       );
 }
 
-@Riverpod()
+@Riverpod(keepAlive: true)
 class ActCountsByMemIdByDate extends _$ActCountsByMemIdByDate {
   bool _loaded = false;
   @override

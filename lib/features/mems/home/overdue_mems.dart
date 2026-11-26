@@ -22,7 +22,7 @@ class OverdueMems extends _$OverdueMems {
         final startOfDay = ref.read(preferenceProvider(startOfDayKey));
         final startOfToday = DateTimeExt.startOfToday(startOfDay, now);
 
-        final mems = ref.refresh(memEntitiesProvider);
+        final mems = ref.watch(memEntitiesProvider);
 
         final notifications = [
           for (final mem in mems)
