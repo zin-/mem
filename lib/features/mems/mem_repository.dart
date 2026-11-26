@@ -466,6 +466,10 @@ class MemRepository extends DriftRepository {
       );
 
   // items / prepost / act 履歴は Overdue 確定に不要なので読まない
+  // FIXME shipOverdueCandidateIdsと統合するべきじゃね？
+  // FIXME あとMemEntity.fromTupleで毎回MemEntityを作るべき
+  // - 取得できていなければnullでいい
+  // - nullで必要な場合は、取得し直して更新したらいい
   Future<List<MemEntity>> shipOverdueMaterials(Iterable<int> ids) => v(
         () async {
           final idList = ids.toSet().toList();
