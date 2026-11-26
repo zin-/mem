@@ -61,10 +61,14 @@ class OverdueMems extends _$OverdueMems {
 
         final mems = await _memRepository
             .shipOverdueMaterials(candidateMems.map((mem) => mem.id));
+        // FIXME ここでmemsが確定したのであれば、ここでmemEntities?stateを更新するべき
 
         // 間隔目標だけ回数を読んでから選ぶ。未取得を 0 扱いにしない
+        // FIXME ActCountsByMemIdByDate.loadってかなり同じ処理してない？
+        // - とりあえず重複は統合するべき
         final actCountsByMemId =
             await ref.read(actCountsByMemIdByDateProvider(now).notifier).load();
+        // FIXME actsも更新する
 
         final notifications = [
           for (final mem in mems)
