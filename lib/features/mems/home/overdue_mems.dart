@@ -14,6 +14,8 @@ part 'overdue_mems.g.dart';
 
 @Riverpod()
 class OverdueMems extends _$OverdueMems {
+  final _memRepository = MemRepository();
+
   bool _loaded = false;
 
   @override
@@ -53,11 +55,11 @@ class OverdueMems extends _$OverdueMems {
         final startOfDay = ref.read(preferenceProvider(startOfDayKey));
         final startOfToday = now.atStartOfDay(startOfDay);
 
-        final repository = MemRepository();
-        final candidateIds = await repository.shipOverdueCandidateIds(now: now);
+        final candidateIds =
+            await _memRepository.shipOverdueCandidateIds(now: now);
         if (candidateIds.isEmpty) return const [];
 
-        final mems = await repository.shipOverdueMaterials(candidateIds);
+        final mems = await _memRepository.shipOverdueMaterials(candidateIds);
 
         // 間隔目標だけ回数を読んでから選ぶ。未取得を 0 扱いにしない
         final actCountsByMemId = await ref
