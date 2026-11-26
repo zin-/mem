@@ -402,8 +402,6 @@ class MemRepository extends DriftRepository {
         },
       );
 
-  // FIXME intだけ返してもしょうがない気がする
-  // パフォーマンスに差がないのであればMemEntityを返すようにする
   Future<Iterable<MemEntity>> shipOverdueCandidateIds(
           {required DateTime now}) =>
       v(
