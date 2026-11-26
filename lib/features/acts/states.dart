@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/acts/client.dart';
+import 'package:mem/features/mems/list/list_period_count.dart';
+import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/framework/date_and_time/period.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
@@ -234,20 +236,62 @@ class ActEntities extends _$ActEntities
 }
 
 @Riverpod()
-class ActsGroundedByMemIdByDate extends _$ActsGroundedByMemIdByDate {
+class ActCountsByMemIdByDate extends _$ActCountsByMemIdByDate {
+  bool _loaded = false;
   @override
-  Map<int, Iterable<SavedActEntityV1>> build(DateTime date) => d(
+  Map<int, int> build(DateTime date) => v(
         () {
           final acts = ref.watch(actEntitiesProvider);
 
           return acts.fold(
-            <int, Iterable<SavedActEntityV1>>{},
+            <int, int>{},
             (map, act) => map
               ..putIfAbsent(
                 act.value.memId,
-                () => [...(map[act.value.memId] ?? []), act],
+                () => (map[act.value.memId] ?? 0) + 1,
               ),
           );
+        },
+        {'date': date},
+      );
+
+  Future<Map<int, int>> load(DateTime date) => v(
+        () async {
+          if (_loaded) return state;
+
+          final now = DateTime.now();
+          final startOfDay = ref.read(preferenceProvider(startOfDayKey));
+
+          final repository = MemRepository();
+          final candidateIds =
+              await repository.shipOverdueCandidateIds(now: now);
+          if (candidateIds.isEmpty) return <int, int>{};
+
+          final mems = await repository.shipOverdueMaterials(candidateIds);
+
+          final periodCountByMemId =
+              await ActQueryService().listPeriodCountsByMemId(
+            mems: [
+              for (final mem in mems)
+                if (mem.target?.secondsAfterLastAct != null)
+                  (
+                    id: mem.id,
+                    target: mem.target,
+                    period: ListPeriodCount.period(
+                      target: mem.target!,
+                      latestAct: mem.latestAct,
+                      scheduleAnchorAct: mem.scheduleAnchorAct,
+                      startOfDay: startOfDay,
+                      now: now,
+                    ),
+                  ),
+            ],
+          );
+
+          _loaded = true;
+          state = periodCountByMemId;
+
+          return periodCountByMemId;
         },
         {'date': date},
       );

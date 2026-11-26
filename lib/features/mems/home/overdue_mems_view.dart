@@ -11,7 +11,7 @@ class OverdueMemsView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
-          ref.watch(overdueMemsProvider.notifier).load();
+          ref.read(overdueMemsProvider.notifier).load();
 
           return HomeMemsCard(
             ref.watch(overdueMemsProvider),

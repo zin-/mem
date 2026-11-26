@@ -1,9 +1,7 @@
-import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/home/mems_by_notify_at.dart';
-import 'package:mem/features/mems/list/list_period_count.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mems/mems_state.dart';
@@ -19,9 +17,9 @@ class OverdueMems extends _$OverdueMems {
   bool _loaded = false;
 
   @override
-  List<MemEntity> build() => d(() {
+  List<MemEntity> build() => v(() {
         final now = DateTime.now();
-        final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
+        final startOfDay = ref.read(preferenceProvider(startOfDayKey));
         final startOfToday = DateTimeExt.startOfToday(startOfDay, now);
 
         final mems = ref.refresh(memEntitiesProvider);
@@ -34,8 +32,8 @@ class OverdueMems extends _$OverdueMems {
         ];
 
         final periodCountByMemId = ref
-            .read(actsGroundedByMemIdByDateProvider(now))
-            .map((memId, acts) => MapEntry(memId, acts.length));
+            .read(actCountsByMemIdByDateProvider(now))
+            .map((memId, count) => MapEntry(memId, count));
 
         final memsByNotifyAt = MemsByNotifyAt.of(
           mems,
@@ -52,7 +50,7 @@ class OverdueMems extends _$OverdueMems {
         if (_loaded) return state;
 
         final now = DateTime.now();
-        final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
+        final startOfDay = ref.read(preferenceProvider(startOfDayKey));
         final startOfToday = DateTimeExt.startOfToday(startOfDay, now);
 
         final repository = MemRepository();
@@ -62,24 +60,9 @@ class OverdueMems extends _$OverdueMems {
         final mems = await repository.shipOverdueMaterials(candidateIds);
 
         // 間隔目標だけ回数を読んでから選ぶ。未取得を 0 扱いにしない
-        final periodCountByMemId =
-            await ActQueryService().listPeriodCountsByMemId(
-          mems: [
-            for (final mem in mems)
-              if (mem.target?.secondsAfterLastAct != null)
-                (
-                  id: mem.id,
-                  target: mem.target,
-                  period: ListPeriodCount.period(
-                    target: mem.target!,
-                    latestAct: mem.latestAct,
-                    scheduleAnchorAct: mem.scheduleAnchorAct,
-                    startOfDay: startOfDay,
-                    now: now,
-                  ),
-                ),
-          ],
-        );
+        final actCountsByMemId = await ref
+            .read(actCountsByMemIdByDateProvider(now).notifier)
+            .load(now);
 
         final notifications = [
           for (final mem in mems)
@@ -92,7 +75,7 @@ class OverdueMems extends _$OverdueMems {
           mems,
           notifications,
           startOfToday: startOfToday,
-          periodCountByMemId: periodCountByMemId,
+          periodCountByMemId: actCountsByMemId,
           include: (notifyAt) => notifyAt.isBefore(now),
         );
 
