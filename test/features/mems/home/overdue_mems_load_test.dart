@@ -131,7 +131,7 @@ void main() {
     // autoDispose の読み取り中に dispose されないよう購読を残す
     final sub = scope.listen(overdueMemsProvider, (_, __) {});
     addTearDown(sub.close);
-    final overdue = await scope.read(overdueMemsProvider.future);
+    final overdue = scope.read(overdueMemsProvider);
     return overdue.map((mem) => mem.id).toList();
   }
 

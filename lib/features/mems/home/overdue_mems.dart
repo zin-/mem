@@ -12,9 +12,16 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'overdue_mems.g.dart';
 
-@riverpod
-Future<List<MemEntity>> overdueMems(Ref ref) => v(
-      () async {
+@Riverpod()
+class OverdueMems extends _$OverdueMems {
+  bool _loaded = false;
+
+  @override
+  List<MemEntity> build() => v(() => const []);
+
+  Future<List<MemEntity>> load() => d(() async {
+        if (_loaded) return state;
+
         final now = DateTime.now();
         final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
         final startOfToday = DateTimeExt.startOfToday(startOfDay, now);
@@ -52,12 +59,17 @@ Future<List<MemEntity>> overdueMems(Ref ref) => v(
               SavedMemNotificationEntityV1.fromEntityV2(notification),
         ];
 
-        return MemsByNotifyAt.of(
+        final memsByNotifyAt = MemsByNotifyAt.of(
           mems,
           notifications,
           startOfToday: startOfToday,
           periodCountByMemId: periodCountByMemId,
           include: (notifyAt) => notifyAt.isBefore(now),
-        ).mems;
-      },
-    );
+        );
+
+        _loaded = true;
+        state = memsByNotifyAt.mems;
+
+        return memsByNotifyAt.mems;
+      });
+}

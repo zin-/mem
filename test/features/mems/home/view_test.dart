@@ -29,19 +29,22 @@ const _reloadLoadCount = 2;
 const _reloadedNameSuffix = ' reloaded';
 
 // view は memEntities のフェイクで描く。本番の overdue は DB 候補取得
-Future<List<MemEntity>> _overdueFromMemEntities(Ref ref) async {
-  final mems = ref.watch(memEntitiesProvider);
-  final notifications = ref.watch(savedMemNotificationsProvider);
-  final startOfToday = DateTimeExt.startOfToday(
-    ref.watch(preferenceProvider(startOfDayKey)),
-  );
-  return MemsByNotifyAt.of(
-    mems,
-    notifications,
-    startOfToday: startOfToday,
-    periodCountByMemId: const {},
-    include: (notifyAt) => notifyAt.isBefore(DateTime.now()),
-  ).mems;
+class _FakeOverdueMems extends OverdueMems {
+  @override
+  List<MemEntity> build() {
+    final mems = ref.watch(memEntitiesProvider);
+    final notifications = ref.watch(savedMemNotificationsProvider);
+    final startOfToday = DateTimeExt.startOfToday(
+      ref.watch(preferenceProvider(startOfDayKey)),
+    );
+    return MemsByNotifyAt.of(
+      mems,
+      notifications,
+      startOfToday: startOfToday,
+      periodCountByMemId: const {},
+      include: (notifyAt) => notifyAt.isBefore(DateTime.now()),
+    ).mems;
+  }
 }
 
 class _FakeMemEntities extends MemEntities {
@@ -158,7 +161,7 @@ void main() {
               memNotificationsByMemIdProvider(mem.id).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
               ),
-            overdueMemsProvider.overrideWith(_overdueFromMemEntities),
+            overdueMemsProvider.overrideWith(_FakeOverdueMems.new),
             habitualMemsProvider.overrideWith((ref) async => <HabitualMem>[]),
           ],
           child: MaterialApp(
@@ -232,7 +235,7 @@ void main() {
               memNotificationsByMemIdProvider(mem.id).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
               ),
-            overdueMemsProvider.overrideWith(_overdueFromMemEntities),
+            overdueMemsProvider.overrideWith(_FakeOverdueMems.new),
             habitualMemsProvider.overrideWith((ref) async => <HabitualMem>[]),
           ],
           child: MaterialApp(
@@ -367,7 +370,7 @@ void main() {
               memNotificationsByMemIdProvider(mem.id).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
               ),
-            overdueMemsProvider.overrideWith(_overdueFromMemEntities),
+            overdueMemsProvider.overrideWith(_FakeOverdueMems.new),
             habitualMemsProvider.overrideWith(
               (ref) async => [
                 habitualMem(overdueEarly),
@@ -459,7 +462,7 @@ void main() {
               memNotificationsByMemIdProvider(mem.id).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
               ),
-            overdueMemsProvider.overrideWith(_overdueFromMemEntities),
+            overdueMemsProvider.overrideWith(_FakeOverdueMems.new),
             habitualMemsProvider.overrideWith(
               (ref) async => [
                 habitualMem(overdue),
@@ -541,7 +544,7 @@ void main() {
               memNotificationsByMemIdProvider(mem.id).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
               ),
-            overdueMemsProvider.overrideWith(_overdueFromMemEntities),
+            overdueMemsProvider.overrideWith(_FakeOverdueMems.new),
             habitualMemsProvider.overrideWith(
               (ref) async => [
                 habitualMem(overdue),
@@ -624,7 +627,7 @@ void main() {
               memNotificationsByMemIdProvider(mem.id).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
               ),
-            overdueMemsProvider.overrideWith(_overdueFromMemEntities),
+            overdueMemsProvider.overrideWith(_FakeOverdueMems.new),
             habitualMemsProvider.overrideWith(
               (ref) async => [
                 habitualMem(
@@ -767,7 +770,7 @@ void main() {
                   : periodCountAfterReload;
               return {countedMemId: count};
             }),
-            overdueMemsProvider.overrideWith(_overdueFromMemEntities),
+            overdueMemsProvider.overrideWith(_FakeOverdueMems.new),
             habitualMemsProvider.overrideWith((ref) async {
               habitualBuilds += 1;
               final mem = habitualBuilds == 1 ? often : later;

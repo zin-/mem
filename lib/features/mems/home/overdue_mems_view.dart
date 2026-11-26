@@ -10,9 +10,13 @@ class OverdueMemsView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () => HomeMemsCard(
-          ref.watch(overdueMemsProvider).value ?? const [],
-          color: warningSurfaceOn(Theme.of(context).colorScheme.surface),
-        ),
+        () {
+          ref.watch(overdueMemsProvider.notifier).load();
+
+          return HomeMemsCard(
+            ref.watch(overdueMemsProvider),
+            color: warningSurfaceOn(Theme.of(context).colorScheme.surface),
+          );
+        },
       );
 }
