@@ -460,19 +460,7 @@ class MemRepository extends DriftRepository {
                   MemEntity.fromTuple(row.readTable(driftDb.mems)),
           };
 
-          return byId.values;
-        },
-        {'now': now},
-      );
-
-  // items / prepost / act 履歴は Overdue 確定に不要なので読まない
-  // FIXME shipOverdueCandidateIdsと統合するべきじゃね？
-  // FIXME あとMemEntity.fromTupleで毎回MemEntityを作るべき
-  // - 取得できていなければnullでいい
-  // - nullで必要な場合は、取得し直して更新したらいい
-  Future<List<MemEntity>> shipOverdueMaterials(Iterable<int> ids) => v(
-        () async {
-          final idList = ids.toSet().toList();
+          final idList = byId.values.map((e) => e.id).toSet().toList();
           if (idList.isEmpty) return const [];
 
           final rows = await (driftDb.select(driftDb.mems)
@@ -494,7 +482,7 @@ class MemRepository extends DriftRepository {
           ];
           return _attachLatestActs(entities);
         },
-        {'ids': ids},
+        {'now': now},
       );
 
   Future<List<MemParent>> wasteParents({int? memId}) => v(

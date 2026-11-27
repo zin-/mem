@@ -235,6 +235,8 @@ class ActEntities extends _$ActEntities
 
 @Riverpod(keepAlive: true)
 class ActCountsByMemIdByDate extends _$ActCountsByMemIdByDate {
+  final _memRepository = MemRepository();
+
   bool _loaded = false;
 
   @override
@@ -261,13 +263,9 @@ class ActCountsByMemIdByDate extends _$ActCountsByMemIdByDate {
           final now = DateTime.now();
           final startOfDay = ref.read(preferenceProvider(startOfDayKey));
 
-          final repository = MemRepository();
-          final candidateMems =
-              await repository.shipOverdueCandidateIds(now: now);
-          if (candidateMems.isEmpty) return <int, int>{};
-
-          final mems = await repository
-              .shipOverdueMaterials(candidateMems.map((mem) => mem.id));
+          final mems = await _memRepository.shipOverdueCandidateIds(now: now);
+          if (mems.isEmpty) return <int, int>{};
+          // FIXME ここでmemsが確定したのであれば、ここでmemEntities?stateを更新するべき
 
           final periodCountByMemId =
               await ActQueryService().listPeriodCountsByMemId(
