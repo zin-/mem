@@ -292,6 +292,7 @@ class ActCountsByMemIdByDate extends _$ActCountsByMemIdByDate {
                   ),
             ],
           );
+          // FIXME actsを更新する
 
           _loaded = true;
           state = periodCountByMemId;

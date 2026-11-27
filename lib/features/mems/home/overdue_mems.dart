@@ -60,11 +60,9 @@ class OverdueMems extends _$OverdueMems {
         ref.read(memEntitiesProvider.notifier).upsert(mems);
 
         // 間隔目標だけ回数を読んでから選ぶ。未取得を 0 扱いにしない
-        // FIXME ActCountsByMemIdByDate.loadってかなり同じ処理してない？
-        // - とりあえず重複は統合するべき
+        // FIXME このコメントなんだ？意味が分からない
         final actCountsByMemId =
             await ref.read(actCountsByMemIdByDateProvider(now).notifier).load();
-        // FIXME actsも更新する
 
         final notifications = [
           for (final mem in mems)
