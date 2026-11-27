@@ -2,7 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/acts/client.dart';
 import 'package:mem/features/mems/list/list_period_count.dart';
-import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/framework/date_and_time/period.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
@@ -235,8 +234,6 @@ class ActEntities extends _$ActEntities
 
 @Riverpod(keepAlive: true)
 class ActCountsByMemIdByDate extends _$ActCountsByMemIdByDate {
-  final _memRepository = MemRepository();
-
   bool _loaded = false;
 
   @override
@@ -263,9 +260,8 @@ class ActCountsByMemIdByDate extends _$ActCountsByMemIdByDate {
           final now = DateTime.now();
           final startOfDay = ref.read(preferenceProvider(startOfDayKey));
 
-          final mems = await _memRepository.shipOverdueCandidateIds(now: now);
+          final mems = ref.read(memEntitiesProvider);
           if (mems.isEmpty) return <int, int>{};
-          // FIXME ここでmemsが確定したのであれば、ここでmemEntities?stateを更新するべき
 
           final periodCountByMemId =
               await ActQueryService().listPeriodCountsByMemId(

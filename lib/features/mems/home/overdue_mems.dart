@@ -48,16 +48,16 @@ class OverdueMems extends _$OverdueMems {
         return memsByNotifyAt.mems;
       });
 
-  Future<List<MemEntity>> load() => v(() async {
-        if (_loaded) return state;
+  Future<void> load() => v(() async {
+        if (_loaded) return;
 
         final now = DateTime.now();
         final startOfDay = ref.read(preferenceProvider(startOfDayKey));
         final startOfToday = now.atStartOfDay(startOfDay);
 
         final mems = await _memRepository.shipOverdueCandidateIds(now: now);
-        if (mems.isEmpty) return const [];
-        // FIXME ここでmemsが確定したのであれば、ここでmemEntities?stateを更新するべき
+        if (mems.isEmpty) return;
+        ref.read(memEntitiesProvider.notifier).upsert(mems);
 
         // 間隔目標だけ回数を読んでから選ぶ。未取得を 0 扱いにしない
         // FIXME ActCountsByMemIdByDate.loadってかなり同じ処理してない？
@@ -81,9 +81,7 @@ class OverdueMems extends _$OverdueMems {
           include: (notifyAt) => notifyAt.isBefore(now),
         );
 
-        _loaded = true;
         state = memsByNotifyAt.mems;
-
-        return memsByNotifyAt.mems;
+        _loaded = true;
       });
 }
