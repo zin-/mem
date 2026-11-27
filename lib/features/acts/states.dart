@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/acts/client.dart';
 import 'package:mem/features/mems/list/list_period_count.dart';
+import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/framework/date_and_time/period.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
@@ -240,8 +241,18 @@ class ActCountsByMemIdByDate extends _$ActCountsByMemIdByDate {
   Map<int, int> build(DateTime date) => v(
         () {
           final acts = ref.watch(actEntitiesProvider);
+          final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
+          final startOfToday = date.atStartOfDay(startOfDay);
+          final endOfToday = startOfToday.shiftCalendarDays(1);
 
-          return acts.fold(
+          return acts
+              .where(
+            (act) =>
+                act.value.period != null &&
+                act.value.period!.start!.isAfter(startOfToday) &&
+                act.value.period!.start!.isBefore(endOfToday),
+          )
+              .fold(
             <int, int>{},
             (map, act) => map
               ..putIfAbsent(
