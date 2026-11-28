@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:drift/drift.dart';
 import 'package:mem/databases/database.dart' hide Act, Target;
 import 'package:mem/databases/database.dart' as drift_schema;
@@ -7,7 +9,6 @@ import 'package:mem/features/acts/act_amount.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_service.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/mems/list/list_period_count.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/today_act_count.dart';
 import 'package:mem/features/targets/target.dart';
@@ -18,6 +19,9 @@ import 'package:mem/framework/singleton.dart';
 
 Expression<bool> actExcludingSkippedForPerformance(Acts t) =>
     t.actKind.isNull() | t.actKind.equals(ActKind.skipped.name).not();
+
+// SQLite の変数上限（999）より少ない。mem id の IN 句をこの件数で割る
+const _memIdInChunkSize = 900;
 
 class ActQueryService {
   AppDatabase get _db => DriftDatabaseAccessor().driftDatabase;
@@ -130,7 +134,7 @@ class ActQueryService {
           final countExpr = countAll();
           final row = await (_db.selectOnly(_db.acts)
                 ..addColumns([countExpr])
-                ..where(_actsInPeriod(_db.acts, memId, period)))
+                ..where(_actsInPeriod(_db.acts, [memId], period)))
               .getSingle();
           return row.read(countExpr) ?? 0;
         },
@@ -162,7 +166,7 @@ class ActQueryService {
       v(
         () async {
           final rows = await (_db.select(_db.acts)
-                ..where((t) => _actsInPeriod(t, memId, period)))
+                ..where((t) => _actsInPeriod(t, [memId], period)))
               .get();
           return rows.map(ActEntity.fromTuple).toList();
         },
@@ -172,13 +176,40 @@ class ActQueryService {
         },
       );
 
+  Future<List<ActEntity>> fetchByMemIdsAndPeriod(
+    Iterable<int> memIds,
+    DateAndTimePeriod period,
+  ) =>
+      v(
+        () async {
+          final ids = memIds.toSet().toList();
+          if (ids.isEmpty) return const [];
+          final acts = <ActEntity>[];
+          for (var i = 0; i < ids.length; i += _memIdInChunkSize) {
+            final chunk = ids.sublist(
+              i,
+              math.min(i + _memIdInChunkSize, ids.length),
+            );
+            final rows = await (_db.select(_db.acts)
+                  ..where((t) => _actsInPeriod(t, chunk, period)))
+                .get();
+            acts.addAll(rows.map(ActEntity.fromTuple));
+          }
+          return acts;
+        },
+        {
+          'memIds': memIds,
+          'period': period,
+        },
+      );
+
   Expression<bool> _actsInPeriod(
     Acts table,
-    int memId,
+    Iterable<int> memIds,
     DateAndTimePeriod? period,
   ) {
     final matched =
-        table.memId.equals(memId) & actExcludingSkippedForPerformance(table);
+        table.memId.isIn(memIds) & actExcludingSkippedForPerformance(table);
     if (period is! WithStartAndEnd) {
       return matched;
     }
@@ -285,44 +316,6 @@ class ActQueryService {
           'memId': memId,
           'period': period,
           'target': target,
-        },
-      );
-
-  Future<Map<int, int>> listPeriodCountsByMemId({
-    required Iterable<
-            ({
-              int id,
-              Target? target,
-              DateAndTimePeriod? period,
-            })>
-        mems,
-  }) =>
-      v(
-        () async {
-          final counts = <int, int>{};
-          for (final mem in mems) {
-            // TODO なにこのコード
-            // FIXME 意味不明なことしてる
-            // FIXME ひとまずQueryServiceでやることではない
-            final target = mem.target;
-            // targetがなければ対象外？
-            // 仕様としては正しそう
-            // FIXME ここに実装されるべきことではない
-            if (target == null) continue;
-            final period = mem.period;
-            // TODO この期間はなんだ？
-            // FIXME memって変数の下のperiodだと問題がある
-            if (period == null) continue;
-            // FIXME 1+Nみたいになってる ゴミ
-            final count = await countByMemIdAndPeriod(mem.id, period);
-            if (ListPeriodCount.of(target: target, value: count) != null) {
-              counts[mem.id] = count;
-            }
-          }
-          return counts;
-        },
-        {
-          'mems': mems,
         },
       );
 

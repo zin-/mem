@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/acts/client.dart';
 import 'package:mem/features/mems/list/list_period_count.dart';
+import 'package:mem/features/mems/list/period_counts.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/framework/date_and_time/period.dart';
 import 'package:mem/features/settings/preference/keys.dart';
@@ -274,24 +275,14 @@ class ActCountsByMemIdByDate extends _$ActCountsByMemIdByDate {
           final mems = ref.read(memEntitiesProvider);
           if (mems.isEmpty) return <int, int>{};
 
-          final periodCountByMemId =
-              await ActQueryService().listPeriodCountsByMemId(
+          final periodCountByMemId = await ListPeriodWindows.of(
             mems: [
               for (final mem in mems)
-                if (mem.target?.secondsAfterLastAct != null)
-                  (
-                    id: mem.id,
-                    target: mem.target,
-                    period: ListPeriodCount.period(
-                      target: mem.target!,
-                      latestAct: mem.latestAct,
-                      scheduleAnchorAct: mem.scheduleAnchorAct,
-                      startOfDay: startOfDay,
-                      now: now,
-                    ),
-                  ),
+                if (mem.target?.secondsAfterLastAct != null) mem,
             ],
-          );
+            startOfDay: startOfDay,
+            now: now,
+          ).counts();
           // FIXME actsを更新する
 
           _loaded = true;

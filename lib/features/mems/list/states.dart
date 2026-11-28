@@ -2,8 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:mem/features/acts/act.dart';
-import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/mem_items/mem_item.dart';
+import 'package:mem/features/mems/list/period_counts.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
@@ -91,24 +91,11 @@ final listPeriodCountByMemIdProvider =
   final mems = ref.watch(memEntitiesProvider);
   final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
   final now = DateTime.now();
-  return ActQueryService().listPeriodCountsByMemId(
-    mems: mems.map((mem) {
-      final target = mem.target;
-      return (
-        id: mem.id,
-        target: target,
-        period: target == null
-            ? null
-            : ListPeriodCount.period(
-                target: target,
-                latestAct: mem.latestAct,
-                scheduleAnchorAct: mem.scheduleAnchorAct,
-                startOfDay: startOfDay,
-                now: now,
-              ),
-      );
-    }),
-  );
+  return ListPeriodWindows.of(
+    mems: mems,
+    startOfDay: startOfDay,
+    now: now,
+  ).counts();
 });
 
 int compareMemListEntries(

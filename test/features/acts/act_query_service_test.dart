@@ -5,8 +5,6 @@ import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/acts/acts_summary.dart';
-import 'package:mem/framework/date_and_time/period.dart';
-import 'package:mem/features/targets/target.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
@@ -490,27 +488,52 @@ void main() {
       );
     });
 
-    test('listPeriodCountsByMemId skips a mem when the period is null',
+    test(
+        'fetchByMemIdsAndPeriod returns non-skipped acts inside one window for each mem',
         () async {
       final memId = await insertMem();
-
-      final counts = await query.listPeriodCountsByMemId(
-        mems: [
-          (
-            id: memId,
-            target: Target(
-              memId: memId,
-              targetType: TargetType.equalTo,
-              targetUnit: TargetUnit.count,
-              value: 2,
-              period: Period.aDay,
-            ),
-            period: null,
-          ),
-        ],
+      final otherMemId = await insertMem();
+      final excludedMemId = await insertMem();
+      final windowStart = DateTime(2024, 6, 2);
+      final windowEnd = DateTime(2024, 6, 3);
+      await insertAct(memId: memId, start: windowStart);
+      await insertAct(
+        memId: otherMemId,
+        start: DateTime(2024, 6, 2, 15),
+        actKind: 'finished',
+      );
+      await insertAct(
+        memId: memId,
+        start: DateTime(2024, 6, 2, 18),
+        actKind: 'skipped',
+      );
+      await insertAct(memId: memId, start: DateTime(2024, 6, 1, 23));
+      await insertAct(memId: memId, start: windowEnd);
+      await insertAct(
+        memId: excludedMemId,
+        start: DateTime(2024, 6, 2, 12),
+        actKind: 'finished',
       );
 
-      expect(counts, isEmpty);
+      final rows = await query.fetchByMemIdsAndPeriod(
+        [memId, otherMemId],
+        DateAndTimePeriod(
+          start: DateAndTime(2024, 6, 2),
+          end: DateAndTime(2024, 6, 3),
+        ),
+      );
+
+      expect(rows.map((row) => row.memId).toSet(), {memId, otherMemId});
+      expect(
+        rows.map((row) => row.start).toSet(),
+        {
+          DateAndTime.from(windowStart, timeOfDay: windowStart),
+          DateAndTime.from(
+            DateTime(2024, 6, 2, 15),
+            timeOfDay: DateTime(2024, 6, 2, 15),
+          ),
+        },
+      );
     });
   });
 }

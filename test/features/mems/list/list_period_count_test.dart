@@ -1,3 +1,4 @@
+import '../../../entity_factories.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
@@ -74,6 +75,81 @@ void main() {
 
       expect(period?.start, DateAndTime(2026, 11, 3, 5, 0));
       expect(period?.end, DateAndTime(2026, 11, 10, 5, 0));
+    });
+  });
+
+  group('ListPeriodWindows', () {
+    const startOfDay = TimeOfDay(hour: 5, minute: 0);
+    final now = DateTime(2026, 11, 9, 10);
+    final createdAt = DateTime(2026, 11, 1);
+
+    Target countTarget({
+      required int memId,
+      required Period period,
+      TargetUnit unit = TargetUnit.count,
+    }) =>
+        Target(
+          memId: memId,
+          targetType: TargetType.equalTo,
+          targetUnit: unit,
+          value: 2,
+          period: period,
+        );
+
+    test('skips a mem when the period is null', () {
+      final weekly = savedMem(
+        id: 1,
+        name: 'weekly',
+        createdAt: createdAt,
+        updatedAt: createdAt,
+        target: countTarget(memId: 1, period: Period.aWeek),
+      );
+
+      final windows = ListPeriodWindows.of(
+        mems: [weekly],
+        startOfDay: startOfDay,
+        now: now,
+      );
+
+      expect(windows.groups, isEmpty);
+    });
+
+    test('groups count targets that share a window and omits other targets',
+        () {
+      final first = savedMem(
+        id: 1,
+        name: 'first',
+        createdAt: createdAt,
+        updatedAt: createdAt,
+        target: countTarget(memId: 1, period: Period.aDay),
+      );
+      final second = savedMem(
+        id: 2,
+        name: 'second',
+        createdAt: createdAt,
+        updatedAt: createdAt,
+        target: countTarget(memId: 2, period: Period.aDay),
+      );
+      final time = savedMem(
+        id: 3,
+        name: 'time',
+        createdAt: createdAt,
+        updatedAt: createdAt,
+        target: countTarget(
+          memId: 3,
+          period: Period.aDay,
+          unit: TargetUnit.time,
+        ),
+      );
+
+      final windows = ListPeriodWindows.of(
+        mems: [first, second, time],
+        startOfDay: startOfDay,
+        now: now,
+      );
+
+      expect(windows.groups, hasLength(1));
+      expect(windows.groups.single.memIds, [1, 2]);
     });
   });
 }
