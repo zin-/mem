@@ -36,10 +36,10 @@ import 'package:mem/values/colors.dart';
 
 class _FakeMemEntities extends MemEntities {
   final Iterable<MemEntity> _state;
-  int doneMemCallCount = 0;
-  int undoneMemCallCount = 0;
-  int? lastDoneMemId;
-  int? lastUndoneMemId;
+  int _doneMemCallCount = 0;
+  int _undoneMemCallCount = 0;
+  int? _lastDoneMemId;
+  int? _lastUndoneMemId;
 
   _FakeMemEntities(this._state);
 
@@ -48,14 +48,14 @@ class _FakeMemEntities extends MemEntities {
 
   @override
   Future<void> doneMem(int memId) async {
-    doneMemCallCount++;
-    lastDoneMemId = memId;
+    _doneMemCallCount++;
+    _lastDoneMemId = memId;
   }
 
   @override
   Future<void> undoneMem(int memId) async {
-    undoneMemCallCount++;
-    lastUndoneMemId = memId;
+    _undoneMemCallCount++;
+    _lastUndoneMemId = memId;
   }
 }
 
@@ -145,56 +145,56 @@ Future<void> _pumpMemListCount(
 }
 
 class _FakeActEntities extends ActEntities {
-  int startActbyCallCount = 0;
-  int resumeActByCallCount = 0;
-  int finishActbyCallCount = 0;
-  int skipActByCallCount = 0;
-  int pauseByMemIdCallCount = 0;
-  int unpauseByMemIdCallCount = 0;
-  int? lastStartActbyMemId;
-  int? lastResumeActByMemId;
-  int? lastFinishActbyMemId;
-  int? lastSkipActByMemId;
-  int? lastPauseByMemId;
-  int? lastUnpauseByMemId;
+  int _startActbyCallCount = 0;
+  int _resumeActByCallCount = 0;
+  int _finishActbyCallCount = 0;
+  int _skipActByCallCount = 0;
+  int _pauseByMemIdCallCount = 0;
+  int _unpauseByMemIdCallCount = 0;
+  int? _lastStartActbyMemId;
+  int? _lastResumeActByMemId;
+  int? _lastFinishActbyMemId;
+  int? _lastSkipActByMemId;
+  int? _lastPauseByMemId;
+  int? _lastUnpauseByMemId;
 
   @override
   Iterable<SavedActEntityV1> build() => [];
 
   @override
   Future<void> startActby(int memId) async {
-    startActbyCallCount++;
-    lastStartActbyMemId = memId;
+    _startActbyCallCount++;
+    _lastStartActbyMemId = memId;
   }
 
   @override
   Future<void> resumeActBy(int memId) async {
-    resumeActByCallCount++;
-    lastResumeActByMemId = memId;
+    _resumeActByCallCount++;
+    _lastResumeActByMemId = memId;
   }
 
   @override
   Future<void> finishActby(int memId) async {
-    finishActbyCallCount++;
-    lastFinishActbyMemId = memId;
+    _finishActbyCallCount++;
+    _lastFinishActbyMemId = memId;
   }
 
   @override
   Future<void> skipActBy(int memId) async {
-    skipActByCallCount++;
-    lastSkipActByMemId = memId;
+    _skipActByCallCount++;
+    _lastSkipActByMemId = memId;
   }
 
   @override
   Future<void> pauseByMemId(int memId) async {
-    pauseByMemIdCallCount++;
-    lastPauseByMemId = memId;
+    _pauseByMemIdCallCount++;
+    _lastPauseByMemId = memId;
   }
 
   @override
   Future<void> unpauseByMemId(int memId) async {
-    unpauseByMemIdCallCount++;
-    lastUnpauseByMemId = memId;
+    _unpauseByMemIdCallCount++;
+    _lastUnpauseByMemId = memId;
   }
 }
 
@@ -239,8 +239,8 @@ void main() {
       await tester.tap(find.byIcon(Icons.play_arrow));
       await tester.pump();
 
-      expect(fakeActEntities.startActbyCallCount, 1);
-      expect(fakeActEntities.lastStartActbyMemId, memId);
+      expect(fakeActEntities._startActbyCallCount, 1);
+      expect(fakeActEntities._lastStartActbyMemId, memId);
     });
 
     testWidgets(
@@ -281,14 +281,14 @@ void main() {
       await tester.tap(find.byIcon(Icons.pause));
       await tester.pump();
 
-      expect(fakeActEntities.pauseByMemIdCallCount, 1);
-      expect(fakeActEntities.lastPauseByMemId, memId);
+      expect(fakeActEntities._pauseByMemIdCallCount, 1);
+      expect(fakeActEntities._lastPauseByMemId, memId);
 
       await tester.tap(find.byIcon(Icons.stop));
       await tester.pump();
 
-      expect(fakeActEntities.finishActbyCallCount, 1);
-      expect(fakeActEntities.lastFinishActbyMemId, memId);
+      expect(fakeActEntities._finishActbyCallCount, 1);
+      expect(fakeActEntities._lastFinishActbyMemId, memId);
     });
 
     testWidgets('displays play/close buttons when act is paused',
@@ -327,9 +327,9 @@ void main() {
       await tester.tap(find.byIcon(Icons.play_arrow));
       await tester.pump();
 
-      expect(fakeActEntities.resumeActByCallCount, 1);
-      expect(fakeActEntities.lastResumeActByMemId, memId);
-      expect(fakeActEntities.startActbyCallCount, 0);
+      expect(fakeActEntities._resumeActByCallCount, 1);
+      expect(fakeActEntities._lastResumeActByMemId, memId);
+      expect(fakeActEntities._startActbyCallCount, 0);
     });
 
     testWidgets(
@@ -830,8 +830,8 @@ void main() {
         checkbox.onChanged!(true);
         await tester.pump();
 
-        expect(fakeMemEntities.doneMemCallCount, 1);
-        expect(fakeMemEntities.lastDoneMemId, memId);
+        expect(fakeMemEntities._doneMemCallCount, 1);
+        expect(fakeMemEntities._lastDoneMemId, memId);
       });
 
       testWidgets('calls undoneMem when checkbox is unchecked', (tester) async {
@@ -858,8 +858,8 @@ void main() {
         checkbox.onChanged!(false);
         await tester.pump();
 
-        expect(fakeMemEntities.undoneMemCallCount, 1);
-        expect(fakeMemEntities.lastUndoneMemId, memId);
+        expect(fakeMemEntities._undoneMemCallCount, 1);
+        expect(fakeMemEntities._lastUndoneMemId, memId);
       });
 
       testWidgets('calls startActby when start button is tapped',
@@ -897,8 +897,8 @@ void main() {
         await tester.tap(find.byIcon(Icons.play_arrow));
         await tester.pump();
 
-        expect(fakeActEntities.startActbyCallCount, 1);
-        expect(fakeActEntities.lastStartActbyMemId, memId);
+        expect(fakeActEntities._startActbyCallCount, 1);
+        expect(fakeActEntities._lastStartActbyMemId, memId);
       });
 
       testWidgets('calls resumeActBy when play is tapped while paused',
@@ -939,9 +939,9 @@ void main() {
         await tester.tap(find.byIcon(Icons.play_arrow));
         await tester.pump();
 
-        expect(fakeActEntities.resumeActByCallCount, 1);
-        expect(fakeActEntities.lastResumeActByMemId, memId);
-        expect(fakeActEntities.startActbyCallCount, 0);
+        expect(fakeActEntities._resumeActByCallCount, 1);
+        expect(fakeActEntities._lastResumeActByMemId, memId);
+        expect(fakeActEntities._startActbyCallCount, 0);
       });
 
       testWidgets('calls finishActby when stop button is tapped',
@@ -984,8 +984,8 @@ void main() {
         await tester.tap(find.byIcon(Icons.stop));
         await tester.pump();
 
-        expect(fakeActEntities.finishActbyCallCount, 1);
-        expect(fakeActEntities.lastFinishActbyMemId, memId);
+        expect(fakeActEntities._finishActbyCallCount, 1);
+        expect(fakeActEntities._lastFinishActbyMemId, memId);
       });
 
       testWidgets(
@@ -1027,9 +1027,9 @@ void main() {
         await tester.tap(find.text(buildL10n().memListCompletionDialogSkip));
         await tester.pump();
 
-        expect(fakeActEntities.skipActByCallCount, 1);
-        expect(fakeActEntities.lastSkipActByMemId, memId);
-        expect(fakeActEntities.finishActbyCallCount, 0);
+        expect(fakeActEntities._skipActByCallCount, 1);
+        expect(fakeActEntities._lastSkipActByMemId, memId);
+        expect(fakeActEntities._finishActbyCallCount, 0);
       });
 
       testWidgets(
@@ -1075,7 +1075,7 @@ void main() {
 
         expect(
             find.text(buildL10n().memListCompletionDialogSkip), findsNothing);
-        expect(fakeActEntities.skipActByCallCount, 0);
+        expect(fakeActEntities._skipActByCallCount, 0);
       });
 
       testWidgets('calls pauseByMemId when pause button is tapped',
@@ -1118,8 +1118,8 @@ void main() {
         await tester.tap(find.byIcon(Icons.pause));
         await tester.pump();
 
-        expect(fakeActEntities.pauseByMemIdCallCount, 1);
-        expect(fakeActEntities.lastPauseByMemId, memId);
+        expect(fakeActEntities._pauseByMemIdCallCount, 1);
+        expect(fakeActEntities._lastPauseByMemId, memId);
       });
 
       testWidgets('calls unpauseByMemId when unpause button is tapped',
@@ -1160,8 +1160,8 @@ void main() {
         await tester.tap(find.byIcon(Icons.close));
         await tester.pump();
 
-        expect(fakeActEntities.unpauseByMemIdCallCount, 1);
-        expect(fakeActEntities.lastUnpauseByMemId, memId);
+        expect(fakeActEntities._unpauseByMemIdCallCount, 1);
+        expect(fakeActEntities._lastUnpauseByMemId, memId);
       });
 
       testWidgets('calls onTap when ListTile is tapped', (tester) async {
@@ -1971,14 +1971,14 @@ void main() {
         await tester.tap(find.byIcon(Icons.play_arrow));
         await tester.pump();
 
-        expect(actEntities.startActbyCallCount, 1);
-        expect(actEntities.lastStartActbyMemId, memId);
+        expect(actEntities._startActbyCallCount, 1);
+        expect(actEntities._lastStartActbyMemId, memId);
 
         await tester.tap(find.byIcon(Icons.stop));
         await tester.pump();
 
-        expect(actEntities.finishActbyCallCount, 1);
-        expect(actEntities.lastFinishActbyMemId, memId);
+        expect(actEntities._finishActbyCallCount, 1);
+        expect(actEntities._lastFinishActbyMemId, memId);
       });
 
       testWidgets(
@@ -1995,8 +1995,8 @@ void main() {
         checkbox.onChanged!(false);
         await tester.pump();
 
-        expect(memEntities.undoneMemCallCount, 1);
-        expect(memEntities.lastUndoneMemId, memId);
+        expect(memEntities._undoneMemCallCount, 1);
+        expect(memEntities._lastUndoneMemId, memId);
       });
 
       testWidgets(
