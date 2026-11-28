@@ -6,6 +6,7 @@ import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mems/home/overdue_mems.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/mems/mem_repository.dart';
+import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/preference/preference_key.dart';
 import 'package:mem/features/settings/states.dart';
@@ -131,12 +132,12 @@ void main() {
     // autoDispose の読み取り中に dispose されないよう購読を残す
     final sub = scope.listen(overdueMemsProvider, (_, __) {});
     addTearDown(sub.close);
-    final overdue = scope.read(overdueMemsProvider);
-    return overdue.map((mem) => mem.id).toList();
+    await scope.read(overdueMemsProvider.notifier).load();
+    return scope.read(overdueMemsProvider).map((mem) => mem.id).toList();
   }
 
   test('returns mems whose notifyAt is before now in ascending order',
-      skip: true, () async {
+      () async {
     final now = DateTime.now();
     final earliest = now.subtract(const Duration(hours: 4));
     final middle = now.subtract(const Duration(hours: 2));
@@ -154,7 +155,6 @@ void main() {
 
   test(
     'omits a future-only period, a plain mem, done, and archived',
-    skip: true,
     () async {
       final now = DateTime.now();
       final past = now.subtract(const Duration(hours: 1));
@@ -172,7 +172,6 @@ void main() {
 
   test(
     'omits a daily count mem once the period count is reached',
-    skip: true,
     () async {
       final now = DateTime.now();
       final past = now.subtract(const Duration(hours: 1));
@@ -203,8 +202,58 @@ void main() {
   );
 
   test(
+    'omits an interval target until its period count is loaded',
+    () async {
+      final now = DateTime.now();
+      final past = now.subtract(const Duration(hours: 1));
+      // 時間。前回終了からこの秒後が notifyAt になる
+      const intervalSeconds = 2 * 60 * 60;
+      // 回。0 件のあいだは間隔の通知を使う
+      const dailyTarget = 2;
+      // 日。今日の件数窓の外
+      const daysBeforeToday = 2;
+      // 時。間隔を足しても同じ暦日に収まる
+      const actHour = 12;
+      // 時。繰り返し通知の固定時刻
+      const repeatHour = 9;
+
+      final overdueId = await insertMem('overdue', notifyAt: past);
+      final intervalId = await insertMem('interval');
+      await insertRepeat(intervalId, hour: repeatHour);
+      await insertTarget(
+        memId: intervalId,
+        value: dailyTarget,
+        secondsAfterLastAct: intervalSeconds,
+      );
+      await insertFinishedAct(
+        memId: intervalId,
+        start: DateTime(now.year, now.month, now.day, actHour)
+            .subtract(const Duration(days: daysBeforeToday)),
+      );
+
+      final scope = container();
+      final sub = scope.listen(overdueMemsProvider, (_, __) {});
+      addTearDown(sub.close);
+      scope.read(memEntitiesProvider.notifier).upsert(
+            await MemRepository().shipOverdueCandidateIds(now: now),
+          );
+
+      expect(
+        scope.read(overdueMemsProvider).map((mem) => mem.id),
+        isNot(contains(intervalId)),
+      );
+
+      await scope.read(overdueMemsProvider.notifier).load();
+
+      expect(
+        scope.read(overdueMemsProvider).map((mem) => mem.id).toList(),
+        [intervalId, overdueId],
+      );
+    },
+  );
+
+  test(
     'keeps the same overdue result when only a non-candidate has items',
-    skip: true,
     () async {
       final now = DateTime.now();
       final past = now.subtract(const Duration(hours: 1));

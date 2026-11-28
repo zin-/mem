@@ -46,17 +46,22 @@ class MemsByNotifyAt {
     Iterable<SavedMemNotificationEntityV1> savedMemNotifications,
     DateTime startOfToday,
     Map<int, int> periodCountByMemId,
-  ) =>
-      mem
-          .toDomain()
-          .notifyAt(
-            startOfToday,
-            savedMemNotifications
-                .where((notification) => notification.value.memId == mem.id)
-                .map((notification) => notification.value),
-            mem.latestAct,
-            target: mem.target,
-            todayCount: periodCountByMemId[mem.id] ?? 0,
-          )
-          ?.at;
+  ) {
+    final todayCount = periodCountByMemId[mem.id];
+    if (mem.target?.secondsAfterLastAct != null && todayCount == null) {
+      return null;
+    }
+    return mem
+        .toDomain()
+        .notifyAt(
+          startOfToday,
+          savedMemNotifications
+              .where((notification) => notification.value.memId == mem.id)
+              .map((notification) => notification.value),
+          mem.latestAct,
+          target: mem.target,
+          todayCount: todayCount ?? 0,
+        )
+        ?.at;
+  }
 }

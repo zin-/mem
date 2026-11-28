@@ -21,65 +21,61 @@ class OverdueMems extends _$OverdueMems {
   @override
   List<MemEntity> build() => v(() {
         final now = DateTime.now();
-        final startOfDay = ref.read(preferenceProvider(startOfDayKey));
-        final startOfToday = DateTimeExt.startOfToday(startOfDay, now);
-
+        final startOfToday =
+            now.atStartOfDay(ref.read(preferenceProvider(startOfDayKey)));
         final mems = ref.watch(memEntitiesProvider);
+        final counted = ref.watch(actCountsByMemIdByDateProvider(now));
 
-        final notifications = [
-          for (final mem in mems)
-            for (final notification
-                in mem.repeatedNotifications ?? const <MemNotificationEntity>[])
-              SavedMemNotificationEntityV1.fromEntityV2(notification),
-        ];
-
-        final periodCountByMemId = ref
-            .read(actCountsByMemIdByDateProvider(now))
-            .map((memId, count) => MapEntry(memId, count));
-
-        final memsByNotifyAt = MemsByNotifyAt.of(
+        return _overdueMems(
           mems,
-          notifications,
-          startOfToday: startOfToday,
-          periodCountByMemId: periodCountByMemId,
-          include: (notifyAt) => notifyAt.isBefore(now),
+          _loaded ? counted : const {},
+          now,
+          startOfToday,
         );
-
-        return memsByNotifyAt.mems;
       });
 
   Future<void> load() => v(() async {
         if (_loaded) return;
 
         final now = DateTime.now();
-        final startOfDay = ref.read(preferenceProvider(startOfDayKey));
-        final startOfToday = now.atStartOfDay(startOfDay);
+        final startOfToday =
+            now.atStartOfDay(ref.read(preferenceProvider(startOfDayKey)));
 
         final mems = await _memRepository.shipOverdueCandidateIds(now: now);
         if (mems.isEmpty) return;
         ref.read(memEntitiesProvider.notifier).upsert(mems);
 
-        // 間隔目標だけ回数を読んでから選ぶ。未取得を 0 扱いにしない
-        // FIXME このコメントなんだ？意味が分からない
         final actCountsByMemId =
             await ref.read(actCountsByMemIdByDateProvider(now).notifier).load();
 
-        final notifications = [
-          for (final mem in mems)
-            for (final notification
-                in mem.repeatedNotifications ?? const <MemNotificationEntity>[])
-              SavedMemNotificationEntityV1.fromEntityV2(notification),
-        ];
-
-        final memsByNotifyAt = MemsByNotifyAt.of(
-          mems,
-          notifications,
-          startOfToday: startOfToday,
-          periodCountByMemId: actCountsByMemId,
-          include: (notifyAt) => notifyAt.isBefore(now),
-        );
-
-        state = memsByNotifyAt.mems;
         _loaded = true;
+        state = _overdueMems(
+          ref.read(memEntitiesProvider),
+          actCountsByMemId,
+          now,
+          startOfToday,
+        );
       });
+
+  List<MemEntity> _overdueMems(
+    Iterable<MemEntity> mems,
+    Map<int, int> periodCountByMemId,
+    DateTime now,
+    DateTime startOfToday,
+  ) {
+    final notifications = [
+      for (final mem in mems)
+        for (final notification
+            in mem.repeatedNotifications ?? const <MemNotificationEntity>[])
+          SavedMemNotificationEntityV1.fromEntityV2(notification),
+    ];
+
+    return MemsByNotifyAt.of(
+      mems,
+      notifications,
+      startOfToday: startOfToday,
+      periodCountByMemId: periodCountByMemId,
+      include: (notifyAt) => notifyAt.isBefore(now),
+    ).mems;
+  }
 }
