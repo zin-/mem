@@ -301,10 +301,19 @@ class ActQueryService {
         () async {
           final counts = <int, int>{};
           for (final mem in mems) {
+            // TODO なにこのコード
+            // FIXME 意味不明なことしてる
+            // FIXME ひとまずQueryServiceでやることではない
             final target = mem.target;
+            // targetがなければ対象外？
+            // 仕様としては正しそう
+            // FIXME ここに実装されるべきことではない
             if (target == null) continue;
             final period = mem.period;
+            // TODO この期間はなんだ？
+            // FIXME memって変数の下のperiodだと問題がある
             if (period == null) continue;
+            // FIXME 1+Nみたいになってる ゴミ
             final count = await countByMemIdAndPeriod(mem.id, period);
             if (ListPeriodCount.of(target: target, value: count) != null) {
               counts[mem.id] = count;
