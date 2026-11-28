@@ -10,8 +10,8 @@ import 'package:mem/framework/date_and_time/date_and_time_text_form_field.dart';
 
 class _FakeActEntities extends ActEntities {
   final Iterable<SavedActEntityV1> _state;
-  int editCallCount = 0;
-  int removeCallCount = 0;
+  int _editCallCount = 0;
+  int _removeCallCount = 0;
 
   _FakeActEntities(this._state);
 
@@ -20,12 +20,12 @@ class _FakeActEntities extends ActEntities {
 
   @override
   Future<void> edit(SavedActEntityV1 act) async {
-    editCallCount++;
+    _editCallCount++;
   }
 
   @override
   Future<Iterable<SavedActEntityV1>> removeAsync(Iterable<int> ids) async {
-    removeCallCount++;
+    _removeCallCount++;
     return _state.where((e) => !ids.contains(e.id));
   }
 
@@ -196,7 +196,7 @@ void main() {
         await tester.tap(find.byIcon(saveIcon));
         await tester.pumpAndSettle();
 
-        expect(fakeActEntities.editCallCount, 1);
+        expect(fakeActEntities._editCallCount, 1);
       });
 
       testWidgets('remove.', (tester) async {
@@ -238,7 +238,7 @@ void main() {
         await tester.tap(find.byIcon(deleteIcon));
         await tester.pumpAndSettle();
 
-        expect(fakeActEntities.removeCallCount, 1);
+        expect(fakeActEntities._removeCallCount, 1);
       });
     });
   });

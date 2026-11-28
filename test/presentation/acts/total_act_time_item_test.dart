@@ -91,44 +91,44 @@ class _FakePreference extends Preference<TimeOfDay> {
 }
 
 class _FakeActEntities extends ActEntities {
-  int startActbyCallCount = 0;
-  int resumeActByCallCount = 0;
-  int finishActbyCallCount = 0;
-  int pauseByMemIdCallCount = 0;
-  int unpauseByMemIdCallCount = 0;
-  int? lastMemId;
+  int _startActbyCallCount = 0;
+  int _resumeActByCallCount = 0;
+  int _finishActbyCallCount = 0;
+  int _pauseByMemIdCallCount = 0;
+  int _unpauseByMemIdCallCount = 0;
+  int? _lastMemId;
 
   @override
   Iterable<SavedActEntityV1> build() => [];
 
   @override
   Future<void> startActby(int memId) async {
-    startActbyCallCount++;
-    lastMemId = memId;
+    _startActbyCallCount++;
+    _lastMemId = memId;
   }
 
   @override
   Future<void> resumeActBy(int memId) async {
-    resumeActByCallCount++;
-    lastMemId = memId;
+    _resumeActByCallCount++;
+    _lastMemId = memId;
   }
 
   @override
   Future<void> finishActby(int memId) async {
-    finishActbyCallCount++;
-    lastMemId = memId;
+    _finishActbyCallCount++;
+    _lastMemId = memId;
   }
 
   @override
   Future<void> pauseByMemId(int memId) async {
-    pauseByMemIdCallCount++;
-    lastMemId = memId;
+    _pauseByMemIdCallCount++;
+    _lastMemId = memId;
   }
 
   @override
   Future<void> unpauseByMemId(int memId) async {
-    unpauseByMemIdCallCount++;
-    lastMemId = memId;
+    _unpauseByMemIdCallCount++;
+    _lastMemId = memId;
   }
 }
 
@@ -280,13 +280,13 @@ void main() {
 
       await tester.tap(find.byIcon(Icons.stop));
       await tester.pump();
-      expect(acts.finishActbyCallCount, 1);
-      expect(acts.lastMemId, _memId);
+      expect(acts._finishActbyCallCount, 1);
+      expect(acts._lastMemId, _memId);
 
       await tester.tap(find.byIcon(Icons.play_arrow));
       await tester.pump();
-      expect(acts.startActbyCallCount, 1);
-      expect(acts.lastMemId, _memId);
+      expect(acts._startActbyCallCount, 1);
+      expect(acts._lastMemId, _memId);
       expect(find.byType(MemDetailPage), findsNothing);
     });
 
@@ -328,13 +328,13 @@ void main() {
 
       await tester.tap(find.byIcon(Icons.pause));
       await tester.pump();
-      expect(acts.pauseByMemIdCallCount, 1);
-      expect(acts.lastMemId, _memId);
+      expect(acts._pauseByMemIdCallCount, 1);
+      expect(acts._lastMemId, _memId);
 
       await tester.tap(find.byIcon(Icons.stop));
       await tester.pump();
-      expect(acts.finishActbyCallCount, 1);
-      expect(acts.lastMemId, _memId);
+      expect(acts._finishActbyCallCount, 1);
+      expect(acts._lastMemId, _memId);
     });
 
     testWidgets('shows resume and unpause while paused', (tester) async {
@@ -355,13 +355,13 @@ void main() {
 
       await tester.tap(find.byIcon(Icons.close));
       await tester.pump();
-      expect(acts.unpauseByMemIdCallCount, 1);
-      expect(acts.lastMemId, _memId);
+      expect(acts._unpauseByMemIdCallCount, 1);
+      expect(acts._lastMemId, _memId);
 
       await tester.tap(find.byIcon(Icons.play_arrow));
       await tester.pump();
-      expect(acts.resumeActByCallCount, 1);
-      expect(acts.lastMemId, _memId);
+      expect(acts._resumeActByCallCount, 1);
+      expect(acts._lastMemId, _memId);
     });
 
     testWidgets('ignores an in-period active act when latest act is finished',

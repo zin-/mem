@@ -29,24 +29,24 @@ class _FakeMemEntities extends MemEntities {
 }
 
 class _FakeActEntities extends ActEntities {
-  int startActbyCallCount = 0;
-  int resumeActByCallCount = 0;
-  int? lastStartActbyMemId;
-  int? lastResumeActByMemId;
+  int _startActbyCallCount = 0;
+  int _resumeActByCallCount = 0;
+  int? _lastStartActbyMemId;
+  int? _lastResumeActByMemId;
 
   @override
   Iterable<SavedActEntityV1> build() => [];
 
   @override
   Future<void> startActby(int memId) async {
-    startActbyCallCount++;
-    lastStartActbyMemId = memId;
+    _startActbyCallCount++;
+    _lastStartActbyMemId = memId;
   }
 
   @override
   Future<void> resumeActBy(int memId) async {
-    resumeActByCallCount++;
-    lastResumeActByMemId = memId;
+    _resumeActByCallCount++;
+    _lastResumeActByMemId = memId;
   }
 }
 
@@ -145,8 +145,8 @@ void main() {
         await tester.tap(find.byIcon(Icons.play_arrow).first);
         await tester.pump();
 
-        expect(fakeAct.startActbyCallCount, 1);
-        expect(fakeAct.lastStartActbyMemId, 2);
+        expect(fakeAct._startActbyCallCount, 1);
+        expect(fakeAct._lastStartActbyMemId, 2);
       });
 
       testWidgets(
@@ -212,10 +212,10 @@ void main() {
         await tester.tap(find.byIcon(Icons.play_arrow).at(1));
         await tester.pump();
 
-        expect(fakeAct.resumeActByCallCount, 0);
-        expect(fakeAct.lastResumeActByMemId, isNull);
-        expect(fakeAct.startActbyCallCount, 1);
-        expect(fakeAct.lastStartActbyMemId, 2);
+        expect(fakeAct._resumeActByCallCount, 0);
+        expect(fakeAct._lastResumeActByMemId, isNull);
+        expect(fakeAct._startActbyCallCount, 1);
+        expect(fakeAct._lastStartActbyMemId, 2);
       });
     });
   });
