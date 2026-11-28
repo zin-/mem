@@ -86,6 +86,59 @@ class ActQueryService {
         {'memIds': memIds},
       );
 
+  Future<Map<int, ActEntity>> fetchLatestActsByMemIds(
+    Iterable<int> memIds,
+  ) =>
+      v(
+        () async {
+          final ids = memIds.toSet().toList();
+          if (ids.isEmpty) return {};
+          final out = <int, ActEntity>{};
+          for (var i = 0; i < ids.length; i += _memIdInChunkSize) {
+            final chunk = ids.sublist(
+              i,
+              math.min(i + _memIdInChunkSize, ids.length),
+            );
+            final rows = await _selectLatestActRows(chunk);
+            for (final row in rows) {
+              out[row.memId] = ActEntity.fromTuple(row);
+            }
+          }
+          return out;
+        },
+        {'memIds': memIds},
+      );
+
+  Future<List<drift_schema.Act>> _selectLatestActRows(
+    List<int> memIdsChunk,
+  ) async {
+    if (memIdsChunk.isEmpty) return const [];
+    final placeholders = List.filled(memIdsChunk.length, '?').join(',');
+    final variables = <Variable<Object>>[
+      for (final id in memIdsChunk) Variable<int>(id),
+    ];
+    final sql = '''
+WITH ranked AS (
+  SELECT
+    id AS id,
+    mem_id AS mem_id,
+    ROW_NUMBER() OVER (
+      PARTITION BY mem_id
+      ORDER BY COALESCE(start, created_at) DESC, id DESC
+    ) AS _rn
+  FROM acts
+  WHERE mem_id IN ($placeholders)
+)
+SELECT id
+FROM ranked r
+WHERE r._rn = 1
+''';
+    final rawRows = await _db.customSelect(sql, variables: variables).get();
+    final ids = rawRows.map((row) => row.read<int>('id')).toList();
+    if (ids.isEmpty) return const [];
+    return (_db.select(_db.acts)..where((t) => t.id.isIn(ids))).get();
+  }
+
   Future<ActEntity?> fetchLatestByMemIds(int memId) => v(
         () async {
           final rows = await (_db.select(_db.acts)

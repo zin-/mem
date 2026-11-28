@@ -10,11 +10,13 @@ import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/acts/client.dart';
 import 'package:mem/features/acts/states.dart';
+import 'package:mem/features/mems/mems_state.dart';
+import 'package:mem/features/targets/target.dart';
 import 'package:mem/framework/date_and_time/period.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/preference/preference_key.dart';
 import 'package:mem/features/settings/states.dart';
-import 'package:mem/databases/database.dart' hide Act;
+import 'package:mem/databases/database.dart' hide Act, Target;
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/singleton.dart';
@@ -716,5 +718,177 @@ void main() {
         // ActsClient().fetch() が呼ばれるため、エラーが発生する可能性がある
       });
     });
+  });
+
+  group('ActCountsByMemIdByDate', () {
+    test(
+      'load stores window acts and an older latest act, and counts each window',
+      () async {
+        final db = await _openMemoryDatabase();
+        final container = ProviderContainer(
+          overrides: [
+            preferenceProvider(startOfDayKey)
+                .overrideWith(() => _FakePreference()),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        // この時刻の論理日。startOfDay は 0:00 なので、日窓は当日、週窓は 11/3 0:00 から 11/10 0:00 の手前
+        final now = DateTime(2026, 11, 9, 10);
+        final createdAt = DateTime(2026, 6, 1);
+        // 回。日窓にも週窓にも 2 件ある。1 件だと mem あたり 1 で止まる数え方と区別できない
+        const actsInsideWindow = 2;
+
+        Future<int> insertMem(String name) async =>
+            (await db.into(db.mems).insertReturning(
+                      MemsCompanion.insert(name: name, createdAt: createdAt),
+                    ))
+                .id;
+
+        Future<int> insertAct({
+          required int memId,
+          required DateTime start,
+          String actKind = 'finished',
+        }) =>
+            db.into(db.acts).insert(
+                  ActsCompanion.insert(
+                    memId: memId,
+                    createdAt: createdAt,
+                    start: Value(start),
+                    end: Value(start.add(const Duration(hours: 1))),
+                    actKind: Value(actKind),
+                  ),
+                );
+
+        final oldMemId = await insertMem('old');
+        final dailyMemId = await insertMem('daily');
+        final weeklyMemId = await insertMem('weekly');
+
+        // 日窓の外。この mem ではこれが最新
+        final oldLatestId = await insertAct(
+          memId: oldMemId,
+          start: DateTime(2026, 10, 1, 12),
+        );
+        final todayEarlyId = await insertAct(
+          memId: dailyMemId,
+          start: DateTime(2026, 11, 9, 8),
+        );
+        final todayLateId = await insertAct(
+          memId: dailyMemId,
+          start: DateTime(2026, 11, 9, 9),
+        );
+        // 日窓の中だが skip。件数には入らない。最新なので act の状態には残る
+        final skippedTodayId = await insertAct(
+          memId: dailyMemId,
+          start: DateTime(2026, 11, 9, 11),
+          actKind: 'skipped',
+        );
+        // 日窓の外で、最新でもない
+        final yesterdayId = await insertAct(
+          memId: dailyMemId,
+          start: DateTime(2026, 11, 8, 12),
+        );
+        // 週窓の中で、今日より前
+        final weekInsidePastId = await insertAct(
+          memId: weeklyMemId,
+          start: DateTime(2026, 11, 4, 15),
+        );
+        final weekLatestStart = DateTime(2026, 11, 8, 12);
+        final weekLatestId = await insertAct(
+          memId: weeklyMemId,
+          start: weekLatestStart,
+        );
+        // 週窓の開始より前。最新でもない
+        final weekOutsideId = await insertAct(
+          memId: weeklyMemId,
+          start: DateTime(2026, 11, 1, 12),
+        );
+
+        Target countTarget(int memId, Period period) => Target(
+              memId: memId,
+              targetType: TargetType.equalTo,
+              targetUnit: TargetUnit.count,
+              value: actsInsideWindow,
+              period: period,
+            );
+
+        container.read(memEntitiesProvider.notifier).upsert([
+          savedMem(
+            id: oldMemId,
+            name: 'old',
+            createdAt: createdAt,
+            updatedAt: createdAt,
+            target: countTarget(oldMemId, Period.aDay),
+          ),
+          savedMem(
+            id: dailyMemId,
+            name: 'daily',
+            createdAt: createdAt,
+            updatedAt: createdAt,
+            target: countTarget(dailyMemId, Period.aDay),
+          ),
+          savedMem(
+            id: weeklyMemId,
+            name: 'weekly',
+            createdAt: createdAt,
+            updatedAt: createdAt,
+            latestAct: Act.by(
+              weeklyMemId,
+              startWhen: DateAndTime.from(
+                weekLatestStart,
+                timeOfDay: weekLatestStart,
+              ),
+              endWhen: DateAndTime.from(
+                weekLatestStart.add(const Duration(hours: 1)),
+                timeOfDay: weekLatestStart.add(const Duration(hours: 1)),
+              ),
+            ),
+            target: countTarget(weeklyMemId, Period.aWeek),
+          ),
+        ]);
+
+        final counts = await container
+            .read(actCountsByMemIdByDateProvider(now).notifier)
+            .load();
+
+        expect(
+          container.read(actEntitiesProvider).map((act) => act.id).toSet(),
+          {
+            oldLatestId,
+            todayEarlyId,
+            todayLateId,
+            skippedTodayId,
+            weekInsidePastId,
+            weekLatestId,
+          },
+        );
+        expect(counts, {
+          oldMemId: 0,
+          dailyMemId: actsInsideWindow,
+          weeklyMemId: actsInsideWindow,
+        });
+
+        // act を upsert し直すと build が同じ窓で数え直す
+        container
+            .read(actEntitiesProvider.notifier)
+            .upsert(container.read(actEntitiesProvider));
+        expect(
+          container.read(actCountsByMemIdByDateProvider(now)),
+          {
+            oldMemId: 0,
+            dailyMemId: actsInsideWindow,
+            weeklyMemId: actsInsideWindow,
+          },
+        );
+        expect(
+          container.read(actEntitiesProvider).map((act) => act.id),
+          isNot(contains(yesterdayId)),
+        );
+        expect(
+          container.read(actEntitiesProvider).map((act) => act.id),
+          isNot(contains(weekOutsideId)),
+        );
+      },
+    );
   });
 }

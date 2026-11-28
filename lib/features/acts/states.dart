@@ -3,7 +3,6 @@ import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/acts/client.dart';
 import 'package:mem/features/mems/list/list_period_count.dart';
 import 'package:mem/features/mems/list/period_counts.dart';
-import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/framework/date_and_time/period.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
@@ -241,25 +240,13 @@ class ActCountsByMemIdByDate extends _$ActCountsByMemIdByDate {
   @override
   Map<int, int> build(DateTime date) => v(
         () {
-          final acts = ref.watch(actEntitiesProvider);
           final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
-          final startOfToday = date.atStartOfDay(startOfDay);
-          final endOfToday = startOfToday.shiftCalendarDays(1);
-
-          return acts
-              .where(
-            (act) =>
-                act.value.period != null &&
-                act.value.period!.start!.isAfter(startOfToday) &&
-                act.value.period!.start!.isBefore(endOfToday),
-          )
-              .fold(
-            <int, int>{},
-            (map, act) => map
-              ..putIfAbsent(
-                act.value.memId,
-                () => (map[act.value.memId] ?? 0) + 1,
-              ),
+          return ListPeriodWindows.of(
+            mems: ref.watch(memEntitiesProvider),
+            startOfDay: startOfDay,
+            now: date,
+          ).countsOf(
+            ref.watch(actEntitiesProvider).map((act) => act.value),
           );
         },
         {'date': date},
@@ -269,26 +256,35 @@ class ActCountsByMemIdByDate extends _$ActCountsByMemIdByDate {
         () async {
           if (_loaded) return state;
 
-          final now = DateTime.now();
           final startOfDay = ref.read(preferenceProvider(startOfDayKey));
-
           final mems = ref.read(memEntitiesProvider);
           if (mems.isEmpty) return <int, int>{};
 
-          final periodCountByMemId = await ListPeriodWindows.of(
-            mems: [
-              for (final mem in mems)
-                if (mem.target?.secondsAfterLastAct != null) mem,
-            ],
+          final windows = ListPeriodWindows.of(
+            mems: mems,
             startOfDay: startOfDay,
-            now: now,
-          ).counts();
-          // FIXME actsを更新する
+            now: date,
+          );
+          final windowActs = await windows.fetchActs();
+          final latestByMemId =
+              await ActQueryService().fetchLatestActsByMemIds(
+            mems.map((mem) => mem.id),
+          );
+          final actsById = <int, ActEntity>{
+            for (final act in windowActs) act.id: act,
+            for (final act in latestByMemId.values) act.id: act,
+          };
+
+          ref.read(actEntitiesProvider.notifier).upsert([
+            for (final act in actsById.values)
+              SavedActEntityV1.fromEntityV2(act),
+          ]);
 
           _loaded = true;
-          state = periodCountByMemId;
-
-          return periodCountByMemId;
+          state = windows.countsOf(
+            ref.read(actEntitiesProvider).map((act) => act.value),
+          );
+          return state;
         },
         {'date': date},
       );

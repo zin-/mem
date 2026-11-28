@@ -4,7 +4,6 @@ import 'package:drift/drift.dart' as drift;
 import 'package:mem/databases/child_fk_cascade.dart';
 import 'package:mem/databases/database.dart' as drift_schema;
 import 'package:mem/databases/table_definitions/mems.dart';
-import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
@@ -696,12 +695,13 @@ class MemRepository extends DriftRepository {
   }
 
   Future<List<MemEntity>> _attachLatestActs(List<MemEntity> mems) async {
-    final latestByMemId = await _latestActRowsByMemId(mems.map((m) => m.id));
+    final latestByMemId = await ActQueryService()
+        .fetchLatestActsByMemIds(mems.map((mem) => mem.id));
     final withLatest = mems.map((m) {
-      final row = latestByMemId[m.id];
-      if (row == null) return m;
+      final latest = latestByMemId[m.id];
+      if (latest == null) return m;
       return m.updatedWith(
-        latestAct: () => ActEntity.fromTuple(row).toDomain(),
+        latestAct: () => latest.toDomain(),
       );
     }).toList();
     return _attachScheduleAnchorsForSkippedOnly(withLatest);
@@ -727,56 +727,6 @@ class MemRepository extends DriftRepository {
         scheduleAnchorAct: () => anchor.toDomain(),
       );
     }).toList();
-  }
-
-  Future<Map<int, drift_schema.Act>> _latestActRowsByMemId(
-    Iterable<int> memIds,
-  ) async {
-    final list = memIds.toSet().toList();
-    final out = <int, drift_schema.Act>{};
-    for (var i = 0; i < list.length; i += _latestActPerMemChunkSize) {
-      final end = math.min(i + _latestActPerMemChunkSize, list.length);
-      final chunk = list.sublist(i, end);
-      for (final entry in (await _selectLatestActsChunk(chunk)).entries) {
-        out[entry.key] = entry.value;
-      }
-    }
-    return out;
-  }
-
-  Future<Map<int, drift_schema.Act>> _selectLatestActsChunk(
-    List<int> memIdsChunk,
-  ) async {
-    final placeholders = List.filled(memIdsChunk.length, '?').join(',');
-    final vars = <drift.Variable<Object>>[
-      ...memIdsChunk.map((id) => drift.Variable<int>(id)),
-    ];
-
-    final sql = '''
-WITH ranked AS (
-  SELECT
-    id AS id,
-    mem_id AS mem_id,
-    ROW_NUMBER() OVER (
-      PARTITION BY mem_id
-      ORDER BY COALESCE(start, created_at) DESC, id DESC
-    ) AS _rn
-  FROM acts
-  WHERE mem_id IN ($placeholders)
-)
-SELECT id
-FROM ranked r
-WHERE r._rn = 1
-''';
-
-    final rawRows = await driftDb.customSelect(sql, variables: vars).get();
-    final ids = rawRows.map((row) => row.read<int>('id')).toList();
-    if (ids.isEmpty) return {};
-
-    final acts = await (driftDb.select(driftDb.acts)
-          ..where((t) => t.id.isIn(ids)))
-        .get();
-    return {for (final a in acts) a.memId: a};
   }
 
   MemRepository._();

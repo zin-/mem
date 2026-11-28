@@ -81,4 +81,23 @@ class ListPeriodWindows {
     }
     return ListPeriodWindows._(byWindow.values.toList());
   }
+
+  Map<int, int> countsOf(Iterable<Act> acts) {
+    final periodByMemId = <int, DateAndTimePeriod>{
+      for (final group in groups)
+        for (final memId in group.memIds) memId: group.period,
+    };
+    final counts = {
+      for (final memId in periodByMemId.keys) memId: 0,
+    };
+    for (final act in acts) {
+      if (act.isSkipped) continue;
+      final period = periodByMemId[act.memId];
+      if (period == null) continue;
+      final start = act.period?.start;
+      if (start == null || !period.includesStart(start)) continue;
+      counts[act.memId] = counts[act.memId]! + 1;
+    }
+    return counts;
+  }
 }
